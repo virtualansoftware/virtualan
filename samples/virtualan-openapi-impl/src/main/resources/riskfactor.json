@@ -1,0 +1,40 @@
+[
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets",
+    "type": "Response",
+    "method": "POST",
+    "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "availableParams": [],
+    "headerParams": [],
+    "resource": "pets"
+  },
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "400",
+    "url": "/pets",
+    "type": "Rule",
+    "method": "POST",
+    "rule": "input.id == 0",
+    "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 0,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"code\": \"PET_1000\",\n  \"message\": \"Should not be 0\"\n}",
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": null,
+    "resource": "pets"
+  },
+  {
+    "httpStatusCode": "200",
+    "url": "/riskfactor/compute",
+    "type": "Script",
+    "priority": 0,
+    "method": "POST",
+    "input": "{\n  \"birthday\" : \"1918-10-24\",\n  \"postalCode\" : \"60563\"\n}",
+    "rule": "import java.time.*\n\ndef executeScript(mockServiceRequest, responseObject) {\n    int age = getAge(mockServiceRequest.getInput().getBirthday());\n    String postalCode = mockServiceRequest.getInput().getPostalCode();\n    int riskFactor = computeRiskFactor(age, postalCode);\n    responseObject.setHttpStatusCode(\"200\");\n    responseObject.setOutput(String.valueOf(riskFactor));\n    return responseObject.builder();\n}\n\ndef getAge(birthday) {\n    LocalDate now = LocalDate.now();\n    return Period.between(birthday, now).getYears();\n}\n\ndef computeRiskFactor(age, postalCode) {\n    int ageGroupRiskFactor = computeAgeGroupRiskFactor(age);\n    int localityRiskFactor = computeLocalityRiskFactor(postalCode);\n    return (ageGroupRiskFactor + localityRiskFactor) / 2;\n}\n\ndef computeAgeGroupRiskFactor(age) {\n    if(age > 90) {\n        return 100;\n    } else if(age > 70) {\n        return 90;\n    } else if(age > 60) {\n        return 70;\n    } else if(age > 50) {\n        return 60;\n    } else if(age > 40) {\n        return 50;\n    } else if(age > 25) {\n        return 20;\n    } else {\n        return 40;\n    }\n}\n\ndef  computeLocalityRiskFactor( postalCodeStr) {\n    try{\n\t\tint postalCode = Integer.parseInt(postalCodeStr);\n\t\tif ((postalCode >= 8000 && postalCode < 9000) || (postalCode >= 1000 && postalCode < 2000)) {\n\t\t\treturn 80;\n\t\t} else if (postalCode >= 5000 && postalCode < 6000) {\n\t\t\treturn 10;\n\t\t} else {\n\t\t\treturn 30;\n\t\t}\n\t} catch(NumberFormatException e) {\n\t\t\treturn 0;\n\t\t}\n}",
+    "output": "40",
+    "availableParams": [],
+    "headerParams": []
+  }
+]

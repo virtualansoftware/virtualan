@@ -1,0 +1,1855 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: MIPS API
+  description: |
+    This Swagger documentation describes an API for submitting data to the CMS
+    [Quality Payment Program](http://qpp.cms.gov).
+
+    The endpoints listed below can be accessed via the command line using the URL
+    https://qpp-submissions-sandbox.navapbc.com/{path}.
+
+    The following API allows you to submit three categories of measurements for
+    complying with the Quality Payment Program: Improvement Activities (IA),
+    Advancing Care Information (ACI), and Quality. There are five measurement
+    types: boolean (true/false), proportional (integer numerator & denominator),
+    single performance rate (float numerator & denominator), multi-performance rate
+    (2+ sets of float numerator and denominator), and non-proportion
+    (float numerator & denominator). Single-performance rates,
+    multi-performance rates, and non-proportion measurements can only be
+    submitted for the Quality category. A list of IA, ACI and Quality measures
+    can be found at [qpp-measures-data](https://github.com/CMSgov/qpp-measures-data).
+
+    No authentication or authorization is currently applied to this API. This is
+    a sandbox environment and as such, is subject to data deletion.
+
+    For more information, see
+    [our Developer Documentation](https://cmsgov.github.io/qpp-submissions-docs/), or
+    reach out to us via [email](mailto:QPP@cms.hhs.gov?subject=Interest%20In%20Alpha%20Program).
+schemes:
+- https
+host: ''
+basePath: "/"
+definitions:
+  Id:
+    type: string
+    example: 060eb4b1-1a93-467e-b3eb-0b8518ed4d49
+  TIN:
+    type: string
+    example: 000456789
+  NPI:
+    type: string
+    example: 0876543210
+  Category:
+    type: string
+    enum:
+    - ia
+    - quality
+    - aci
+  SubmissionMethod:
+    type: string
+    enum:
+    - registry
+    - cmsWebInterface
+    - electronicHealthRecord
+    - claims
+    - certifiedSurveyVendor
+    - administrativeClaims
+  SubmitterId:
+    type: string
+    example: 060eb4b1-1a93-467e-b3eb-0b8518ed4d49
+  SubmitterType:
+    type: string
+    example: organization
+  BenchmarkStatus:
+    type: string
+    enum:
+    - historical
+    - current
+    - currentInsufficientData
+  EntityType:
+    type: string
+    enum:
+    - individual
+    - group
+  MeasureSet:
+    type: string
+    enum:
+    - allergyImmunology
+    - anesthesiology
+    - cardiology
+    - dermatology
+    - diagnosticRadiology
+    - electrophysiologyCardiacSpecialist
+    - emergencyMedicine
+    - gastroenterology
+    - generalOncology
+    - generalPracticeFamilyMedicine
+    - generalSurgery
+    - hospitalists
+    - internalMedicine
+    - interventionalRadiology
+    - mentalBehavioralHealth
+    - neurology
+    - obstetricsGynecology
+    - ophthalmology
+    - orthopedicSurgery
+    - otolaryngology
+    - pathology
+    - pediatrics
+    - physicalMedicine
+    - plasticSurgery
+    - preventiveMedicine
+    - radiationOncology
+    - rheumatology
+    - thoracicSurgery
+    - urology
+    - vascularSurgery
+    example: pediatrics
+  MeasureId:
+    type: string
+    example: IA_EPA_4
+  Measurement:
+    xml:
+      name: measurement
+    properties:
+      id:
+        "$ref": "#/definitions/Id"
+      measurementSetId:
+        "$ref": "#/definitions/Id"
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+  BooleanMeasurement:
+    allOf:
+    - "$ref": "#/definitions/Measurement"
+    - type: object
+      properties:
+        value:
+          type: boolean
+          example: true
+        id:
+          type: string
+          example: b24aa2c2-f1ab-4d28-a7a4-882d93e5a31d
+        measurementSetId:
+          type: string
+          example: d2acc2af-8382-402e-aa97-0fd118451b22
+  IABooleanMeasurement:
+    "$ref": "#/definitions/BooleanMeasurement"
+  IABooleanMeasurementToCreate:
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+      value:
+        type: boolean
+        example: true
+  ACIBooleanMeasurement:
+    allOf:
+    - "$ref": "#/definitions/BooleanMeasurement"
+    - type: object
+      properties:
+        measureId:
+          type: string
+          example: ACI_PHCDRR_5
+  ACIBooleanMeasurementToCreate:
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: ACI_PHCDRR_5
+      value:
+        type: boolean
+        example: true
+  ProportionMeasurement:
+    allOf:
+    - "$ref": "#/definitions/Measurement"
+    - type: object
+      properties:
+        value:
+          properties:
+            numerator:
+              type: integer
+              minimum: 0
+              example: 1
+            denominator:
+              type: integer
+              minimum: 0
+              example: 2
+  NonProportionMeasurement:
+    allOf:
+    - "$ref": "#/definitions/Measurement"
+    - type: object
+      properties:
+        value:
+          properties:
+            numerator:
+              type: number
+              minimum: 0
+              example: 1.26
+            denominator:
+              type: number
+              minimum: 0
+              example: 2.91
+            isEndToEndReported:
+              type: boolean
+              example: false
+  MultiPerformanceRateMeasurement:
+    allOf:
+    - "$ref": "#/definitions/Measurement"
+    - type: object
+      properties:
+        value:
+          properties:
+            reportingRate:
+              type: number
+              example: 80
+            performanceRate:
+              type: number
+              example: 100
+            isEndToEndReported:
+              type: boolean
+              example: false
+            strata:
+              type: array
+              items:
+              - "$ref": "#/definitions/PerformanceRateStratum"
+              - "$ref": "#/definitions/AlternativePerformanceRateStratum"
+  SinglePerformanceRateMeasurement:
+    allOf:
+    - "$ref": "#/definitions/Measurement"
+    - type: object
+      properties:
+        value:
+          properties:
+            reportingRate:
+              type: number
+              example: 80
+            performanceRate:
+              type: number
+              example: 50
+            isEndToEndReported:
+              type: boolean
+              example: false
+            performanceMet:
+              type: integer
+              minimum: 0
+              example: 1
+            performanceNotMet:
+              type: integer
+              minimum: 0
+              example: 1
+            eligiblePopulation:
+              type: integer
+              minimum: 0
+              example: 5
+            eligiblePopulationExclusion:
+              type: integer
+              minimum: 0
+              example: 1
+            eligiblePopulationException:
+              type: integer
+              minimum: 0
+              example: 1
+  ACIProportionMeasurement:
+    allOf:
+    - "$ref": "#/definitions/ProportionMeasurement"
+    - type: object
+      properties:
+        measureId:
+          type: string
+          example: ACI_HIE_3
+  ACIProportionMeasurementToCreate:
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: ACI_HIE_3
+      value:
+        properties:
+          numerator:
+            type: integer
+            minimum: 0
+            example: 1
+          denominator:
+            type: integer
+            minimum: 0
+            example: 2
+  PerformanceRateStratum:
+    properties:
+      performanceMet:
+        type: integer
+        example: 2
+      performanceNotMet:
+        type: integer
+        example: 1
+      eligiblePopulation:
+        type: integer
+        example: 10
+      eligiblePopulationException:
+        type: integer
+        example: 1
+      eligiblePopulationExclusion:
+        type: integer
+        example: 2
+      stratum:
+        type: string
+        example: 30days
+  AlternativePerformanceRateStratum:
+    properties:
+      performanceMet:
+        type: integer
+        example: 2
+      performanceNotMet:
+        type: integer
+        example: 1
+      eligiblePopulation:
+        type: integer
+        example: 6
+      eligiblePopulationException:
+        type: integer
+        example: 1
+      eligiblePopulationExclusion:
+        type: integer
+        example: 0
+      stratum:
+        type: string
+        example: overall
+  QualityNonProportionMeasurement:
+    allOf:
+    - "$ref": "#/definitions/NonProportionMeasurement"
+    - type: object
+      properties:
+        measureId:
+          type: string
+          example: ACEP32
+  QualityMultiPerformanceRateMeasurement:
+    allOf:
+    - "$ref": "#/definitions/MultiPerformanceRateMeasurement"
+    - type: object
+      properties:
+        measureId:
+          type: string
+          example: '391'
+  QualitySinglePerformanceRateMeasurement:
+    allOf:
+    - "$ref": "#/definitions/SinglePerformanceRateMeasurement"
+    - type: object
+      properties:
+        measureId:
+          type: string
+          example: 093
+  QualityNonProportionMeasurementToCreate:
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: ACEP32
+      value:
+        properties:
+          numerator:
+            type: number
+            minimum: 0
+            example: 1.26
+          denominator:
+            type: number
+            minimum: 0
+            example: 2.91
+          isEndToEndReported:
+            type: boolean
+            example: false
+  QualityMultiPerformanceRateMeasurementToCreate:
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: '391'
+      value:
+        properties:
+          isEndToEndReported:
+            type: boolean
+            example: false
+          strata:
+            type: array
+            items:
+            - "$ref": "#/definitions/PerformanceRateStratum"
+            - "$ref": "#/definitions/AlternativePerformanceRateStratum"
+  QualitySinglePerformanceRateMeasurementToCreate:
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: 093
+      value:
+        properties:
+          isEndToEndReported:
+            type: boolean
+            example: false
+          performanceMet:
+            type: integer
+            minimum: 0
+            example: 1
+          performanceNotMet:
+            type: integer
+            example: 1
+          eligiblePopulation:
+            type: integer
+            minimum: 0
+            example: 5
+          eligiblePopulationExclusion:
+            type: integer
+            example: 1
+          eligiblePopulationException:
+            type: integer
+            example: 1
+  StandaloneProportionMeasurementToCreate:
+    xml:
+      name: data
+    properties:
+      measurementSetId:
+        "$ref": "#/definitions/Id"
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: ACI_HIE_3
+      value:
+        properties:
+          numerator:
+            type: integer
+            minimum: 0
+            example: 1
+          denominator:
+            type: integer
+            minimum: 0
+            example: 2
+  PerformanceYear:
+    type: integer
+    example: 2017
+  BenchmarkYear:
+    type: integer
+    example: 2015
+  StartDate:
+    type: string
+    example: '2017-01-01'
+  EndDate:
+    type: string
+    example: '2017-06-01'
+  ProgramName:
+    type: string
+    enum:
+    - mips
+    - cpcPlus
+    default: mips
+    example: cpcPlus
+  PracticeId:
+    type: string
+    example: G1234
+  DateTime:
+    type: string
+    example: '2017-11-16T06:43:32.000Z'
+  ScoreValue:
+    type: number
+    example: 20
+  Decile:
+    type: number
+    example: 64.45
+  Deciles:
+    xml:
+      name: deciles
+    type: array
+    items:
+    - "$ref": "#/definitions/Decile"
+      example: 0
+    - "$ref": "#/definitions/Decile"
+      example: 53.85
+    - "$ref": "#/definitions/Decile"
+      example: 64.75
+    - "$ref": "#/definitions/Decile"
+      example: 70.91
+    - "$ref": "#/definitions/Decile"
+      example: 86.69
+    - "$ref": "#/definitions/Decile"
+      example: 89.32
+    - "$ref": "#/definitions/Decile"
+      example: 92.91
+    - "$ref": "#/definitions/Decile"
+      example: 96.55
+    - "$ref": "#/definitions/Decile"
+      example: 98.68
+  InverseDeciles:
+    xml:
+      name: inversedeciles
+    type: array
+    items:
+    - "$ref": "#/definitions/Decile"
+      example: 100
+    - "$ref": "#/definitions/Decile"
+      example: 84.53
+    - "$ref": "#/definitions/Decile"
+      example: 71.34
+    - "$ref": "#/definitions/Decile"
+      example: 57.45
+    - "$ref": "#/definitions/Decile"
+      example: 45.21
+    - "$ref": "#/definitions/Decile"
+      example: 34.82
+    - "$ref": "#/definitions/Decile"
+      example: 24.91
+    - "$ref": "#/definitions/Decile"
+      example: 15.39
+    - "$ref": "#/definitions/Decile"
+      example: 7.77
+  IAMeasurements:
+    xml:
+      name: measurement
+    type: array
+    items:
+    - "$ref": "#/definitions/IABooleanMeasurement"
+  ACIMeasurements:
+    xml:
+      name: measurement
+    type: array
+    items:
+    - "$ref": "#/definitions/ACIBooleanMeasurement"
+    - "$ref": "#/definitions/ACIProportionMeasurement"
+  QualityMeasurements:
+    xml:
+      name: measurement
+    type: array
+    items:
+    - "$ref": "#/definitions/QualityMultiPerformanceRateMeasurement"
+    - "$ref": "#/definitions/QualitySinglePerformanceRateMeasurement"
+    - "$ref": "#/definitions/QualityNonProportionMeasurement"
+  ReturnedACIMeasurements:
+    properties:
+      startIndex:
+        type: number
+        example: 0
+      itemsPerPage:
+        type: number
+        example: 10
+      measurements:
+        "$ref": "#/definitions/ACIMeasurements"
+  ReturnedMeasurementSet:
+    properties:
+      id:
+        "$ref": "#/definitions/Id"
+      submissionId:
+        "$ref": "#/definitions/Id"
+      submissionMethod:
+        "$ref": "#/definitions/SubmissionMethod"
+      submitterId:
+        "$ref": "#/definitions/SubmitterId"
+      submitterType:
+        "$ref": "#/definitions/SubmitterType"
+      performanceStart:
+        "$ref": "#/definitions/StartDate"
+      performanceEnd:
+        "$ref": "#/definitions/EndDate"
+      category:
+        "$ref": "#/definitions/Category"
+      programName:
+        "$ref": "#/definitions/ProgramName"
+      practiceId:
+        "$ref": "#/definitions/PracticeId"
+  ReturnedIAMeasurementSet:
+    xml:
+      name: measurementSet
+    allOf:
+    - "$ref": "#/definitions/ReturnedMeasurementSet"
+    - type: object
+      properties:
+        category:
+          "$ref": "#/definitions/Category"
+          example: ia
+        measurements:
+          "$ref": "#/definitions/IAMeasurements"
+  ReturnedACIMeasurementSet:
+    xml:
+      name: measurementSet
+    allOf:
+    - "$ref": "#/definitions/ReturnedMeasurementSet"
+    - type: object
+      properties:
+        category:
+          "$ref": "#/definitions/Category"
+          example: aci
+        measurements:
+          "$ref": "#/definitions/ACIMeasurements"
+  ReturnedQualityMeasurementSet:
+    xml:
+      name: measurementSet
+    allOf:
+    - "$ref": "#/definitions/ReturnedMeasurementSet"
+    - type: object
+      properties:
+        category:
+          "$ref": "#/definitions/Category"
+          example: quality
+        measurements:
+          "$ref": "#/definitions/QualityMeasurements"
+  MeasurementSets:
+    xml:
+      name: measurementSet
+    type: array
+    items:
+    - "$ref": "#/definitions/ReturnedIAMeasurementSet"
+    - "$ref": "#/definitions/ReturnedACIMeasurementSet"
+    - "$ref": "#/definitions/ReturnedQualityMeasurementSet"
+  ReturnedMeasurementSets:
+    properties:
+      startIndex:
+        type: number
+        example: 0
+      itemsPerPage:
+        type: number
+        example: 10
+      measurementSets:
+        "$ref": "#/definitions/MeasurementSets"
+  IAMeasurementsToCreate:
+    xml:
+      name: measurement
+    type: array
+    items:
+    - "$ref": "#/definitions/IABooleanMeasurementToCreate"
+  ACIMeasurementsToCreate:
+    xml:
+      name: measurement
+    type: array
+    items:
+    - "$ref": "#/definitions/ACIProportionMeasurementToCreate"
+    - "$ref": "#/definitions/ACIBooleanMeasurementToCreate"
+  QualityMeasurementsToCreate:
+    xml:
+      name: measurement
+    type: array
+    items:
+    - "$ref": "#/definitions/QualityMultiPerformanceRateMeasurementToCreate"
+    - "$ref": "#/definitions/QualitySinglePerformanceRateMeasurementToCreate"
+    - "$ref": "#/definitions/QualityNonProportionMeasurementToCreate"
+  Benchmark:
+    xml:
+      name: benchmark
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: '193'
+      performanceYear:
+        "$ref": "#/definitions/PerformanceYear"
+      benchmarkYear:
+        "$ref": "#/definitions/BenchmarkYear"
+      submissionMethod:
+        "$ref": "#/definitions/SubmissionMethod"
+      status:
+        "$ref": "#/definitions/BenchmarkStatus"
+      deciles:
+        "$ref": "#/definitions/Deciles"
+  InverseBenchmark:
+    xml:
+      name: inversebenchmark
+    properties:
+      measureId:
+        "$ref": "#/definitions/MeasureId"
+        example: '193'
+      performanceYear:
+        "$ref": "#/definitions/PerformanceYear"
+      benchmarkYear:
+        "$ref": "#/definitions/BenchmarkYear"
+      submissionMethod:
+        "$ref": "#/definitions/SubmissionMethod"
+        example: registry
+      status:
+        "$ref": "#/definitions/BenchmarkStatus"
+      deciles:
+        "$ref": "#/definitions/InverseDeciles"
+  Benchmarks:
+    xml:
+      name: benchmark
+    type: array
+    items:
+    - "$ref": "#/definitions/Benchmark"
+    - "$ref": "#/definitions/InverseBenchmark"
+  ReturnedBenchmarks:
+    properties:
+      startIndex:
+        type: number
+        example: 0
+      itemsPerPage:
+        type: number
+        example: 10
+      benchmarks:
+        "$ref": "#/definitions/Benchmarks"
+  MeasurementSetToCreateOrUpdate:
+    properties:
+      category:
+        "$ref": "#/definitions/Category"
+      submissionMethod:
+        "$ref": "#/definitions/SubmissionMethod"
+      performanceStart:
+        "$ref": "#/definitions/StartDate"
+      performanceEnd:
+        "$ref": "#/definitions/EndDate"
+      programName:
+        "$ref": "#/definitions/ProgramName"
+      practiceId:
+        "$ref": "#/definitions/PracticeId"
+  StandaloneMeasurementSetToCreate:
+    xml:
+      name: data
+    allOf:
+    - "$ref": "#/definitions/MeasurementSetToCreateOrUpdate"
+    properties:
+      submission:
+        "$ref": "#/definitions/SubmissionCompositeKey"
+      measurements:
+        "$ref": "#/definitions/IAMeasurementsToCreate"
+  StandaloneMeasurementSetToUpdate:
+    xml:
+      name: data
+    allOf:
+    - "$ref": "#/definitions/MeasurementSetToCreateOrUpdate"
+    properties:
+      submissionId:
+        "$ref": "#/definitions/Id"
+      measurements:
+        "$ref": "#/definitions/IAMeasurementsToCreate"
+  IAMeasurementSetToCreate:
+    xml:
+      name: data
+    allOf:
+    - "$ref": "#/definitions/MeasurementSetToCreateOrUpdate"
+    properties:
+      measurements:
+        "$ref": "#/definitions/IAMeasurementsToCreate"
+  ACIMeasurementSetToCreate:
+    xml:
+      name: data
+    allOf:
+    - "$ref": "#/definitions/MeasurementSetToCreateOrUpdate"
+    - type: object
+      properties:
+        category:
+          "$ref": "#/definitions/Category"
+          example: aci
+        measurements:
+          "$ref": "#/definitions/ACIMeasurementsToCreate"
+  QualityMeasurementSetToCreate:
+    xml:
+      name: data
+    allOf:
+    - "$ref": "#/definitions/MeasurementSetToCreateOrUpdate"
+    - type: object
+      properties:
+        category:
+          "$ref": "#/definitions/Category"
+          example: quality
+        measurements:
+          "$ref": "#/definitions/QualityMeasurementsToCreate"
+  SubmissionCompositeKey:
+    properties:
+      entityType:
+        "$ref": "#/definitions/EntityType"
+      taxpayerIdentificationNumber:
+        "$ref": "#/definitions/TIN"
+      nationalProviderIdentifier:
+        "$ref": "#/definitions/NPI"
+      performanceYear:
+        "$ref": "#/definitions/PerformanceYear"
+  MeasurementSetsToCreate:
+    xml:
+      name: measurementSet
+    type: array
+    items:
+    - "$ref": "#/definitions/IAMeasurementSetToCreate"
+    - "$ref": "#/definitions/ACIMeasurementSetToCreate"
+    - "$ref": "#/definitions/QualityMeasurementSetToCreate"
+  ReturnedSubmission:
+    properties:
+      id:
+        "$ref": "#/definitions/Id"
+      createdAt:
+        "$ref": "#/definitions/DateTime"
+      updatedAt:
+        "$ref": "#/definitions/DateTime"
+      entityType:
+        "$ref": "#/definitions/EntityType"
+      taxpayerIdentificationNumber:
+        "$ref": "#/definitions/TIN"
+      nationalProviderIdentifier:
+        "$ref": "#/definitions/NPI"
+      performanceYear:
+        "$ref": "#/definitions/PerformanceYear"
+      measurementSets:
+        "$ref": "#/definitions/MeasurementSets"
+  ReturnedSubmissions:
+    properties:
+      startIndex:
+        type: number
+        example: 0
+      itemsPerPage:
+        type: number
+        example: 10
+      totalItems:
+        type: number
+        example: 100
+      submissions:
+        xml:
+          name: submission
+        type: array
+        items:
+          "$ref": "#/definitions/ReturnedSubmission"
+  SubmissionToCreateOrValidate:
+    xml:
+      name: data
+    properties:
+      entityType:
+        "$ref": "#/definitions/EntityType"
+      taxpayerIdentificationNumber:
+        "$ref": "#/definitions/TIN"
+      nationalProviderIdentifier:
+        "$ref": "#/definitions/NPI"
+      performanceYear:
+        "$ref": "#/definitions/PerformanceYear"
+      measurementSets:
+        "$ref": "#/definitions/MeasurementSetsToCreate"
+  ScorePart:
+    properties:
+      name:
+        type: string
+        example: ia_part
+      title:
+        type: string
+        example: Improvement Activities Component
+      value:
+        "$ref": "#/definitions/ScoreValue"
+      detail:
+        type: string
+        example: Original 80, weighted down to 40
+      original:
+        properties:
+          name:
+            type: string
+            example: ia_final
+          title:
+            type: string
+            example: Improvement Activities Score
+          value:
+            "$ref": "#/definitions/ScoreValue"
+          parts:
+            type: array
+            items:
+              properties:
+                name:
+                  type: string
+                  example: ia_component_1
+                value:
+                  "$ref": "#/definitions/ScoreValue"
+  ReturnedSubmissionScore:
+    properties:
+      score:
+        properties:
+          name:
+            type: string
+            example: final
+          title:
+            type: string
+            example: Final score
+          value:
+            "$ref": "#/definitions/ScoreValue"
+          detail:
+            type: string
+            example: A message
+          parts:
+            type: array
+            items:
+              "$ref": "#/definitions/ScorePart"
+  IdValidationError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: ValidationError
+          message:
+            type: string
+            example: 'Invalid value for measurement ID: bc48b6f8-b24c-4a15-b6a1-invalid.
+              IDs must be canonical UUIDs.'
+  InvalidFilterError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: BadRequestError
+          message:
+            type: string
+            example: 'Cannot filter by field: invalidFieldToFilter'
+  FilterParamValidationError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: ValidationError
+          message:
+            type: string
+            example: 'Invalid value: 12345 for filter parameter: taxpayerIdentificationNumber'
+  SubmissionNotFoundError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: NotFoundError
+          message:
+            type: string
+            example: 'No submission found for id: bc48b6f8-b24c-4a15-b6a1-b80a9ae4975e'
+  MeasurementSetNotFoundError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: NotFoundError
+          message:
+            type: string
+            example: 'No measurement set found for id: bc48b6f8-b24c-4a15-b6a1-b80a9ae4975e'
+  MeasurementNotFoundError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: NotFoundError
+          message:
+            type: string
+            example: 'No measurement found for id: bc48b6f8-b24c-4a15-b6a1-b80a9ae4975e'
+  MeasurementsForMsetNotFoundError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: NotFoundError
+          message:
+            type: string
+            example: 'No measurements found for measurementSetId: bc48b6f8-b24c-4a15-b6a1-b80a9ae4975e'
+  SubmissionValidationDetail:
+    type: string
+    example: 'field ''measureId'' in Submission.measurementSets[0].measurements[0]
+      is invalid: Invalid value "IA_EPA_0" supplied to /0/measurements/0/measureId:
+      ...'
+  MeasurementSetValidationDetail:
+    type: string
+    example: 'field ''measureId'' in MeasurementSet.measurements[0] is invalid: Invalid
+      value "IA_EPA_0" supplied to /0/measureId: ...'
+  SubmissionValidationError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: ValidationError
+          message:
+            type: string
+            example: Found errors while validating Submission object
+          details:
+            type: array
+            items:
+              "$ref": "#/definitions/SubmissionValidationDetail"
+  DuplicateMeasurementSetError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: DuplicateEntryError
+          message:
+            type: string
+            example: Duplicate entry for key submission_category_method_submitter_type_program_name_practice
+          details:
+            type: array
+            items:
+            - type: object
+              properties:
+                submissionId:
+                  "$ref": "#/definitions/Id"
+  MeasurementSetValidationError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          type:
+            type: string
+            example: ValidationError
+          message:
+            type: string
+            example: Found errors while validating MeasurementSet object
+          details:
+            type: array
+            items:
+              "$ref": "#/definitions/MeasurementSetValidationDetail"
+  MeasurementValidationError:
+    xml:
+      name: root
+    properties:
+      error:
+        type: object
+        properties:
+          message:
+            type: string
+            example: Could not find qpp-measure-data for measureId ACI_HIE_0
+  ConversionError:
+    type: object
+    properties:
+      errors:
+        type: object
+        properties:
+          sourceIdentifier:
+            type: string
+            example: 2017_Sample_QRDA_III_Informative.xml
+          type:
+            type: string
+            example: 'null'
+          message:
+            type: string
+            example: 'null'
+          details:
+            type: array
+            items:
+              "$ref": "#/definitions/ConversionErrorDetail"
+  ConversionErrorDetail:
+    type: object
+    properties:
+      message:
+        type: string
+        example: 'The eCQM (electronic measure id: CMS165v5) requires a denominator
+          exclusion'
+      path:
+        type: string
+        example: "/*[local-name() = 'ClinicalDocument' and namespace-uri() = 'urn:hl7-org:v3']/*[local-name()
+          = 'component' and namespace-uri() = 'urn:hl7-org:v3']/*[local-name() = 'structuredBody'
+          and namespace-uri() = 'urn:hl7-org:v3']/*[local-name() = 'component' and
+          namespace-uri() = 'urn:hl7-org:v3'][2]/*[local-name() = 'section' and namespace-uri()
+          = 'urn:hl7-org:v3']/*[local-name() = 'entry' and namespace-uri() = 'urn:hl7-org:v3'][1]/*[local-name()
+          = 'organizer' and namespace-uri() = 'urn:hl7-org:v3']"
+      value:
+        type: string
+        example: 'null'
+      type:
+        type: string
+        example: 'null'
+produces:
+- application/json
+- application/xml
+- application/vnd.qpp.cms.gov.v1+json
+- application/vnd.qpp.cms.gov.v1+xml
+paths:
+  "/submissions":
+    get:
+      operationId: listSubmissions
+      summary: Lists submissions
+      description: Returns a list containing all matching submissions.
+      tags:
+      - Submissions
+      parameters:
+      - name: qpp-taxpayer-identification-number
+        in: header
+        type: string
+        description: 9-digit taxpayer identification number with no dashes or spaces
+          and beginning with 000
+      - name: nationalProviderIdentifier
+        in: query
+        type: string
+        description: 10-digits with no dashes or spaces and beginning with 0
+      - name: entityType
+        in: query
+        type: string
+        description: "'group' or 'individual'"
+      - name: itemsPerPage
+        in: query
+        type: integer
+        description: the maximum number of rows the response can contain (default
+          10)
+      - name: startIndex
+        in: query
+        type: integer
+        description: the starting index of rows (default 0)
+      responses:
+        '200':
+          description: A list of Submissions
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedSubmissions"
+        '400':
+          description: Invalid filter query
+          schema:
+            "$ref": "#/definitions/InvalidFilterError"
+        '422':
+          description: Error validating filter parameter value
+          schema:
+            "$ref": "#/definitions/FilterParamValidationError"
+    post:
+      operationId: createSubmission
+      summary: Create or updates a submission
+      description: Creates a submission with the provided values if there is no matching
+        TaxpayerId & NationalProviderId & providerYear. If there is a matching submission
+        with those fields, the provided measurementSet will be appended to the existing
+        submission if the existing submission does not have an existing measurementSet
+        which has the same category and submissionType as the provided measurementSet.
+      tags:
+      - Submissions
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: submission
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/SubmissionToCreateOrValidate"
+      responses:
+        '201':
+          description: The created Submission object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  submission:
+                    "$ref": "#/definitions/ReturnedSubmission"
+        '422':
+          description: Duplicate Measurement Set
+          schema:
+            "$ref": "#/definitions/DuplicateMeasurementSetError"
+  "/submissions/{id}":
+    get:
+      operationId: getSubmissionById
+      summary: Gets a single submission by ID
+      description: Returns a single submission corresponding to the provided ID
+      tags:
+      - Submissions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the Submission to retrieve
+        type: string
+      responses:
+        '200':
+          description: The Submission object corresponding to the given ID
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedSubmission"
+        '404':
+          description: Submission was not found
+          schema:
+            "$ref": "#/definitions/SubmissionNotFoundError"
+        '422':
+          description: Error validating submission ID
+          schema:
+            "$ref": "#/definitions/IdValidationError"
+    put:
+      operationId: updateSubmissionById
+      summary: Updates a single submission
+      description: Updates a single submission with PUT (full-replacement) semantics
+      tags:
+      - Submissions
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the submission to update
+        type: string
+      - name: submission
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/SubmissionToCreateOrValidate"
+      responses:
+        '200':
+          description: The updated Submission object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  submission:
+                    "$ref": "#/definitions/ReturnedSubmission"
+        '404':
+          description: Submission was not found
+          schema:
+            "$ref": "#/definitions/SubmissionNotFoundError"
+        '422':
+          description: Error validating submission object
+          schema:
+            "$ref": "#/definitions/SubmissionValidationError"
+    patch:
+      operationId: patchSubmissionById
+      summary: Updates a single submission
+      description: Updates a single submission with PATCH (delta) semantics
+      tags:
+      - Submissions
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the submission to update
+        type: string
+      - name: submission
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/SubmissionToCreateOrValidate"
+      responses:
+        '200':
+          description: The updated Submission object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  submission:
+                    "$ref": "#/definitions/ReturnedSubmission"
+        '404':
+          description: Submission was not found
+          schema:
+            "$ref": "#/definitions/SubmissionNotFoundError"
+        '422':
+          description: Error validating submission object
+          schema:
+            "$ref": "#/definitions/SubmissionValidationError"
+  "/submissions/{id}/score":
+    get:
+      operationId: getSubmissionScore
+      summary: Get the score for a pre-existing submission
+      description: |
+        Returns the score for the submission corresponding to the provided ID. Uses a [provider profile stub](https://cmsgov.github.io/qpp-submissions-docs/provider-profile) in the sandbox environment.
+
+        **Disclaimer:** Scoring is subject to change, based on periodic policy updates, eligibility reviews, and technical integration developments.
+      tags:
+      - Submissions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the Submission to score
+        type: string
+      responses:
+        '200':
+          description: The score for the associated submission
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedSubmissionScore"
+        '404':
+          description: Submission was not found
+          schema:
+            "$ref": "#/definitions/SubmissionNotFoundError"
+        '422':
+          description: Error validating submission ID
+          schema:
+            "$ref": "#/definitions/IdValidationError"
+  "/submissions/score-preview":
+    post:
+      operationId: scoreSubmission
+      summary: Get the score preview for a submission
+      description: |
+        Returns the score for the submission with the provided values without persisting. Always uses a default provider profile.
+
+        **Disclaimer:** Scoring is subject to change, based on periodic policy updates, eligibility reviews, and technical integration developments.
+      tags:
+      - Submissions
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: submission
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/SubmissionToCreateOrValidate"
+      responses:
+        '200':
+          description: The score for the associated submission
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedSubmissionScore"
+        '422':
+          description: Error validating submission object
+          schema:
+            "$ref": "#/definitions/SubmissionValidationError"
+  "/measurement-sets":
+    get:
+      operationId: listMeasurementSets
+      summary: Lists measurement sets
+      description: Returns a list containing all matching measurement sets.
+      tags:
+      - MeasurementSets
+      parameters:
+      - name: submissionId
+        in: query
+        type: string
+        required: true
+        description: the ID of the Submission which the MeasurementSets belong to
+      - name: submissionMethod
+        in: query
+        type: string
+        description: the submission method of the MeasurementSet, e.g. the CMS web
+          interface
+      - name: itemsPerPage
+        in: query
+        type: integer
+        description: the maximum number of rows the response can contain (default
+          10)
+      - name: startIndex
+        in: query
+        type: integer
+        description: the starting index of rows (default 0)
+      responses:
+        '200':
+          description: A list of measurementSets
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedMeasurementSets"
+        '400':
+          description: Invalid filter query
+          schema:
+            "$ref": "#/definitions/InvalidFilterError"
+        '422':
+          description: Error validating filter parameter value
+          schema:
+            "$ref": "#/definitions/FilterParamValidationError"
+    post:
+      operationId: createMeasurementSet
+      summary: Creates a measurement set
+      description: Creates a measurement set with the provided values. The submission
+        is specified by a submission object containing a composite key of TIN, entityType,
+        performanceYear, and (optionally) NPI for individuals. The submission can
+        also be specified via submissionId.
+      tags:
+      - MeasurementSets
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: measurementSet
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/StandaloneMeasurementSetToCreate"
+      responses:
+        '201':
+          description: The created MeasurementSet object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurementSet:
+                    "$ref": "#/definitions/ReturnedIAMeasurementSet"
+        '422':
+          description: Error validating submission object
+          schema:
+            "$ref": "#/definitions/MeasurementSetValidationError"
+  "/measurement-sets/{id}":
+    get:
+      operationId: getMeasurementSetById
+      summary: Gets a single measurement set by ID
+      description: Returns a single measurement set corresponding to the provided
+        ID
+      tags:
+      - MeasurementSets
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the MeasurementSet to retrieve
+        type: string
+      responses:
+        '200':
+          description: The MeasurementSet object corresponding to the given ID
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurementSet:
+                    "$ref": "#/definitions/ReturnedIAMeasurementSet"
+        '404':
+          description: Measurement set was not found
+          schema:
+            "$ref": "#/definitions/MeasurementSetNotFoundError"
+        '422':
+          description: Error validating measurement set ID
+          schema:
+            "$ref": "#/definitions/MeasurementSetValidationError"
+    put:
+      operationId: updateMeasurementSetById
+      summary: Updates a single measurement set
+      description: Updates a single measurement set with PUT (full-replacement) semantics
+      tags:
+      - MeasurementSets
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the measurement set to update
+        type: string
+      - name: measurementSet
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/StandaloneMeasurementSetToUpdate"
+      responses:
+        '200':
+          description: The updated MeasurementSet object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurementSet:
+                    "$ref": "#/definitions/ReturnedIAMeasurementSet"
+        '404':
+          description: MeasurementSet was not found
+          schema:
+            "$ref": "#/definitions/MeasurementSetNotFoundError"
+        '422':
+          description: Error validating measurement set object
+          schema:
+            "$ref": "#/definitions/MeasurementSetValidationError"
+    patch:
+      operationId: patchMeasurementSetById
+      summary: Updates a single measurement set
+      description: Updates a single measurement set with PATCH (delta) semantics
+      tags:
+      - MeasurementSets
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the measurement set to update
+        type: string
+      - name: measurementSet
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/StandaloneMeasurementSetToUpdate"
+      responses:
+        '200':
+          description: The updated MeasurementSet object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurementSet:
+                    "$ref": "#/definitions/ReturnedIAMeasurementSet"
+        '404':
+          description: MeasurementSet was not found
+          schema:
+            "$ref": "#/definitions/MeasurementSetNotFoundError"
+        '422':
+          description: Error validating measurement set object
+          schema:
+            "$ref": "#/definitions/MeasurementSetValidationError"
+    delete:
+      operationId: deleteMeasurementSetById
+      summary: Deletes a single measurement set by ID
+      description: Deletes a single measurement set corresponding to the provided
+        ID
+      tags:
+      - MeasurementSets
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the MeasurementSet to delete
+        type: string
+      responses:
+        '204':
+          description: Success (No Content)
+        '404':
+          description: Measurement set was not found
+          schema:
+            "$ref": "#/definitions/MeasurementSetNotFoundError"
+        '422':
+          description: Error validating measurement set ID
+          schema:
+            "$ref": "#/definitions/IdValidationError"
+  "/measurements":
+    get:
+      operationId: listMeasurements
+      summary: Lists measurements
+      description: Returns a list containing all matching measurements.
+      tags:
+      - Measurements
+      parameters:
+      - name: measurementSetId
+        in: query
+        type: string
+        required: true
+        description: the ID of the MeasurementSet which the Measurements belong to
+      - name: measureId
+        in: query
+        type: string
+        description: the measureId of the Measurement, e.g. ACI_HIE_3
+      - name: itemsPerPage
+        in: query
+        type: integer
+        description: the maximum number of rows the response can contain (default
+          10)
+      - name: startIndex
+        in: query
+        type: integer
+        description: the starting index of rows (default 0)
+      responses:
+        '200':
+          description: A list of measurements
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedACIMeasurements"
+        '400':
+          description: Invalid filter query
+          schema:
+            "$ref": "#/definitions/InvalidFilterError"
+        '404':
+          description: No measurements found for filter
+          schema:
+            "$ref": "#/definitions/MeasurementsForMsetNotFoundError"
+        '422':
+          description: Error validating filter parameter value
+          schema:
+            "$ref": "#/definitions/FilterParamValidationError"
+    post:
+      operationId: createMeasurement
+      summary: Creates a measurement
+      description: Creates a measurement with the provided values
+      tags:
+      - Measurements
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: measurement
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/StandaloneProportionMeasurementToCreate"
+      responses:
+        '201':
+          description: The created Measurement object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurement:
+                    "$ref": "#/definitions/ACIProportionMeasurement"
+        '422':
+          description: Error validating measurement object
+          schema:
+            "$ref": "#/definitions/MeasurementValidationError"
+  "/measurements/{id}":
+    get:
+      operationId: getMeasurementById
+      summary: Gets a single measurement by ID
+      description: Returns a single measurement corresponding to the provided ID
+      tags:
+      - Measurements
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the Measurement to retrieve
+        type: string
+      responses:
+        '200':
+          description: The Measurement object corresponding to the given ID
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurement:
+                    "$ref": "#/definitions/ProportionMeasurement"
+        '404':
+          description: Measurement was not found
+          schema:
+            "$ref": "#/definitions/MeasurementNotFoundError"
+        '422':
+          description: Error validating measurement ID
+          schema:
+            "$ref": "#/definitions/IdValidationError"
+    put:
+      operationId: putMeasurements
+      summary: Update an existing measurement
+      description: Updates an existing measurement with request body
+      tags:
+      - Measurements
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the Measurement to update
+        type: string
+      - name: measurement
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/StandaloneProportionMeasurementToCreate"
+      responses:
+        '200':
+          description: The updated Measurement object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurement:
+                    "$ref": "#/definitions/ACIProportionMeasurement"
+        '404':
+          description: Measurement was not found
+          schema:
+            "$ref": "#/definitions/MeasurementNotFoundError"
+        '422':
+          description: Error validating measurement object
+          schema:
+            "$ref": "#/definitions/MeasurementValidationError"
+    patch:
+      operationId: patchMeasurements
+      summary: Patch an existing measurement
+      description: Updates an existing measurement with request body
+      tags:
+      - Measurements
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the Measurement to update
+        type: string
+      - name: measurement
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/StandaloneProportionMeasurementToCreate"
+      responses:
+        '200':
+          description: The updated Measurement object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  measurement:
+                    "$ref": "#/definitions/ProportionMeasurement"
+        '404':
+          description: Measurement was not found
+          schema:
+            "$ref": "#/definitions/MeasurementNotFoundError"
+        '422':
+          description: Error validating measurement object
+          schema:
+            "$ref": "#/definitions/MeasurementValidationError"
+    delete:
+      operationId: deleteMeasurementById
+      summary: Deletes a single measurement by ID
+      description: Deletes a single measurement corresponding to the provided ID
+      tags:
+      - Measurements
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: the ID of the Measurement to delete
+        type: string
+      responses:
+        '204':
+          description: Success (No Content)
+        '404':
+          description: Measurement was not found
+          schema:
+            "$ref": "#/definitions/MeasurementNotFoundError"
+        '422':
+          description: Error validating submission ID
+          schema:
+            "$ref": "#/definitions/IdValidationError"
+  "/public/benchmarks":
+    get:
+      operationId: listBenchmarks
+      summary: Lists benchmarks
+      description: Returns a list containing all matching benchmarks.
+      tags:
+      - Public Endpoints
+      parameters:
+      - name: measureId
+        in: query
+        type: string
+        description: the measureId of the quality benchmark, e.g. "193"
+      - name: submissionMethod
+        in: query
+        type: string
+        description: the submission method of the data, e.g. "registry"
+      - name: performanceYear
+        in: query
+        type: integer
+        description: the performance year of the returned benchmarks (default to current
+          reporting period's performance year)
+      - name: itemsPerPage
+        in: query
+        type: integer
+        description: the maximum number of rows the response can contain (default
+          10)
+      - name: startIndex
+        in: query
+        type: integer
+        description: the starting index of rows (default 0)
+      responses:
+        '200':
+          description: A list of benchmarks
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                "$ref": "#/definitions/ReturnedBenchmarks"
+        '400':
+          description: Invalid filter query
+          schema:
+            "$ref": "#/definitions/InvalidFilterError"
+        '422':
+          description: Error validating filter parameter value
+          schema:
+            "$ref": "#/definitions/FilterParamValidationError"
+  "/public/validate-submission":
+    post:
+      operationId: validateSubmission
+      summary: Validate a submission
+      description: |
+        Returns whether a submission is valid, without persisting.
+
+        **Disclaimer:** Validation is subject to change, based on periodic policy updates, eligibility reviews, and technical integration developments.
+      tags:
+      - Public Endpoints
+      consumes:
+      - application/json
+      - application/xml
+      parameters:
+      - name: submission
+        in: body
+        required: true
+        schema:
+          "$ref": "#/definitions/SubmissionToCreateOrValidate"
+      responses:
+        '200':
+          description: Returns the validated submission object
+          schema:
+            xml:
+              name: root
+            properties:
+              data:
+                properties:
+                  submission:
+                    "$ref": "#/definitions/SubmissionToCreateOrValidate"
+        '422':
+          description: Error validating submission object
+          schema:
+            "$ref": "#/definitions/SubmissionValidationError"
+  "/converter":
+    post:
+      operationId: qrda3Convert
+      summary: Converts QRDA3 XML to QPP JSON
+      description: |
+        *Note: This API endpoint is not currently supported in the development preview.*
+        Converts QRDA3 XML to QPP JSON. Provide a QRDA3 XML file as a multipart file. The response body will contain the QPP JSON upon success or error JSON on failure.
+      tags:
+      - Conversion
+      consumes:
+      - multipart/form-data
+      produces:
+      - application/json
+      parameters:
+      - name: file
+        in: formData
+        required: true
+        type: file
+        description: The QRDA3 XML file.
+      responses:
+        '201':
+          description: Successfully converted the QRDA3 XML to QPP JSON which resides
+            in the response body.
+          schema:
+            "$ref": "#/definitions/SubmissionToCreateOrValidate"
+        '422':
+          description: Errors converting the QRDA3 XML to QPP.
+          schema:
+            "$ref": "#/definitions/ConversionError"
+

@@ -1,0 +1,45 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: riskfactor
+  license:
+    name: MIT
+servers:
+  - url: http://riskfactor.io/v1
+paths:
+  /riskfactor/compute:
+    post:
+      summary: riskfactor
+      operationId: riskfactor
+      tags:
+        - riskfactor
+      requestBody:
+        description: riskfactor
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskFactorRequestDto'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskFactorResponseDto"
+components:
+  schemas:
+    RiskFactorRequestDto:
+      type: object
+      properties:
+        birthday:
+          type: string
+          format: date
+        postalCode:
+          type: string
+    RiskFactorResponseDto:
+      type: object
+      properties:
+        riskFactor:
+          type: integer
+          format: int64

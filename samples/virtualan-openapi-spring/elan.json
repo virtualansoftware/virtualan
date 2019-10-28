@@ -1,0 +1,27 @@
+[
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets/",
+    "type": "Response",
+    "method": "POST",
+    "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "availableParams": [],
+    "headerParams": [],
+    "resource": "pets"
+    },
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets/",
+    "type": "Response",
+    "method": "POST",
+    "input": "input.id == 0",
+    "output": "{\n  \"code\": \"PET_1000\",\n  \"message\": \"Should not be 0\"\n}",
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": null,
+    "resource": "pets"
+  }
+]
