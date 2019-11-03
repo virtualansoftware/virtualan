@@ -12,9 +12,9 @@
 	<version>1.2.7-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
-		<connection>scm:git:ssh://git@github.com:elan-venture/virtualan.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/elan-venture/virtualan.git</developerConnection>
-		<url>https://github.com/elan-venture/virtualan.git</url>
+		<connection>scm:git:ssh://git@github.com:virtualansoftware/mapson.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/mapson.git</developerConnection>
+		<url>https://github.com/virtualansoftware/mapson.git</url>
 		<tag>v1.0.0</tag>
 	</scm>
 	<developers>
@@ -26,7 +26,7 @@
 	</developers>
 	<issueManagement>
 		<system>github</system>
-		<url>https://github.com/elan-venture/virtualan.git/virtualan/issues</url>
+		<url>https://github.com/virtualansoftware/mapson/issues</url>
 	</issueManagement>
 	<distributionManagement>
 		<snapshotRepository>
@@ -309,7 +309,7 @@
 				</property>
 			</activation>
 			<modules>
-				<module>test/virtualan-test-data</module>
+				<!--<module>test/virtualan-test-data</module> -->
 				<module>samples/virtualan-openapi-spring</module>
 				<!--<module>samples/virtualan-openapi-cxf</module>
 				<module>samples/virtualan-openapi-spring-mapping</module>-->
