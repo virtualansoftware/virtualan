@@ -31,7 +31,7 @@ public class PetStepDefinition extends PetApiTest {
 
 	@Given("a pet exists with an id of (.*)")
 	public void petExistsById(int id) {
-		request = given().port(80).pathParam("id", id);
+		request = given().port(8080).pathParam("id", id);
 	}
 
 	@When("a user GET the pet by id")
@@ -42,13 +42,13 @@ public class PetStepDefinition extends PetApiTest {
 	@Given("update a pet with given a pet id (\\d+) with input$")
 	public void updatePetData(int petId, Map<String, String> petMap)  {
 		String json = petMap.get("input");
-		request = given().contentType("application/json").port(80).pathParam("id", petId).body(json);
+		request = given().contentType("application/json").port(8080).pathParam("id", petId).body(json);
 	}
 	
 	@Given("create a pet with given input$")
 	public void createPetData(Map<String, String> petMap)  {
 		String json = petMap.get("input");
-		request = given().contentType("application/json").port(80).body(json);
+		request = given().contentType("application/json").port(8080).body(json);
 	}
 	
 	@When("a user POST the pet with id")
@@ -107,7 +107,7 @@ public class PetStepDefinition extends PetApiTest {
 		if(data != null && data.asList(VirtualServiceKeyValue.class) != null) {
 			virtualServiceRequest.setAvailableParams(data.asList(VirtualServiceKeyValue.class));
 		}
-		request = given().port(80).contentType("application/json").body(virtualServiceRequest);
+		request = given().port(8080).contentType("application/json").body(virtualServiceRequest);
 	}
 	
 	@When("tester create the mock data for Pet")
