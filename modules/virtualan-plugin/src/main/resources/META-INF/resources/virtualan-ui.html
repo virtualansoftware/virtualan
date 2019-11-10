@@ -25,7 +25,11 @@
 	sizes="16x16" />
 </head>
 
+<link rel="stylesheet" href="static/thirdparty/highlight/styles/darkula.css">
+
+
 <style type="text/css">
+
 .head-text-black {
 	color: #000 !important;
 	text-shadow: 2px 4px 3px rgba(0, 0, 0, 0.3);;
@@ -351,10 +355,10 @@ json-tree .branch-preview::after {
 	<ui-view></ui-view>
 
 
-
 	<!-- underscore -->
 	<script
 		src="static/thirdparty/underscore.js/1.8.3/underscore-min.js"></script>
+
 
 
 
@@ -381,8 +385,7 @@ json-tree .branch-preview::after {
 	<script data-require="angular-resource@*" data-semver="1.2.5"
 		src="static/thirdparty/angularjs/1.2.5/angular-resource.js"></script>
 	<script data-require="angular-route@*" data-semver="1.2.5"
-		src="static/thirdparty/angularjs/1.2.5/angucd sm
-		cd 		lar-route.js"></script>
+		src="static/thirdparty/angularjs/1.2.5/angular-route.js"></script>
 
 
 	<!-- app -->
@@ -638,8 +641,8 @@ json-tree .branch-preview::after {
 															<label class="head-text-black col-md-2 control-lable"
 																   for="file">Rule: </label>
 															<div class="col-md-7">
-																<input type="text" ng-model="mockRequest.rule" name="rule"
-																	   class="form-control input-sm bk-textarea"> {{mockRequest.rule}}</input>
+																<textarea type="text" ng-model="mockRequest.rule" name="rule"
+																					class="form-control input-sm bk-textarea"> </textarea>
 															</div>
 														</div>
 													</div>
@@ -650,7 +653,7 @@ json-tree .branch-preview::after {
 																   for="file">Groovy Script: </label>
 															<div class="col-md-7">
 														<textarea type="text" ng-model="mockRequest.rule" name="rule"
-																  class="form-control input-sm bk-textarea"> def executeScript(mockServiceRequest) {mockServiceRequest.getInput()}</textarea>
+																  class="form-control input-sm bk-textarea"></textarea>
 															</div>
 														</div>
 													</div>
@@ -1082,8 +1085,12 @@ json-tree .branch-preview::after {
 											</div></td>
 										<td><span ng-bind="mockRequest.operationId"></span></td>
 										<td>
-											<span ng-show="mockRequest.type.toUpperCase() == 'SCRIPT'"
-												  ng-bind="mockRequest.rule"></span>
+											<button type="button" class="btn btn-info btn-sm"
+															ng-show="mockRequest.type.toUpperCase() == 'SCRIPT'"
+															data-toggle="modal"
+															data-target="#groovy-editor"
+															ng-click="ctrl.loadGroovy(mockRequest.rule)">Script!!</button>
+
 											<span ng-show="mockRequest.type.toUpperCase() == 'RULE'"
 													ng-bind="mockRequest.rule"></span>
 													<div class="line-separator"></div>
@@ -1141,6 +1148,44 @@ json-tree .branch-preview::after {
 
 		</div>
 
+		<div class="modal fade" id="groovy-editor" ng-model="groovyEditor">
+			<div class="modal-dialog modal-xl">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<div class="swagger-ui">
+							<div class="topbar">
+								<div class="wrapper">
+									<button type="button" class="close" data-dismiss="modal">
+										<font color="WHITE">&cross;</font>
+									</button>
+									<div class="topbar-wrapper">
+										<a href="#" class="link"><img height="30" width="30"
+																									src="data:image/png;base64,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"
+																									alt="Virtualan"> <span><kbd>Groovy!!!</kbd></span></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-body">
+								<code class="groovy hljs">
+									<pre>
+												{{ ctrl.groovyObj }}
+									</pre>
+								</code>
+						</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+
 		<div class="modal fade" id="load-json" ng-model="loadJson">
 			<div class="modal-dialog modal-xl">
 				<!-- Modal content-->
@@ -1188,3 +1233,10 @@ json-tree .branch-preview::after {
 	<!-- END -->
 
 </body>
+
+<script src="static/thirdparty/highlight/highlight.pack.js"></script>
+<script>hljs.configure({useBR: true});
+
+document.querySelectorAll('code.pre').forEach((block) => {
+  hljs.highlightBlock(block);
+});</script>

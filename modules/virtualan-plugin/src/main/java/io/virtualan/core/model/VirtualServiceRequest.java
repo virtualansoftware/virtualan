@@ -39,7 +39,7 @@ public class VirtualServiceRequest {
     private Class inputObjectType;
     private String outputObjectType;
     private String input;
-    private String rule;
+    private String rule = groovyTemplateObj();
     private String output;
     private List<VirtualServiceKeyValue> availableParams;
     private List<VirtualServiceKeyValue> headerParams;
@@ -97,7 +97,18 @@ public class VirtualServiceRequest {
     public void setResponseType(Map<String, VirtualServiceApiResponse> responseType) {
         this.responseType = responseType;
     }
-    
+
+    public String groovyTemplateObj() {
+        return " def executeScript(mockServiceRequest, responseObject) { \n" +
+            "     int age = getAge(mockServiceRequest.getInput().getBirthday()); \n" +
+            "    String postalCode = mockServiceRequest.getInput().getPostalCode(); \n" +
+            "    int riskFactor = computeRiskFactor(age, postalCode); \n" +
+            "    responseObject.setHttpStatusCode('200'); \n" +
+            "    responseObject.setOutput(String.valueOf(riskFactor)); \n" +
+            "    return responseObject.builder();\n" +
+            " }} \n";
+    }
+
     public String getType() {
         return type;
     }
