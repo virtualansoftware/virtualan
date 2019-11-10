@@ -30,6 +30,13 @@
 
 <style type="text/css">
 
+
+hr.vertical {
+  width: 0px;
+  height: 100%;
+  /* or height in PX */
+}
+
 .head-text-black {
 	color: #000 !important;
 	text-shadow: 2px 4px 3px rgba(0, 0, 0, 0.3);;
@@ -1054,13 +1061,14 @@ json-tree .branch-preview::after {
 									<tr>
 										<th class="head-text-black">ID.</th>
 										<th class="head-text-black">Resource/Verb</th>
-										<th class="head-text-black">HttpStatusCode</th>
-										<th class="head-text-black">Path/QueryParam</th>
+										<th class="head-text-black">Http Code</th>
+										<th class="head-text-black">Params</th>
 										<th class="head-text-black">OperationId</th>
-										<th class="head-text-black">Input/Rule</th>
+										<th class="head-text-black">Script/Rule</th>
+										<th class="head-text-black">Input</th>
 										<th class="head-text-black">Output</th>
 										<th class="head-text-black">HeaderParam</th>
-										<th class="head-text-black">ExcludeList</th>
+										<th class="head-text-black">Excludes</th>
 										<th width="20%"></th>
 									</tr>
 								</thead>
@@ -1079,19 +1087,20 @@ json-tree .branch-preview::after {
 											</div></td>
 										<td><span ng-bind="mockRequest.operationId"></span></td>
 										<td>
+											<span ng-show="mockRequest.type.toUpperCase() == 'RULE'"
+													ng-bind="mockRequest.rule"></span>
 											<button type="button" class="btn btn-info btn-sm"
 															ng-show="mockRequest.type.toUpperCase() == 'SCRIPT'"
 															data-toggle="modal"
 															data-target="#groovy-editor"
 															ng-click="ctrl.loadGroovy(mockRequest.rule)">Script!!</button>
 
-											<span ng-show="mockRequest.type.toUpperCase() == 'RULE'"
-													ng-bind="mockRequest.rule"></span>
-													<div class="line-separator"></div>
-											<button type="button" class="btn btn-info btn-sm"
-												data-toggle="modal" 
-												data-target="#load-json"
-												ng-click="ctrl.loadJson(mockRequest.input)">Request</button>
+										</td>
+										<td>
+															<button type="button" class="btn btn-info btn-sm"
+																	data-toggle="modal"
+																	data-target="#load-json"
+																	ng-click="ctrl.loadJson(mockRequest.input)">Request</button>
 										</td>
 										<td><button type="button" class="btn btn-info btn-sm"
 												data-toggle="modal" data-target="#load-json"
