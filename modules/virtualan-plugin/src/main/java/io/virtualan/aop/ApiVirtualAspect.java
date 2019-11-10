@@ -15,6 +15,7 @@
 
 package io.virtualan.aop;
 
+import io.virtualan.core.VirtualServiceInfo;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -69,7 +70,9 @@ import io.virtualan.custom.message.ResponseException;
 @Component
 public class ApiVirtualAspect {
 
-    private static final Logger log = LoggerFactory.getLogger(ApiVirtualAspect.class);
+
+    private static Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
+
 
     @Autowired
     HttpServletRequest request;
@@ -77,13 +80,7 @@ public class ApiVirtualAspect {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private ObjectMapper getObjectMapper() {
-        objectMapper.findAndRegisterModules();
-        return objectMapper.enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE,
-                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-        // ,DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
-        );
-    }
+
 
     @Autowired
     private VirtualServiceUtil virtualServiceUtil;
@@ -162,13 +159,12 @@ public class ApiVirtualAspect {
                         PathVariable requestParam = (PathVariable) annotation;
                         requestParamName = requestParam.value();
                     } else if (annotation instanceof RequestBody) {
-                        RequestBody requestBody = (RequestBody) annotation;
-                        try {
+                         try {
                             mockServiceRequest.setInputObjectType(Class.forName(
                                     (methodSignature.getParameterTypes()[argIndex]).getName()));
                             mockServiceRequest.setInput(args[argIndex]);
                         } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                             log.error(e.getMessage());
                         }
                         mockServiceRequest.setInput(args[argIndex]);
 
@@ -202,7 +198,7 @@ public class ApiVirtualAspect {
                                 mockServiceRequest.setInput(args[argIndex]);
                             }
                         } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                            log.error(e.getMessage());
                         }
                         break;
                     }
