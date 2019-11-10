@@ -1087,8 +1087,11 @@ json-tree .branch-preview::after {
 											</div></td>
 										<td><span ng-bind="mockRequest.operationId"></span></td>
 										<td>
-											<span ng-show="mockRequest.type.toUpperCase() == 'RULE'"
-													ng-bind="mockRequest.rule"></span>
+											<button type="button" class="btn btn-info btn-sm"
+															ng-show="mockRequest.type.toUpperCase() == 'RULE'"
+															data-toggle="modal"
+															data-target="#groovy-editor"
+															ng-click="ctrl.loadGroovy(mockRequest.rule)">Rule!!</button>
 											<button type="button" class="btn btn-info btn-sm"
 															ng-show="mockRequest.type.toUpperCase() == 'SCRIPT'"
 															data-toggle="modal"
@@ -1172,12 +1175,10 @@ json-tree .branch-preview::after {
 						</div>
 					</div>
 					<div class="modal-body">
-								<code class="groovy hljs">
-									<pre>
-												{{ ctrl.groovyObj }}
-									</pre>
-								</code>
-						</div>
+						<code class="groovy hljs"><pre>
+{{ ctrl.groovyObj }}
+						</pre></code>
+					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 					</div>
@@ -1240,6 +1241,6 @@ json-tree .branch-preview::after {
 <script src="static/thirdparty/highlight/highlight.pack.js"></script>
 <script>hljs.configure({useBR: true});
 
-document.querySelectorAll('code.pre').forEach((block) => {
+document.querySelectorAll('div.code').forEach((block) => {
   hljs.highlightBlock(block);
 });</script>
