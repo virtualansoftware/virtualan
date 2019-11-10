@@ -71,14 +71,28 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     }
 
    self.jsonObj = JSON.parse("{  \"errorCode\": \"____NOT_FOUND\",  \"errorMessage\": \" Missing?????\"}");
+   self.groovyObj = "NO Data ";
+
+    self.copyToClipboard = function(value) {
+      var $temp = $("<input type='hidden'>");
+      $("body").append($temp);
+      $temp.val(JSON.parse(value.toString())).select();
+      document.execCommand("copy");
+      $temp.remove();
+    };
 
     self.loadJson = function (value) {
- 		console.log(value);
- 		self.jsonObj = JSON.parse(value);
- 		self.jsonStr = JSON.parse(value.toString());
-    }; 
+      console.log(value);
+      self.jsonObj = JSON.parse(value);
+      self.jsonStr = JSON.parse(value.toString());
+    };
 
-    
+
+    self.loadGroovy = function (value) {
+      console.log(value);
+      self.groovyObj = value;
+    };
+
     $scope.$watch(self.searchText, function (term) {
       var obj = term;
       self.filterList = $filter('filter')(self.mockRequests, obj);
