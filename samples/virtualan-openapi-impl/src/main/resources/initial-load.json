@@ -36,5 +36,17 @@
     "output": "40",
     "availableParams": [],
     "headerParams": []
+  },
+  {
+    "httpStatusCode": "400",
+    "url": "/persons",
+    "type": "Rule",
+    "method": "POST",
+    "input": "{\n  \"dateOfBirth\": \"2008-04-07\",\n  \"firstName\": \"Suki\",\n  \"lastName\": \"Elan\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\"\n  },\n  \"username\": \"elanmathi\"\n}",
+    "rule": "T(java.time.Period).between(input.dateOfBirth, T(java.time.LocalDate).now()).getYears() < 22",
+    "output": "{\n  \"code\": \"DBERR\",\n  \"message\": \"Age Restricted\"\n}",
+    "availableParams": [],
+    "headerParams": [],
+    "resource": "persons"
   }
 ]
