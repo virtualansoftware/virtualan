@@ -1,6 +1,8 @@
 package io.virtualan.message.core;
 
+import io.virtualan.core.model.MockResponse;
 import io.virtualan.core.model.VirtualServiceRequest;
+import io.virtualan.core.util.ReturnMockResponse;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.ListTopicsResult;
@@ -184,7 +186,7 @@ public class MessagingApplication {
 		MessageObject messageObject = new MessageObject();
 		try {
 			messageObject.jsonObject = (JSONObject) new JSONTokener((message.getPayload().toString())).nextValue();
-			messageObject.outboundTopic = "virtualan-dummy-outbound";
+			//messageObject.outboundTopic = "virtualan-dummy-outbound";
 			messageObject.inboundTopic = message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString();
 			return messageObject;
 		} catch (JSONException e) {
@@ -210,22 +212,20 @@ public class MessagingApplication {
 		return new ResponseMessage() {
 			@Override
 			public MessageObject readResponseMessage(MessageObject messageObject) {
-				
-				if (messageObject.outboundTopic != null) {
 					VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
 					virtualServiceRequest.setInput(messageObject.jsonObject.toString());
 					virtualServiceRequest.setOperationId(messageObject.inboundTopic);
 					virtualServiceRequest.setResource(messageObject.inboundTopic);
-					messageObject.outputMessage =  messageUtil.getMatchingRecord(virtualServiceRequest);
-					if(messageObject.outputMessage == null){
+					ReturnMockResponse response  = messageUtil.getMatchingRecord(virtualServiceRequest);
+					messageObject.outputMessage = response.getMockResponse().getOutput() ;
+					messageObject.outboundTopic =  response.getMockRequest().getMethod();
+					if(messageObject.outputMessage == null || messageObject.outboundTopic == null){
 						log.info("No response configured.." );
 						return null;
 					} else {
-						log.info("Response configured.. :" + messageObject.outputMessage );
+						log.info("Response configured.. with ("+messageObject.outboundTopic+") :" + messageObject.outputMessage );
 						return messageObject;
 					}
-				}
-				return null;
 			}
 		};
 	}
@@ -241,7 +241,7 @@ public class MessagingApplication {
 							.setHeader(KafkaHeaders.TOPIC, messageObject.outboundTopic)
 							.setHeader(KafkaHeaders.MESSAGE_KEY, messageObject.messageKey)
 							.setHeader(KafkaHeaders.PARTITION_ID, 0)
-							.setHeader("X-Virtualan-Header", "Mock service Response")
+							.setHeader("X-Virtualan-Header", "Mock-Service-Response")
 							.build();
 					kafkaTemplate().send(message);
 				}

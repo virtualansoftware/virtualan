@@ -33,7 +33,16 @@ public class MockRequest {
     private String rule;
     private String type;
     private Set excludeSet;
-    
+    private String method;
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     private List<VirtualServiceKeyValue> availableParams;
 
     private List<VirtualServiceKeyValue> headerParams;

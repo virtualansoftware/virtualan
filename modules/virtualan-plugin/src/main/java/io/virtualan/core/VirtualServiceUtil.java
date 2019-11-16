@@ -168,7 +168,7 @@ public class VirtualServiceUtil {
                 mockRequest.setType(mockTransferObject.getType());
                 mockRequest.setExcludeSet(excludeSet);
                 mockRequest.setAvailableParams(mockTransferObject.getAvailableParams());
-
+                mockRequest.setMethod(mockTransferObject.getMethod());
                 final MockResponse mockResponse =
                         new MockResponse(output, mockTransferObject.getHttpStatusCode());
                 mockResponse.setHeaderParams(mockTransferObject.getHeaderParams());
