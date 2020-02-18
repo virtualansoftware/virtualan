@@ -50,7 +50,6 @@ public class MessagingApplication {
 	
 	public static List<NewTopic> topicList = new ArrayList<NewTopic>();
 	
-	
 	@Autowired
 	private MessageUtil messageUtil;
 	
