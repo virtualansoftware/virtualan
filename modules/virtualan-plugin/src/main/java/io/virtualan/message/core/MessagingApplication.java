@@ -1,8 +1,14 @@
 package io.virtualan.message.core;
 
+import io.virtualan.controller.VirtualMessageController;
 import io.virtualan.core.model.MockResponse;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.util.ReturnMockResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.ListTopicsResult;
@@ -11,6 +17,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -38,12 +45,13 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.util.*;
+import springfox.documentation.service.ResponseMessage;
 
 @Configuration
 @EnableIntegration
 @EnableKafka
 @ConditionalOnClass({Kafka.class, IntegrationFlows.class, MessageChannelSpec.class})
-@ConditionalOnResource(resources = {"classpath:application.properties"})
+@ConditionalOnResource(resources = {"classpath:kafka.json"})
 public class MessagingApplication {
 	
 	private static final Logger log = LoggerFactory.getLogger(MessagingApplication.class);
@@ -57,23 +65,44 @@ public class MessagingApplication {
 	private static String bootstrapServers;
 	private static String topicString;
 	static {
-		bootstrapServers = ApplicationProps.getProperty("virtualan.kafka.1.bootstrapServers");
-		topicString = ApplicationProps.getProperty("virtualan.kafka.1.topics");
 		try {
-			Set<String> names = getTopics();
-			for (String topic : topicString.split(",")) {
-				boolean contains = names.contains(topic);
-				if (!contains) {
-					topicList.add(addNewTopic(topic));
+			JSONObject obj =  getJsonObject().optJSONObject(0);
+			if(obj != null ) {
+				bootstrapServers = obj.getString("broker");
+				topicString = obj.getString("topics");
+				Set<String> names = getTopics();
+				for (String topic : topicString.split(",")) {
+					boolean contains = names.contains(topic);
+					if (!contains) {
+						topicList.add(addNewTopic(topic));
+					}
 				}
+				if (topicList != null)
+					addTopic(topicList);
 			}
-			if (topicList != null)
-				addTopic(topicList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+	private static JSONArray getJsonObject() throws Exception {
+		InputStream stream = MessagingApplication.class.getClassLoader()
+				.getResourceAsStream("conf/kafka.json");
+		if (stream != null) {
+			String jmsConfigJson = readString(stream);
+			JSONObject jsonObject = new JSONObject(jmsConfigJson);
+			return jsonObject.optJSONArray("Kafka");
+		}
+		return null;
+	}
+
+	public static String readString(InputStream inputStream) throws IOException {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+			return br.lines().collect(Collectors.joining(System.lineSeparator()));
+		}
+	}
+
+
 	private static AdminClient getAdminClient() {
 		Properties config = new Properties();
 		config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -207,7 +236,7 @@ public class MessagingApplication {
 	}
 	
 	@Bean
-	public ResponseMessage  getResponseMessage() {
+	public ResponseMessage getResponseMessage() {
 		return new ResponseMessage() {
 			@Override
 			public MessageObject readResponseMessage(MessageObject messageObject) {

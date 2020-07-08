@@ -32,16 +32,16 @@ public class OpenAPIDocumentationConfig {
                 .termsOfServiceUrl("").version("1.0.0").contact(new Contact("", "", "")).build();
     }
 
-    @Bean
-    public Docket customImplementation(ServletContext servletContext,
-            @Value("${openapi.openAPIPetstore.base-path:/}") String basePath) {
-        return new Docket(DocumentationType.SWAGGER_2).select()
-                .apis(RequestHandlerSelectors.basePackage("io.virtualan.api")).build()
-                .pathProvider(new BasePathAwareRelativePathProvider(servletContext, basePath))
-                .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
-                .directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
-                .apiInfo(apiInfo());
-    }
+//    @Bean
+//    public Docket customImplementation(ServletContext servletContext,
+//            @Value("${openapi.openAPIPetstore.base-path:/}") String basePath) {
+//        return new Docket(DocumentationType.SWAGGER_2).select()
+//                .apis(RequestHandlerSelectors.basePackage("io.virtualan.api")).build()
+//                .pathProvider(new BasePathAwareRelativePathProvider(servletContext, basePath))
+//                .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
+//                .directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
+//                .apiInfo(apiInfo());
+//    }
 
     class BasePathAwareRelativePathProvider extends RelativePathProvider {
         private String basePath;

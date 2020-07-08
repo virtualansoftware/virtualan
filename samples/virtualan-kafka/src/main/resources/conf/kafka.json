@@ -1,0 +1,8 @@
+{
+  "Kafka" : [
+    {
+      "broker" : "tcp://localhost:61616",
+      "topics": ["virtualan.input", "virtualan-output"]
+    }
+  ]
+}

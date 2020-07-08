@@ -76,6 +76,36 @@ Feature: Test Pet API
     And verify mock response with "mockStatus" includes following in the response
       | code | Mock created successfully |
 
+  Scenario: Setup a mock service for  Pet with GET API
+    Given set Pet Mock data for the following given input
+      | url					| /pets/120	             |
+      | output                | {   "category": {     "id": 110,     "name": "Fish-GET"   },   "id": 110,   "name": "GoldFish-GET",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 110,       "name": "Fish-GET"     }   ] }  |
+      | httpStatusCode	    |   200              |
+      | method                |   GET             |
+      | type                  |   Response        |
+    And set available parameters for the following given input
+      | key   | value | type|
+      | petId |120    | java.lang.Long |
+    When tester create the mock data for Pet
+    Then verify the status code is 201
+    And verify mock response with "mockStatus" includes following in the response
+      | code | Mock created successfully |
+
+  Scenario: Setup a mock service for  Pet with GET API
+    Given set Pet Mock data for the following given input
+      | url					| /pets/130	             |
+      | output                | {   "category": {     "id": 110,     "name": "Fish-GET"   },   "id": 110,   "name": "GoldFish-GET",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 110,       "name": "Fish-GET"     }   ] }  |
+      | httpStatusCode	    |   200              |
+      | method                |   GET             |
+      | type                  |   Response        |
+    And set available parameters for the following given input
+      | key   | value | type|
+      | petId |130    | java.lang.Long |
+    When tester create the mock data for Pet
+    Then verify the status code is 201
+    And verify mock response with "mockStatus" includes following in the response
+      | code | Mock created successfully |
+
   Scenario: User calls service to GET a pet by its id
     Given a pet exists with an id of 110
     When a user GET the pet by id
