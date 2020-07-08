@@ -12,10 +12,10 @@
 	<version>1.3.0-SNAPSHOT</version>
 	<url>https://virtualan.io</url>
 	<scm>
-		<connection>scm:git:ssh://git@github.com:virtualansoftware/mapson.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/mapson.git</developerConnection>
-		<url>https://github.com/virtualansoftware/mapson.git</url>
-		<tag>v1.0.0</tag>
+		<connection>scm:git:ssh://git@github.com:virtualansoftware/virtualan.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/virtualan.git</developerConnection>
+		<url>https://github.com/virtualansoftware/virtualan.git</url>
+		<tag>v1.3.0</tag>
 	</scm>
 	<developers>
 		<developer>
