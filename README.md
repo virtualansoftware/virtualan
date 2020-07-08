@@ -64,7 +64,7 @@ Developing  a sprint boot(supports from 2.0.1.RELEASE) REST services using Rest 
 ## [License](#table-of-contents)
 -------
 
-Copyright 2019 Virtualan Contributors (https://virtualan.io)  
+Copyright 2020 Virtualan Contributors (https://virtualan.io)  
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
