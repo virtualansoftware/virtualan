@@ -27,19 +27,19 @@ public class MessageUtil {
 	private VirtualServiceUtil virtualServiceUtil;
 	
 	
-	public String isResponseExists(final Map<Integer, ReturnMockResponse> returnMockResponseMap) throws IOException {
+	public ReturnMockResponse isResponseExists(final Map<Integer, ReturnMockResponse> returnMockResponseMap) throws IOException {
 		final List<ReturnMockResponse> returnMockResponseList =
 				new ArrayList<>(returnMockResponseMap.values());
 		Collections.sort(returnMockResponseList, new BestMatchComparator());
 		System.out.println("Sorted list : " + returnMockResponseList);
 		final ReturnMockResponse rMockResponse = returnMockResponseList.iterator().next();
 		if (rMockResponse != null && rMockResponse.getHeaderResponse() != null && rMockResponse.isExactMatch()) {
-			return rMockResponse.getMockResponse().getOutput();
+			return rMockResponse;
 		}
 		return null;
 	}
 	
-	public String getMatchingRecord(VirtualServiceRequest mockTransferObject) {
+	public  ReturnMockResponse getMatchingRecord(VirtualServiceRequest mockTransferObject) {
 		
 		try {
 			

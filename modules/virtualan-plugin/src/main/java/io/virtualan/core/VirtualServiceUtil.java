@@ -168,7 +168,7 @@ public class VirtualServiceUtil {
                 mockRequest.setType(mockTransferObject.getType());
                 mockRequest.setExcludeSet(excludeSet);
                 mockRequest.setAvailableParams(mockTransferObject.getAvailableParams());
-
+                mockRequest.setMethod(mockTransferObject.getMethod());
                 final MockResponse mockResponse =
                         new MockResponse(output, mockTransferObject.getHttpStatusCode());
                 mockResponse.setHeaderParams(mockTransferObject.getHeaderParams());
@@ -362,7 +362,7 @@ public class VirtualServiceUtil {
                 && mockServiceRequest.getInput() == null) {
             return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
                     mockServiceRequest);
-        } else if (mockServiceRequest.getRule() != null ||mockServiceRequest.getInput() != null) {
+        } else if ("RULE".equalsIgnoreCase(mockServiceRequest.getType()) || mockServiceRequest.getInput() != null) {
             return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
                     mockServiceRequest);
         } else if (mockServiceRequest.getParams() != null
