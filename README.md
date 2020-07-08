@@ -56,7 +56,7 @@ Developing  a sprint boot(supports from 2.0.1.RELEASE) REST services using Rest 
 <div align="center">
 
 [![Join the chat at https://gitter.im/sv-virtualan/virtualan](https://badges.gitter.im/sv-virtualan/virtualan.svg)](https://gitter.im/sv-virtualan/virtualan??utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
-[![Stable releases in the Maven store](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/io/virtualan/virtualan-plugin/maven-metadata.xml.svg)](https://search.maven.org/search?q=g:io.virtualan%20AND%20a:virtualan-plugin)
+[![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/virtualan-plugin.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22virtualan-plugin%22)
 
 </div>
 
