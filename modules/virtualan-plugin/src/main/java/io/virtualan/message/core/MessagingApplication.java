@@ -39,6 +39,7 @@ import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAd
 import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.ConsumerProperties;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -50,7 +51,7 @@ import springfox.documentation.service.ResponseMessage;
 @Configuration
 @EnableIntegration
 @EnableKafka
-@ConditionalOnClass({Kafka.class, IntegrationFlows.class, MessageChannelSpec.class})
+@ConditionalOnClass({ConsumerProperties.class, Kafka.class, IntegrationFlows.class, MessageChannelSpec.class})
 @ConditionalOnResource(resources = {"classpath:kafka.json"})
 public class MessagingApplication {
 	

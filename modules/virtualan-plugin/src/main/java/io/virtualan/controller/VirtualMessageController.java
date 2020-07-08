@@ -3,7 +3,6 @@ package io.virtualan.controller;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.message.core.MessageUtil;
-import io.virtualan.message.core.jms.JMSMessageSender;
 import io.virtualan.service.VirtualService;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -87,15 +86,13 @@ public class VirtualMessageController {
 
   private JSONArray getJsonObject() throws Exception {
     InputStream stream = VirtualMessageController.class.getClassLoader()
-        .getResourceAsStream("conf/kafka.json");
+        .getResourceAsStream("kafka.json");
     if (stream != null) {
       String jmsConfigJson = readString(stream);
       JSONObject jsonObject = new JSONObject(jmsConfigJson);
       return jsonObject.optJSONArray("Kafka");
-    } else {
-      log.warn("ignore this message.. if kafka-mock service message features is not utilized..");
     }
-    return null;
+    return new JSONArray();
   }
 
   public String readString(InputStream inputStream) throws IOException {
