@@ -39,7 +39,7 @@ public class VirtualServiceRequest {
     private Class inputObjectType;
     private String outputObjectType;
     private String input;
-    private String rule = groovyTemplateObj();
+    private String rule;
     private String output;
     private List<VirtualServiceKeyValue> availableParams;
     private List<VirtualServiceKeyValue> headerParams;

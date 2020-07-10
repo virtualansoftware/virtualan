@@ -214,17 +214,19 @@ public interface VirtualServiceInfo {
             for (ApiResponses apiResponses : apiResponsesAnno) {
                 for (ApiResponse apiResponse : apiResponses.value()) {
                     try {
-                        responseType
+                        if(!responseType.containsKey(String.valueOf(apiResponse.code()))) {
+                            responseType
                                 .put(String.valueOf(apiResponse.code()),
-                                        new VirtualServiceApiResponse(
-                                                String.valueOf(apiResponse.code()),
-                                                apiResponse.response().getCanonicalName(),
-                                                getObjectMapper().writerWithDefaultPrettyPrinter()
-                                                        .writeValueAsString(Class
-                                                                .forName(apiResponse.response()
-                                                                        .getCanonicalName())
-                                                                .newInstance()),
-                                                apiResponse.message()));
+                                    new VirtualServiceApiResponse(
+                                        String.valueOf(apiResponse.code()),
+                                        apiResponse.response().getCanonicalName(),
+                                        getObjectMapper().writerWithDefaultPrettyPrinter()
+                                            .writeValueAsString(Class
+                                                .forName(apiResponse.response()
+                                                    .getCanonicalName())
+                                                .newInstance()),
+                                        apiResponse.message()));
+                        }
                     } catch (Exception e) {
                         responseType.put(String.valueOf(apiResponse.code()),
                                 new VirtualServiceApiResponse(String.valueOf(apiResponse.code()),

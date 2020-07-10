@@ -26,14 +26,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 
 import io.virtualan.core.model.MockResponse;
 import io.virtualan.core.model.MockServiceRequest;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
-import io.virtualan.message.core.ApplicationProps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +41,6 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.SpelParseException;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,11 +50,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.virtualan.api.ApiType;
 import io.virtualan.core.InvalidMockResponseException;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
@@ -128,10 +119,6 @@ public class VirtualServiceController {
     public VirtualServiceInfo getVirtualServiceInfo() {
         return virtualServiceUtil.getVirtualServiceInfo();
     }
-
-    
-
-   
 
     @Value("${virtualan.application.name:Mock Service}")
     private String applicationName;

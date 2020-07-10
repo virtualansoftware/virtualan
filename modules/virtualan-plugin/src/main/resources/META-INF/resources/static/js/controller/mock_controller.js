@@ -81,6 +81,34 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       $temp.remove();
     };
 
+    self.isEmpty = function (value) {
+      console.log(value=== null)
+      return value=== null
+    };
+
+    self.loadDefaultRule = function(type, value) {
+     if(type =="SCRIPT") {
+       if (value != null ) {
+          return value;
+       } else {
+          return " def executeScript(mockServiceRequest, responseObject) { " +
+            "     int age = getAge(mockServiceRequest.getInput().getBirthday()); " +
+            "    String postalCode = mockServiceRequest.getInput().getPostalCode(); " +
+            "    int riskFactor = computeRiskFactor(age, postalCode); " +
+            "    responseObject.setHttpStatusCode('200'); " +
+            "    responseObject.setOutput(String.valueOf(riskFactor)); " +
+            "    return responseObject.builder();" +
+            " }} ";
+          }
+        } else if(type =="RULE") {
+           if (value != null ) {
+              return value;
+           } else {
+              return " T(java.time.Period).between(input.dateOfBirth, T(java.time.LocalDate).now()).getYears() < 22 ";
+              }
+        }
+    }
+
     self.loadJson = function (value) {
       console.log(value);
       self.jsonObj = JSON.parse(value);

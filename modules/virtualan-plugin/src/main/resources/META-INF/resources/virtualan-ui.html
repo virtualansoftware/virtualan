@@ -556,7 +556,7 @@ json-tree .branch-preview::after {
 																		ng-options="httpStatus as (httpStatus + ' - ' + name)   for (httpStatus, name) in mockRequest.httpStatusMap"
 																		required></select>  &nbsp;&nbsp;&nbsp;&nbsp;
 
-																	<select ng-model="mockRequest.type"
+																	<select ng-model="mockRequest.type" onchange="ctrl.loadDefaultRule(mockRequest.type, mockRequest.rule)"
 																			required>
 																		<option id="RESPONSE" selected>Response</option>
 																		<option id="RULE">Rule</option>
@@ -1096,13 +1096,14 @@ json-tree .branch-preview::after {
 									</td>
 									<td>
 										<button type="button" class="btn btn-info btn-sm"
+														ng-show="ctrl.isEmpty(mockRequest.input) == false "
 														data-toggle="modal"
 														data-target="#load-json"
 														ng-click="ctrl.loadJson(mockRequest.input)">Request</button>
 									</td>
 									<td><button type="button" class="btn btn-info btn-sm"
 															data-toggle="modal" data-target="#load-json"
-															ng-show="mockRequest.output != null"
+															ng-show="ctrl.isEmpty(mockRequest.output) == false "
 															ng-click="ctrl.loadJson(mockRequest.output)">Response</button>
 									</td>
 									<td><div
