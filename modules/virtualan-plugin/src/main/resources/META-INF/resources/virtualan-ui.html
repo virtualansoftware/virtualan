@@ -556,7 +556,7 @@ json-tree .branch-preview::after {
 																		ng-options="httpStatus as (httpStatus + ' - ' + name)   for (httpStatus, name) in mockRequest.httpStatusMap"
 																		required></select>  &nbsp;&nbsp;&nbsp;&nbsp;
 
-																	<select ng-model="mockRequest.type" onchange="ctrl.loadDefaultRule(mockRequest.type, mockRequest.rule)"
+																	<select ng-model="mockRequest.type" ng-click="mockRequest.rule = ctrl.loadDefaultRule(mockRequest.type, mockRequest.rule)"
 																			required>
 																		<option id="RESPONSE" selected>Response</option>
 																		<option id="RULE">Rule</option>

@@ -28,11 +28,11 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.viewby = 5;
     self.perPage = 5;
     self.maxSize = 5;
-	self.prettyJson = '';
-	self.treeJson = '';
-	self.appName = "Virtualan!!";
-	getAppName();
-	loadAllMockRequest();
+    self.prettyJson = '';
+    self.treeJson = '';
+    self.appName = "Virtualan!!";
+    getAppName();
+    loadAllMockRequest();
     loadAllTopics();
 
     self.isNotEmpty = function() {
@@ -82,35 +82,29 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     };
 
     self.isEmpty = function (value) {
-      console.log(value=== null)
-      return value=== null
+      return value === null
     };
 
     self.loadDefaultRule = function(type, value) {
-     if(type =="SCRIPT") {
-       if (value != null ) {
-          return value;
-       } else {
-          return " def executeScript(mockServiceRequest, responseObject) { " +
-            "     int age = getAge(mockServiceRequest.getInput().getBirthday()); " +
-            "    String postalCode = mockServiceRequest.getInput().getPostalCode(); " +
-            "    int riskFactor = computeRiskFactor(age, postalCode); " +
-            "    responseObject.setHttpStatusCode('200'); " +
-            "    responseObject.setOutput(String.valueOf(riskFactor)); " +
-            "    return responseObject.builder();" +
-            " }} ";
+     if(type.toUpperCase() === 'SCRIPT') {
+       if (value == null ) {
+        return  " def executeScript(mockServiceRequest, responseObject) { \n" +
+            "     int age = getAge(mockServiceRequest.getInput().getBirthday()); \n" +
+            "    String postalCode = mockServiceRequest.getInput().getPostalCode(); \n" +
+            "    int riskFactor = computeRiskFactor(age, postalCode); \n" +
+            "    responseObject.setHttpStatusCode('200'); \n" +
+            "    responseObject.setOutput(String.valueOf(riskFactor)); \n" +
+            "    return responseObject.builder(); \n" +
+            " }} \n";
           }
-        } else if(type =="RULE") {
-           if (value != null ) {
-              return value;
-           } else {
+        } else if(type.toUpperCase() === 'RULE') {
+           if (value == null ) {
               return " T(java.time.Period).between(input.dateOfBirth, T(java.time.LocalDate).now()).getYears() < 22 ";
-              }
+           }
         }
     }
 
     self.loadJson = function (value) {
-      console.log(value);
       self.jsonObj = JSON.parse(value);
       self.jsonStr = JSON.parse(value.toString());
     };
