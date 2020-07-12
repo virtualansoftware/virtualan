@@ -1,0 +1,37 @@
+[
+  {
+    "url": "/employees/{employeeId}",
+    "type": "Script",
+    "rule": "import com.mongodb.*\n\ndef executeScript(mockServiceRequest, responseObject) { \n\n\tMongoClient mongoClient = new MongoClient(new ServerAddress(\"localhost\", 27017));\n\tDB db = mongoClient.getDB(\"virtualan-mongo\");\n\tDBCollection coll = db.getCollection(\"employee\"); \n\t int id = mockServiceRequest.getParam(\"employeeId\").get().toInteger();\n\n        /**** Find and display ****/\n\tBasicDBObject searchQuery2 = new BasicDBObject().append(\"id\", id);\n\n\tDBCursor cursor2 = coll.find(searchQuery2);\n\n\tresponseObject.setHttpStatusCode('200'); \n\t\n\tif (cursor2.hasNext()) {\n\t       responseObject.setOutput(cursor2.next().toString()); \n    }\n\treturn responseObject.builder(); \n}",
+    "output": "{\n  \"gender\": \"Male\",\n  \"id\": 1,\n  \"name\": \"Suki\"\n}",
+    "excludeList": null,
+    "httpStatusCode": "200",
+    "method": "GET",
+    "availableParams": [
+      {
+        "key": "employeeId",
+        "parameterType": "PATH_PARAM"
+      }
+    ]
+  },
+  {
+    "httpStatusCode": "200",
+    "url": "/riskfactor/compute",
+    "type": "Script",
+    "priority": 0,
+    "method": "POST",
+    "input": "{\n  \"birthday\" : \"1918-10-24\",\n  \"postalCode\" : \"60563\"\n}",
+    "rule": "import java.time.*\n\ndef executeScript(mockServiceRequest, responseObject) {\n    int age = getAge(mockServiceRequest.getInput().getBirthday());\n    String postalCode = mockServiceRequest.getInput().getPostalCode();\n    int riskFactor = computeRiskFactor(age, postalCode);\n    responseObject.setHttpStatusCode(\"200\");\n    responseObject.setOutput(String.valueOf(riskFactor));\n    return responseObject.builder();\n}\n\ndef getAge(birthday) {\n    LocalDate now = LocalDate.now();\n    return Period.between(birthday, now).getYears();\n}\n\ndef computeRiskFactor(age, postalCode) {\n    int ageGroupRiskFactor = computeAgeGroupRiskFactor(age);\n    int localityRiskFactor = computeLocalityRiskFactor(postalCode);\n    return (ageGroupRiskFactor + localityRiskFactor) / 2;\n}\n\ndef computeAgeGroupRiskFactor(age) {\n    if(age > 90) {\n        return 100;\n    } else if(age > 70) {\n        return 90;\n    } else if(age > 60) {\n        return 70;\n    } else if(age > 50) {\n        return 60;\n    } else if(age > 40) {\n        return 50;\n    } else if(age > 25) {\n        return 20;\n    } else {\n        return 40;\n    }\n}\n\ndef  computeLocalityRiskFactor( postalCodeStr) {\n    try{\n\t\tint postalCode = Integer.parseInt(postalCodeStr);\n\t\tif ((postalCode >= 8000 && postalCode < 9000) || (postalCode >= 1000 && postalCode < 2000)) {\n\t\t\treturn 80;\n\t\t} else if (postalCode >= 5000 && postalCode < 6000) {\n\t\t\treturn 10;\n\t\t} else {\n\t\t\treturn 30;\n\t\t}\n\t} catch(NumberFormatException e) {\n\t\t\treturn 0;\n\t\t}\n}",
+    "output": "40"
+  },
+  {
+    "url": "/employees",
+    "type": "Script",
+    "rule": "import com.mongodb.*\n\ndef executeScript(mockServiceRequest, responseObject) { \n\n\tMongoClient mongoClient = new MongoClient(new ServerAddress(\"localhost\", 27017));\n\tDB db = mongoClient.getDB(\"virtualan-mongo\");\n\tDBCollection coll = db.getCollection(\"employee\"); \n \n\n\tString name = mockServiceRequest.getInput().getName();\n\tString gender = mockServiceRequest.getInput().getGender();\n\tint id = mockServiceRequest.getInput().getId();\n\tBasicDBObject doc = new BasicDBObject()\n\tdoc.put(\"name\", name)\n\tdoc.put(\"gender\", gender)\n\tdoc.put(\"id\", id)\n\n\tcoll.insert(doc)\n\n\tresponseObject.setHttpStatusCode('201'); \n\tresponseObject.setOutput(\"{\\\"name\\\" :\\\"\"+name+\"\\\", \\\"gender\\\":\\\"\"+gender+\"\\\", \\\"id\\\":\"+id +\"}\"); \n\treturn responseObject.builder(); \n}",
+    "input": "{\n  \"gender\": \"Male\",\n  \"id\": 1,\n  \"name\": \"Suki\"\n}",
+    "output": "{\n  \"gender\": \"Male\",\n  \"id\": 1,\n  \"name\": \"Suki\"\n}",
+    "excludeList": null,
+    "httpStatusCode": "200",
+    "method": "POST"
+  }
+]

@@ -1,0 +1,50 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.2
+  title: XXXX Sample specification
+  description: Sample API
+  contact:
+    name: Test User
+    url: http://api.localhost
+    email: abcd.xyz-xxxxxx@xxxx.ac
+  license:
+    name: No license
+servers:
+  - url: /api
+paths:
+  /riskfactor/compute:
+    post:
+      summary: riskfactor
+      operationId: riskfactor
+      tags:
+        - riskfactor
+      requestBody:
+        description: riskfactor
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskFactorRequestDto'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskFactorResponseDto"
+components:
+  schemas:
+    RiskFactorRequestDto:
+      type: object
+      properties:
+        birthday:
+          type: string
+          format: date
+        postalCode:
+          type: string
+    RiskFactorResponseDto:
+      type: object
+      properties:
+        riskFactor:
+          type: integer
+          format: int64

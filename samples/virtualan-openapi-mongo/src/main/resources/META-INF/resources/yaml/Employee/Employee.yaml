@@ -1,0 +1,98 @@
+openapi: "3.0.3"
+info:
+  version: 0.0.2
+  title: Employee Sample specification
+  description: Employeee API
+  contact:
+    name: Elan Thangamani
+    url: http://virtualan.io
+    email: elan.thangamani@virtualan.io
+  license:
+    name: No license
+servers:
+  - url: /api
+paths:
+  /employees:
+    post:
+      summary: Create a Employee
+      description: Create a new Employee object.
+      operationId: createEmployee
+      tags:
+        - employee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Employee"
+      responses:
+        '201':
+          description: Employee created
+        '400':
+          description: Employee exists already. Choose another name.
+        '405':
+          description: Invalid input.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /employees/{employeeId}:
+    get:
+      summary: The GET Employee
+      operationId: employeeById
+      description: Sample path
+      tags:
+        - employee
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          description: The id of the employee
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+        '400':
+          description: Employee Invalid ID
+        '404':
+          description: Employee not found
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Employee:
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 001
+        name:
+          type: string
+          example: Elan
+        gender:
+          type: string
+          example: 0.0.1
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 404
+        message:
+          type: string
+          example: Unexpected error.

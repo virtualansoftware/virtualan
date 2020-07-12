@@ -16,6 +16,7 @@
 
 package io.virtualan.core.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,8 @@ public class VirtualServiceRequest {
     private String input;
     private String rule;
     private String output;
-    private List<VirtualServiceKeyValue> availableParams;
-    private List<VirtualServiceKeyValue> headerParams;
+    private List<VirtualServiceKeyValue> availableParams = new ArrayList<>();
+    private List<VirtualServiceKeyValue> headerParams  = new ArrayList<>();
     private Map<String, VirtualServiceApiResponse> responseType;
     private String excludeList;
     private String resource;
@@ -96,6 +97,15 @@ public class VirtualServiceRequest {
 
     public void setResponseType(Map<String, VirtualServiceApiResponse> responseType) {
         this.responseType = responseType;
+    }
+
+
+    public Object getHeaderParam(String param) {
+        return getHeaderParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+    }
+
+    public Object getAvailableParam(String param) {
+        return getAvailableParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
     }
 
     public String groovyTemplateObj() {
