@@ -15,6 +15,7 @@
 package io.virtualan.core.model;
 
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -108,7 +109,27 @@ public class MockServiceRequest {
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
-    
+
+    public Object getHeaderParam(String param) {
+        return getHeaderParams().entrySet().stream()
+            .filter(e -> param.equals(e.getKey())).map(Map.Entry::getValue).findFirst();
+    }
+
+    public Object getParam(String param) {
+        Optional<Object> obj = Optional.ofNullable(getAvailableParam(param));
+        if( obj == null) {
+            obj=  getParameters().entrySet().stream().filter(e -> param.equals(e.getKey())).map(Map.Entry::getValue).findFirst();
+        }
+        return obj.isPresent() ? obj.get() : null;
+    }
+
+    public Optional<String> getAvailableParam(String param) {
+        return getParams().entrySet().stream()
+            .filter(e -> param.equals(e.getKey())).map(Map.Entry::getValue).findFirst();
+    }
+
+
+
     public Class getInputObjectType() {
         return inputObjectType;
     }

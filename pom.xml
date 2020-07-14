@@ -331,6 +331,7 @@
 	</profiles>
 	<modules>
 		<module>modules/virtualan-plugin</module>
+<!--		<module>modules/virtualan-openapi-mongo</module>-->
 	</modules>
 	<reporting>
 		<outputDirectory>target/site</outputDirectory>

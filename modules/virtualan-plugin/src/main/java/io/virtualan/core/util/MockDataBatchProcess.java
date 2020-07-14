@@ -100,12 +100,15 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 	
 	private List<VirtualServiceKeyValue> getParams(JSONArray params) {
 		List<VirtualServiceKeyValue> virtualServiceKeyValueList = new LinkedList<>();
-		for(int i=0; i < params.length(); i++){
-			JSONObject object = params.getJSONObject(i);
-			VirtualServiceKeyValue virtualServiceKeyValue = new VirtualServiceKeyValue();
-			virtualServiceKeyValue.setKey(object.getString("key"));
-			virtualServiceKeyValue.setValue(object.getString("value"));
-			virtualServiceKeyValueList.add(virtualServiceKeyValue);
+		if(params != null  && params.length() > 0) {
+			for (int i = 0; i < params.length(); i++) {
+				JSONObject object = params.getJSONObject(i);
+				VirtualServiceKeyValue virtualServiceKeyValue = new VirtualServiceKeyValue();
+				virtualServiceKeyValue.setKey(object.optString("key"));
+				virtualServiceKeyValue.setValue(object.optString("value"));
+				virtualServiceKeyValue.setParameterType(object.optString("parameterType"));
+				virtualServiceKeyValueList.add(virtualServiceKeyValue);
+			}
 		}
 		return virtualServiceKeyValueList;
 	}
