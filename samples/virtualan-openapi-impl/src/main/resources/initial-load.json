@@ -1,5 +1,19 @@
 [
   {
+    "url": "/pets/{petId}",
+    "operationId": "getPetById",
+    "httpStatusCode": "200",
+    "method": "GET",
+    "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": 101,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "availableParams": [
+      {
+        "key": "petId",
+        "value": "101",
+        "parameterType": "PATH_PARAM"
+      }
+    ]
+  },
+  {
     "operationId": "addPet",
     "httpStatusCode": "200",
     "url": "/pets",
