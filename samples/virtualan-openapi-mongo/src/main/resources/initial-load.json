@@ -2,7 +2,7 @@
   {
     "url": "/employees/{employeeId}",
     "type": "Script",
-    "rule": "import com.mongodb.*\n\ndef executeScript(mockServiceRequest, responseObject) { \n\n\tMongoClient mongoClient = new MongoClient(new ServerAddress(\"localhost\", 27017));\n\tDB db = mongoClient.getDB(\"virtualan-mongo\");\n\tDBCollection coll = db.getCollection(\"employee\"); \n\t int id = mockServiceRequest.getParam(\"employeeId\").get().toInteger();\n\n        /**** Find and display ****/\n\tBasicDBObject searchQuery2 = new BasicDBObject().append(\"id\", id);\n\n\tDBCursor cursor2 = coll.find(searchQuery2);\n\n\tresponseObject.setHttpStatusCode('200'); \n\t\n\tif (cursor2.hasNext()) {\n\t       responseObject.setOutput(cursor2.next().toString()); \n    }\n\treturn responseObject.builder(); \n}",
+    "rule": "import com.mongodb.*\n\ndef executeScript(mockServiceRequest, responseObject) { \n\n\tMongoClient mongoClient = io.virtualan.MongoConfig.mongoClient();\n\tDB db = mongoClient.getDB(\"virtualan-mongo\");\n\tDBCollection coll = db.getCollection(\"employee\"); \n\t int id = mockServiceRequest.getParam(\"employeeId\").get().toInteger();\n\n        /**** Find and display ****/\n\tBasicDBObject searchQuery2 = new BasicDBObject().append(\"id\", id);\n\n\tDBCursor cursor2 = coll.find(searchQuery2);\n\n\tresponseObject.setHttpStatusCode('200'); \n\t\n\tif (cursor2.hasNext()) {\n\t       responseObject.setOutput(cursor2.next().toString()); \n    }\n\treturn responseObject.builder(); \n}",
     "output": "{\n  \"gender\": \"Male\",\n  \"id\": 1,\n  \"name\": \"Suki\"\n}",
     "excludeList": null,
     "httpStatusCode": "200",
@@ -27,7 +27,7 @@
   {
     "url": "/employees",
     "type": "Script",
-    "rule": "import com.mongodb.*\n\ndef executeScript(mockServiceRequest, responseObject) { \n\n\tMongoClient mongoClient = new MongoClient(new ServerAddress(\"localhost\", 27017));\n\tDB db = mongoClient.getDB(\"virtualan-mongo\");\n\tDBCollection coll = db.getCollection(\"employee\"); \n \n\n\tString name = mockServiceRequest.getInput().getName();\n\tString gender = mockServiceRequest.getInput().getGender();\n\tint id = mockServiceRequest.getInput().getId();\n\tBasicDBObject doc = new BasicDBObject()\n\tdoc.put(\"name\", name)\n\tdoc.put(\"gender\", gender)\n\tdoc.put(\"id\", id)\n\n\tcoll.insert(doc)\n\n\tresponseObject.setHttpStatusCode('201'); \n\tresponseObject.setOutput(\"{\\\"name\\\" :\\\"\"+name+\"\\\", \\\"gender\\\":\\\"\"+gender+\"\\\", \\\"id\\\":\"+id +\"}\"); \n\treturn responseObject.builder(); \n}",
+    "rule": "import com.mongodb.*\n\ndef executeScript(mockServiceRequest, responseObject) { \n\n\tMongoClient mongoClient = io.virtualan.MongoConfig.mongoClient();;\n\tDB db = mongoClient.getDB(\"virtualan-mongo\");\n\tDBCollection coll = db.getCollection(\"employee\"); \n \n\n\tString name = mockServiceRequest.getInput().getName();\n\tString gender = mockServiceRequest.getInput().getGender();\n\tint id = mockServiceRequest.getInput().getId();\n\tBasicDBObject doc = new BasicDBObject()\n\tdoc.put(\"name\", name)\n\tdoc.put(\"gender\", gender)\n\tdoc.put(\"id\", id)\n\n\tcoll.insert(doc)\n\n\tresponseObject.setHttpStatusCode('201'); \n\tresponseObject.setOutput(\"{\\\"name\\\" :\\\"\"+name+\"\\\", \\\"gender\\\":\\\"\"+gender+\"\\\", \\\"id\\\":\"+id +\"}\"); \n\treturn responseObject.builder(); \n}",
     "input": "{\n  \"gender\": \"Male\",\n  \"id\": 1,\n  \"name\": \"Suki\"\n}",
     "output": "{\n  \"gender\": \"Male\",\n  \"id\": 1,\n  \"name\": \"Suki\"\n}",
     "excludeList": null,
