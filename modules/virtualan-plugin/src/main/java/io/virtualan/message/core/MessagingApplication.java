@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.ListTopicsResult;
@@ -62,7 +63,9 @@ public class MessagingApplication {
 	
 	private static String bootstrapServers;
 	private static List<String> topics;
-	static {
+
+	@PostConstruct
+	public void init() {
 		try {
 			JSONObject obj =  getJsonObject().optJSONObject(0);
 			if(obj != null ) {
