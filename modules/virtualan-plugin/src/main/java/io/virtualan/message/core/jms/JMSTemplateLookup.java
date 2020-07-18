@@ -2,8 +2,10 @@ package io.virtualan.message.core.jms;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.jms.core.JmsTemplate;
 
+@ConditionalOnResource(resources = {"classpath:conf/jms-config.json"})
 public class JMSTemplateLookup {
 
   private static Map<String, JmsTemplate> jmsTemplateMap = new HashMap<>();

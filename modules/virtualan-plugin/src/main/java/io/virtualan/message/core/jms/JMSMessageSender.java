@@ -21,7 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.jms.listener.MessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,6 +32,7 @@ public class JMSMessageSender {
   public static void sendMessage(String queueName, String message) {
     log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
     log.info("sending: " + message);
+
     JMSTemplateLookup.getJmsTemplate(queueName).send(queueName, new MessageCreator() {
       @Override
       public Message createMessage(Session session) throws JMSException {

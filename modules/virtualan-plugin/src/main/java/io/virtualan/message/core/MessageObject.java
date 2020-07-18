@@ -5,9 +5,11 @@ import org.json.JSONObject;
 
 @Data
 public class MessageObject {
-	String outboundTopic;
-	String inboundTopic;
-	JSONObject jsonObject;
-	String messageKey;
-	String outputMessage;
+
+	public JSONObject jsonObject;
+	public String outboundTopic;
+	public String inboundTopic;
+
+	public String messageKey;
+	public String outputMessage;
 }

@@ -51,28 +51,26 @@ import springfox.documentation.service.ResponseMessage;
 @Configuration
 @EnableIntegration
 @EnableKafka
-@ConditionalOnClass({ConsumerProperties.class, Kafka.class, IntegrationFlows.class, MessageChannelSpec.class})
-@ConditionalOnResource(resources = {"classpath:kafka.json"})
+@ConditionalOnResource(resources = {"classpath:conf/kafka.json"})
 public class MessagingApplication {
 	
 	private static final Logger log = LoggerFactory.getLogger(MessagingApplication.class);
-	
 	public static List<NewTopic> topicList = new ArrayList<NewTopic>();
 	
 	@Autowired
 	private MessageUtil messageUtil;
 	
-	
 	private static String bootstrapServers;
-	private static String topicString;
+	private static List<String> topics;
 	static {
 		try {
 			JSONObject obj =  getJsonObject().optJSONObject(0);
 			if(obj != null ) {
 				bootstrapServers = obj.getString("broker");
-				topicString = obj.getString("topics");
+				topics = obj.getJSONArray("topics").toList().stream().map(x -> x.toString()).collect(
+						Collectors.toList());
 				Set<String> names = getTopics();
-				for (String topic : topicString.split(",")) {
+				for (String topic : topics) {
 					boolean contains = names.contains(topic);
 					if (!contains) {
 						topicList.add(addNewTopic(topic));
@@ -186,8 +184,7 @@ public class MessagingApplication {
 		
 		return IntegrationFlows
 				.from(Kafka.messageDrivenChannelAdapter(consumerFactory(),
-						KafkaMessageDrivenChannelAdapter.ListenerMode.record,  topicString.split(",")
-								)
+						KafkaMessageDrivenChannelAdapter.ListenerMode.record,  topics.toArray(new String[topics.size()]))
 								.configureListenerContainer(c ->
 								c.ackMode(ContainerProperties.AckMode.RECORD)
 										.ackOnError(true)
@@ -246,14 +243,20 @@ public class MessagingApplication {
 					virtualServiceRequest.setOperationId(messageObject.inboundTopic);
 					virtualServiceRequest.setResource(messageObject.inboundTopic);
 					ReturnMockResponse response  = messageUtil.getMatchingRecord(virtualServiceRequest);
-					messageObject.outputMessage = response.getMockResponse().getOutput() ;
-					messageObject.outboundTopic =  response.getMockRequest().getMethod();
-					if(messageObject.outputMessage == null || messageObject.outboundTopic == null){
-						log.info("No response configured.." );
-						return null;
+					if(response != null && response.getMockResponse() != null) {
+						messageObject.outputMessage = response.getMockResponse().getOutput();
+						messageObject.outboundTopic = response.getMockRequest().getMethod();
+						if (messageObject.outputMessage == null || messageObject.outboundTopic == null) {
+							log.info("No outputMessage response configured..");
+							return null;
+						} else {
+							log.info("Response configured.. with (" + messageObject.outboundTopic + ") :"
+									+ messageObject.outputMessage);
+							return messageObject;
+						}
 					} else {
-						log.info("Response configured.. with ("+messageObject.outboundTopic+") :" + messageObject.outputMessage );
-						return messageObject;
+						log.info("No response configured for the given input");
+						return null;
 					}
 			}
 		};

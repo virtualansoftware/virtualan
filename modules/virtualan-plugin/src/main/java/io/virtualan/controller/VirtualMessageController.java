@@ -86,7 +86,7 @@ public class VirtualMessageController {
 
   private JSONArray getJsonObject() throws Exception {
     InputStream stream = VirtualMessageController.class.getClassLoader()
-        .getResourceAsStream("kafka.json");
+        .getResourceAsStream("conf/kafka.json");
     if (stream != null) {
       String jmsConfigJson = readString(stream);
       JSONObject jsonObject = new JSONObject(jmsConfigJson);
