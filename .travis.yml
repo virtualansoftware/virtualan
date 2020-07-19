@@ -1,9 +1,6 @@
 language: java
 sudo: false
 script: mvn clean -Denv=samples verify
-language: java
-sudo: false
-script: mvn clean -Denv=samples verify
 addons:
   sonarcloud:
     organization: "virtualan-software"
