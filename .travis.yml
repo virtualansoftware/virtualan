@@ -1,15 +1,12 @@
 language: java
 sudo: false
 script: mvn clean -Denv=samples verify
-addons:
-  sonarcloud:
-    organization: "virtualan-software"
-    token:
-      secure: a2bc66338021df274f40143548d8bc2dd032bb9e
-
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar \
+   -Dsonar.organization=virtualan-software \
+   -Dsonar.host.url=https://sonarcloud.io \
+   -Dsonar.login=a2bc66338021df274f40143548d8bc2dd032bb9e
 
 cache:
   directories:
