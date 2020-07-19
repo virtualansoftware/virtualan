@@ -5,7 +5,7 @@ addons:
   sonarcloud:
     organization: "virtualan-software"
     token:
-      secure: "**************************" # encrypted value of your token
+      secure: $SONAR_TOKEN
 
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
