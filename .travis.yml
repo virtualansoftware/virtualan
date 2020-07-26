@@ -1,6 +1,6 @@
 language: java
 sudo: false
-script: mvn clean -Denv=samples verify sonar:sonar
+script: mvn clean -Denv=samples verify
 cache:
   directories:
     - '$HOME/.m2/repository'
