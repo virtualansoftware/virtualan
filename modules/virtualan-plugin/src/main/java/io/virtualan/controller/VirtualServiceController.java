@@ -32,6 +32,7 @@ import io.virtualan.core.model.MockServiceRequest;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,11 +140,13 @@ public class VirtualServiceController {
     
     @RequestMapping(value = "/virtualservices", method = RequestMethod.GET)
     public ResponseEntity<List<VirtualServiceRequest>> listAllMockLoadRequests() {
-        final List<VirtualServiceRequest> MockLoadRequests = virtualService.findAllMockRequests();
-        if (MockLoadRequests.isEmpty()) {
+        final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
+        final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> Type.REST.toString().equalsIgnoreCase(x.getType())).collect(
+            Collectors.toList());
+        if (mockRestLoadRequests.isEmpty()) {
             return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<VirtualServiceRequest>>(MockLoadRequests, HttpStatus.OK);
+        return new ResponseEntity<List<VirtualServiceRequest>>(mockRestLoadRequests, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/virtualservices/{id}", method = RequestMethod.GET,
@@ -162,6 +165,7 @@ public class VirtualServiceController {
 
         try {
 
+            virtualServiceRequest.setType(Type.REST.toString());
             validateExpectedInput(virtualServiceRequest);
             // find the operationId for the given Request. It required for the Automation test cases
             virtualServiceUtil.findOperationIdForService(virtualServiceRequest);

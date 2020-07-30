@@ -79,11 +79,13 @@ public class VirtualMessageController {
     List<VirtualServiceMessageRequest> msgList = new ArrayList<>();
     for ( VirtualServiceRequest request :mockLoadRequests) {
       VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
-      BeanUtils.copyProperties( request,virtualServiceMessageRequest);
-      virtualServiceMessageRequest.setBrokerUrl(request.getUrl());
-      virtualServiceMessageRequest.setResponseTopicOrQueueName(request.getMethod());
-      virtualServiceMessageRequest.setRequestTopicOrQueueName(request.getOperationId());
-      msgList.add(virtualServiceMessageRequest);
+      if(Type.KAFKA.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType())) {
+        BeanUtils.copyProperties(request, virtualServiceMessageRequest);
+        virtualServiceMessageRequest.setBrokerUrl(request.getUrl());
+        virtualServiceMessageRequest.setResponseTopicOrQueueName(request.getMethod());
+        virtualServiceMessageRequest.setRequestTopicOrQueueName(request.getOperationId());
+        msgList.add(virtualServiceMessageRequest);
+      }
     }
 
     if (msgList.isEmpty()) {
@@ -103,7 +105,7 @@ public class VirtualMessageController {
       request.setUrl(virtualServiceMessageRequest.getBrokerUrl());
       request.setMethod(virtualServiceMessageRequest.getResponseTopicOrQueueName());
       request.setOperationId(virtualServiceMessageRequest.getRequestTopicOrQueueName());
-
+      request.setType(Type.KAFKA.toString());
       ResponseEntity responseEntity = checkIfServiceDataAlreadyExists(request);
 
       if (responseEntity != null) {
