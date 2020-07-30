@@ -10,12 +10,14 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
     var REST_SERVICE_URI_LOAD_TOPIC = 'virtualservices/load-topics';
 
     var factory = {
-    	loadAllMockRequest: loadAllMockRequest,
-    	loadAllTopics: loadAllTopics,
+        loadAllMockRequest: loadAllMockRequest,
+        loadAllTopics: loadAllTopics,
         createMockMsgRequest: createMockMsgRequest,
+        fetchAllMsgMockRequest: fetchAllMsgMockRequest,
         fetchAllMockRequest: fetchAllMockRequest,
         createMockRequest: createMockRequest,
         updateMockRequest:updateMockRequest,
+        deleteMsgMockRequest:deleteMsgMockRequest,
         deleteMockRequest:deleteMockRequest,
         loadCatalogFiles:loadCatalogFiles,
         loadCatalogNames:loadCatalogNames,
@@ -99,7 +101,23 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
         );
         return deferred.promise;
     }
-    
+
+
+    function fetchAllMsgMockRequest() {
+        var deferred = $q.defer();
+        $http.get(REST_SERVICE_URI_MESSAGE)//+'?operationId='+operationId+'&resource='+resource)
+            .then(
+            function (response) {
+                deferred.resolve(response.data);
+            },
+            function(errResponse){
+                console.error('Error while fetching MockRequests');
+                deferred.reject(errResponse);
+            }
+        );
+        return deferred.promise;
+    }
+
     function fetchAllMockRequest() {
         var deferred = $q.defer();
         $http.get(REST_SERVICE_URI)//+'?operationId='+operationId+'&resource='+resource)
@@ -157,6 +175,22 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
             },
             function(errResponse){
                 console.error('Error while updating MockRequest');
+                deferred.reject(errResponse);
+            }
+        );
+        return deferred.promise;
+    }
+
+
+    function deleteMsgMockRequest(id) {
+        var deferred = $q.defer();
+        $http.delete(REST_SERVICE_URI_MESSAGE+"/"+id)
+            .then(
+            function (response) {
+                deferred.resolve(response.data);
+            },
+            function(errResponse){
+                console.error('Error while deleting msg MockRequest');
                 deferred.reject(errResponse);
             }
         );

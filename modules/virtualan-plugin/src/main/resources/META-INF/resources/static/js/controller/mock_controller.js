@@ -6,6 +6,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.mockRequest={id:'',resource:'',url:'',method:'',type:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
     self.mockCreateRequest= {id:'',resource:'',method:'',type:'',url:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
     self.mockRequests=[];
+    self.mockMsgRequests=[];
     self.additionalParamKey ='';
     self.additionalParamValue ='';
     self.additionalParams ={};
@@ -25,6 +26,9 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.filtered = {};
     self.searchText ='';
     self.currentPage = 1;
+    self.msgFiltered = {};
+    self.searchMsgText ='';
+    self.currentMsgPage = 1;
     self.viewby = 5;
     self.perPage = 5;
     self.maxSize = 5;
@@ -120,7 +124,14 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       self.filterList = $filter('filter')(self.mockRequests, obj);
       self.currentPage = 1;
     }); 
-    
+
+   $scope.$watch(self.searchMsgText, function (term) {
+         var obj = term;
+         self.filterMsgList = $filter('filter')(self.mockMsgRequests, obj);
+         self.currentMsgPage = 1;
+       });
+
+
     self.isDefined = function (value) {
     		return typeof value !== 'undefined';
     }
@@ -158,7 +169,22 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     };
         
     self.loadData = fetchAllMockRequest();
-    	  
+
+    self.loadData = fetchAllMsgMockRequest();
+
+    function fetchAllMsgMockRequest(){
+        	MockService.fetchAllMsgMockRequest()
+                .then(
+                function(d) {
+                    self.mockMsgRequests = d;
+                    self.filterMsgList = self.mockMsgRequests;
+                },
+                function(errResponse){
+                    console.error('Error while fetching Mocks');
+                }
+            );
+        };
+
     function fetchAllMockRequest(){
     	MockService.fetchAllMockRequest()
             .then(
@@ -279,6 +305,16 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         );
     }
 
+  function deleteMsgMockRequest(id){
+        MockService.deleteMsgMockRequest(id)
+            .then(
+            		fetchAllMsgMockRequest,
+            function(errResponse){
+                console.error('Error while deleting MockRequest');
+            }
+        );
+    }
+
     function deleteMockRequest(id){
         MockService.deleteMockRequest(id)
             .then(
@@ -356,12 +392,12 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
             self.mockCreateRequest= {id:'',
             			resource:mockRequest.resource,
-            			url:mockRequest.url,
-            			operationId:mockRequest.operationId,
+            			brokerUrl:mockRequest.url,
+            			requestTopicOrQueueName:mockRequest.operationId,
             			input:mockRequest.input,
             			output:mockRequest.output,
             			excludeList:mockRequest.excludeList,
-            			method:mockRequest.method,
+            			responseTopicOrQueueName:mockRequest.method,
             			availableParams:self.mergeParams(mockRequest),
             			headerParams:self.responseHeaderParamList};
             console.log('Saving New mock message Request', self.mockCreateRequest);
@@ -377,6 +413,14 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
                 break;
             }
         }
+    }
+
+    function removeMsg(id){
+        console.log('id to be deleted', id);
+        if(self.mockRequest.id === id) {//clean form if the mockRequest to be deleted is shown there.
+            reset();
+        }
+        deleteMsgMockRequest(id);
     }
 
     function remove(id){

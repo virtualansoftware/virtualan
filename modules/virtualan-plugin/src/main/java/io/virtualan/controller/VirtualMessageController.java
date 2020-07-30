@@ -1,5 +1,6 @@
 package io.virtualan.controller;
 
+import io.virtualan.core.model.VirtualServiceMessageRequest;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.message.core.MessageUtil;
@@ -8,17 +9,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,20 +62,56 @@ public class VirtualMessageController {
     return null;
   }
 
+  @RequestMapping(value = "/virtualservices/message/{id}", method = RequestMethod.DELETE)
+  public ResponseEntity<VirtualServiceRequest> deleteMockRequest(@PathVariable("id") long id) {
+    final VirtualServiceRequest MockLoadRequest = virtualService.findById(id);
+    if (MockLoadRequest == null) {
+      return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NOT_FOUND);
+    }
+    virtualService.deleteMockRequestById(id);
+    return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NO_CONTENT);
+  }
+
+  @RequestMapping(value = "/virtualservices/message", method = RequestMethod.GET)
+  public ResponseEntity<List<VirtualServiceMessageRequest>> listAllMockMessageLoadRequests() {
+    final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
+
+    List<VirtualServiceMessageRequest> msgList = new ArrayList<>();
+    for ( VirtualServiceRequest request :mockLoadRequests) {
+      VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
+      BeanUtils.copyProperties( request,virtualServiceMessageRequest);
+      virtualServiceMessageRequest.setBrokerUrl(request.getUrl());
+      virtualServiceMessageRequest.setResponseTopicOrQueueName(request.getMethod());
+      virtualServiceMessageRequest.setRequestTopicOrQueueName(request.getOperationId());
+      msgList.add(virtualServiceMessageRequest);
+    }
+
+    if (msgList.isEmpty()) {
+      return new ResponseEntity<List<VirtualServiceMessageRequest>>(HttpStatus.NO_CONTENT);
+    }
+    return new ResponseEntity<List<VirtualServiceMessageRequest>>(msgList, HttpStatus.OK);
+  }
+
   @RequestMapping(value = "/virtualservices/message", method = RequestMethod.POST)
   public ResponseEntity createMockRequest(
-      @RequestBody VirtualServiceRequest virtualServiceRequest) {
+      @RequestBody VirtualServiceMessageRequest virtualServiceMessageRequest) {
 
     try {
 
-      ResponseEntity responseEntity = checkIfServiceDataAlreadyExists(virtualServiceRequest);
+      VirtualServiceRequest request = new VirtualServiceRequest();
+      BeanUtils.copyProperties(virtualServiceMessageRequest, request);
+      request.setUrl(virtualServiceMessageRequest.getBrokerUrl());
+      request.setMethod(virtualServiceMessageRequest.getResponseTopicOrQueueName());
+      request.setOperationId(virtualServiceMessageRequest.getRequestTopicOrQueueName());
+
+      ResponseEntity responseEntity = checkIfServiceDataAlreadyExists(request);
 
       if (responseEntity != null) {
         return responseEntity;
       }
 
       final VirtualServiceRequest mockTransferObject =
-          virtualService.saveMockRequest(virtualServiceRequest);
+          virtualService.saveMockRequest(request);
 
       mockTransferObject.setMockStatus(
           new VirtualServiceStatus(messageSource.getMessage("VS_SUCCESS", null, locale)));

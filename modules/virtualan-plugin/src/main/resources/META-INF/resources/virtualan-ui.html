@@ -1051,7 +1051,7 @@ json-tree .branch-preview::after {
 							<input type="text" ng-model="ctrl.searchText"
 										 class="head-text-black form-control search-icon float-right"
 										 placeholder="Type to filter"> Total items:
-							{{ctrl.filtered.length}} <br />
+							{{ctrl.msgFiltered.length}} <br />
 
 							<table class="table table-striped table-hover table-bordered">
 								<thead>
@@ -1071,52 +1071,52 @@ json-tree .branch-preview::after {
 								</thead>
 								<tbody>
 								<tr
-										ng-repeat="mockRequest in ctrl.filtered = (ctrl.filterList | filter: ctrl.searchText ) | start: (ctrl.currentPage - 1) * ctrl.perPage | limitTo : ctrl.perPage">
-									<td><span ng-bind="mockRequest.id"></span></td>
-									<td><span ng-bind="mockRequest.url"></span></td>
-									<td><span ng-bind="mockRequest.operationId"></span></td>
+										ng-repeat="mockMsgRequest in ctrl.msgFiltered = (ctrl.filterMsgList | filter: ctrl.searchMsgText ) | start: (ctrl.currentMsgPage - 1) * ctrl.perPage | limitTo : ctrl.perPage">
+									<td><span ng-bind="mockMsgRequest.id"></span></td>
+									<td><span ng-bind="mockMsgRequest.brokerUrl"></span></td>
+									<td><span ng-bind="mockMsgRequest.requestTopicOrQueueName"></span></td>
 									<td><div
-											ng-repeat="mockKeyValue in mockRequest.availableParams track by $index">
+											ng-repeat="mockKeyValue in mockMsgRequest.availableParams track by $index">
 										{{mockKeyValue.key}} =
-										{{mockRequest.availableParams[$index].value}}</br>
+										{{mockMsgRequest.availableParams[$index].value}}</br>
 									</div></td>
-									<td><span ng-bind="mockRequest.method"></span></td>
+									<td><span ng-bind="mockMsgRequest.responseTopicOrQueueName"></span></td>
 									<td>
 										<button type="button" class="btn btn-info btn-sm"
-														ng-show="mockRequest.type.toUpperCase() == 'RULE'"
+														ng-show="mockMsgRequest.type.toUpperCase() == 'RULE'"
 														data-toggle="modal"
 														data-target="#groovy-editor"
-														ng-click="ctrl.loadGroovy(mockRequest.rule)">Rule!!</button>
+														ng-click="ctrl.loadGroovy(mockMsgRequest.rule)">Rule!!</button>
 										<button type="button" class="btn btn-info btn-sm"
-														ng-show="mockRequest.type.toUpperCase() == 'SCRIPT'"
+														ng-show="mockMsgRequest.type.toUpperCase() == 'SCRIPT'"
 														data-toggle="modal"
 														data-target="#groovy-editor"
-														ng-click="ctrl.loadGroovy(mockRequest.rule)">Script!!</button>
+														ng-click="ctrl.loadGroovy(mockMsgRequest.rule)">Script!!</button>
 
 									</td>
 									<td>
 										<button type="button" class="btn btn-info btn-sm"
-														ng-show="ctrl.isEmpty(mockRequest.input) == false "
+														ng-show="ctrl.isEmpty(mockMsgRequest.input) == false "
 														data-toggle="modal"
 														data-target="#load-json"
-														ng-click="ctrl.loadJson(mockRequest.input)">Request</button>
+														ng-click="ctrl.loadJson(mockMsgRequest.input)">Request</button>
 									</td>
 									<td><button type="button" class="btn btn-info btn-sm"
 															data-toggle="modal" data-target="#load-json"
-															ng-show="ctrl.isEmpty(mockRequest.output) == false "
-															ng-click="ctrl.loadJson(mockRequest.output)">Response</button>
+															ng-show="ctrl.isEmpty(mockMsgRequest.output) == false "
+															ng-click="ctrl.loadJson(mockMsgRequest.output)">Response</button>
 									</td>
 									<td><div
-											ng-repeat="headerKeyValue in mockRequest.headerParams track by $index">
+											ng-repeat="headerKeyValue in mockMsgRequest.headerParams track by $index">
 										{{headerKeyValue.key}} =
 										{{headerKeyValue.value}}</br>
 									</div>
 									</td>
-									<td><span ng-bind="mockRequest.excludeList"></span></td>
+									<td><span ng-bind="mockMsgRequest.excludeList"></span></td>
 									<td>
 										<!-- 							<button type="button" ng-click="ctrl.edit(u.id)"
                 class="btn btn-success custom-width">Edit</button> -->
-										<button type="button" ng-click="ctrl.remove(mockRequest.id)"
+										<button type="button" ng-click="ctrl.remove(mockMsgRequest.id)"
 														class="btn btn-danger custom-width">Remove</button>
 									</td>
 								</tr>
