@@ -5,6 +5,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 	var self = this;
     self.mockRequest={id:'',resource:'',url:'',method:'',type:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
     self.mockCreateRequest= {id:'',resource:'',method:'',type:'',url:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
+    self.mockMsgRequest={id:'',resource:'',brokerUrl:'',responseTopicOrQueueName:'',type:'',requestTopicOrQueueName:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
     self.mockRequests=[];
     self.mockMsgRequests=[];
     self.additionalParamKey ='';
@@ -169,7 +170,6 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     };
         
     self.loadData = fetchAllMockRequest();
-
     self.loadData = fetchAllMsgMockRequest();
 
     function fetchAllMsgMockRequest(){
@@ -279,10 +279,10 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
  function createMockMsgRequest(mockRequest){
 		self.showDialog = false;
     	self.typeWarning = false;
-    	self.selectedOperationId = mockRequest.operationId;
+    	self.selectedOperationId = mockRequest.requestTopicOrQueueName;
 		MockService.createMockMsgRequest(mockRequest)
             .then(
-            		fetchAllMockRequest,
+            		fetchAllMsgMockRequest,
             function(errResponse){
                 self.showDialog = true;
             	self.typeWarning = true;
@@ -305,11 +305,20 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         );
     }
 
+    function deleteMsgMockRequest(id){
+        MockService.deleteMockRequest(id)
+            .then(
+            		fetchAllMsgMockRequest,
+            function(errResponse){
+                console.error('Error while deleting Msg MockRequest');
+            }
+        );
+    }
+
     function deleteMockRequest(id){
         MockService.deleteMockRequest(id)
             .then(
             		fetchAllMockRequest,
-            		fetchAllMsgMockRequest,
             function(errResponse){
                 console.error('Error while deleting MockRequest');
             }
@@ -404,6 +413,15 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
                 break;
             }
         }
+    }
+
+
+    self.removeMsg = function(id){
+        console.log('id to be deleted', id);
+        if(self.mockRequest.id === id) {//clean form if the mockRequest to be deleted is shown there.
+            reset();
+        }
+        deleteMsgMockRequest(id);
     }
 
     function remove(id){

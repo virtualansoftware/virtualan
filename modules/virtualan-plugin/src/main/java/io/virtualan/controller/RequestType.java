@@ -1,5 +1,5 @@
 package io.virtualan.controller;
 
-public enum Type {
+public enum RequestType {
     KAFKA, REST, MQ, AMQ
 }

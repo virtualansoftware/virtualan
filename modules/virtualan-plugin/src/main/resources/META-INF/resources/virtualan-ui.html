@@ -809,7 +809,7 @@ json-tree .branch-preview::after {
 										ng-click="ctrl.reset()" label="{{messageSystem.broker}}">
 									<div class="swagger-ui swagger-container">
 										<div class="wrapper">
-											<div ng-model="mockRequest"
+											<div ng-model="mockMsgRequest"
 												 ng-repeat="topic in  messageSystem.topics"
 												 class="opblock opblock-{{$odd ? 'get': 'post'}}"
 												 id="messages-{{topic}}">
@@ -819,24 +819,24 @@ json-tree .branch-preview::after {
 														class="opblock-summary-path"><a class="nostyle"
 																						href="#/operations/{{topic}}"><span>{{messageSystem.broker}} / {{topic}}</span></a>
 													<!-- react-empty: 111 --> </span>
-													<div class="opblock-summary-description">{{mockRequest.desc}}</div>
+													<div class="opblock-summary-description">{{mockMsgRequest.desc}}</div>
 												</div>
 												<div
 														style="height: auto; border: none; margin: 0px; padding: 0px;">
 
 													<div ng-show="showme ">
 														<div class="opblock-section nomargin">
-															<form ng-submit="ctrl.submitMessage(mockRequest)" name="myForm-message"
+															<form ng-submit="ctrl.submitMessage(mockMsgRequest)" name="myForm-message"
 																  class="form-horizontal">
 																<div class="row"
-																	 ng-show="ctrl.showAlert(mockRequest.operationId)">
+																	 ng-show="ctrl.showAlert(mockMsgRequest.operationId)">
 																	<div layout="row" layout-fill
 																		 layout-align="center center">
 																		<div class="container">
 																			<alert ng-if="ctrl.showDialog"
 																				   type="{{ctrl.typeDialog()}}"
-																				   close="ctrl.closeAlert(mockRequest.operationId)">
-																				<strong>{{ctrl.showMessage(mockRequest.operationId)}}
+																				   close="ctrl.closeAlert(mockMsgRequest.operationId)">
+																				<strong>{{ctrl.showMessage(mockMsgRequest.operationId)}}
 																				</strong> </alert>
 
 																		</div>
@@ -849,24 +849,24 @@ json-tree .branch-preview::after {
 																		<label class="head-text-black col-md-2 control-lable"
 																			   for="file">Publisher-Topic:</label>
 																		<div class="col-md-7">
-																			<input type="hidden" id="resource" ng-model="mockRequest.resource"
+																			<input type="hidden" id="resource" ng-model="mockMsgRequest.resource"
 																				   class="input form-control input-sm" required
-																				   ng-init="mockRequest.resource=topic">
+																				   ng-init="mockMsgRequest.resource=topic">
 																				<input
-																				type="hidden" id="operationId" ng-model="mockRequest.operationId"
-																				ng-init="mockRequest.operationId=topic"
+																				type="hidden" id="operationId" ng-model="mockMsgRequest.operationId"
+																				ng-init="mockMsgRequest.operationId=topic"
 																				class="input form-control input-sm"
 																				>
 																			<input
-																					type="text" id="method" ng-model="mockRequest.method"
+																					type="text" id="method" ng-model="mockMsgRequest.method"
 																					class="input form-control input-sm"
 																			>
 																				<input
-																				type="hidden" id="url" ng-model="mockRequest.url"
+																				type="hidden" id="url" ng-model="mockMsgRequest.url"
 																				class="input form-control input-sm"
-																				ng-init="mockRequest.url=messageSystem.broker"
+																				ng-init="mockMsgRequest.url=messageSystem.broker"
 																				> <input
-																				type="hidden" id="id" ng-model="mockRequest.id"
+																				type="hidden" id="id" ng-model="mockMsgRequest.id"
 																				value="" />
 																			<div class="has-error" ng-show="myForm-message.$dirty">
 																		<span ng-show="myForm-message.api.$error.required">This
@@ -883,11 +883,11 @@ json-tree .branch-preview::after {
 
 																		<div class="col-md-7">
 																			<table id="page">
-																				<tr ng-repeat="(addKey, addValue) in mockRequest.additionalParams">
+																				<tr ng-repeat="(addKey, addValue) in mockMsgRequest.additionalParams">
 																					<td  class="head-text-black"><span >{{addKey}}</span></td>
 																					<td  class="head-text-black"><span >{{addValue}}</span></td>
 																					<td>
-																						<img height="30" width="30" ng-click="ctrl.removeParam(addKey, mockRequest.additionalParams);"
+																						<img height="30" width="30" ng-click="ctrl.removeParam(addKey, mockMsgRequest.additionalParams);"
 																							 src= "static/img/minus-img.png"
 																							 alt="Remove">
 
@@ -905,7 +905,7 @@ json-tree .branch-preview::after {
 																							   type="text" ng-model="ctrl.additionalParamValue"/>
 																					</td>
 																					<td>
-																						<img height="30" width="30" ng-click="ctrl.addParam(mockRequest, ctrl.additionalParamKey,ctrl.additionalParamValue);"
+																						<img height="30" width="30" ng-click="ctrl.addParam(mockMsgRequest, ctrl.additionalParamKey,ctrl.additionalParamValue);"
 																							 src= "static/img/plus-img.png"
 																							 alt="Add">
 																					</td>
@@ -921,9 +921,9 @@ json-tree .branch-preview::after {
 																		<label class="head-text-black col-md-2 control-lable"
 																			   for="file">Mock Request Body: </label>
 																		<div class="col-md-7">
-																	<textarea ng-model="mockRequest.input" name="input"
+																	<textarea ng-model="mockMsgRequest.input" name="input"
 																			  class="input form-control input-sm bk-textarea"
-																			  rows="3"> {{mockRequest.input}}</textarea>
+																			  rows="3"> {{mockMsgRequest.input}}</textarea>
 																		</div>
 																	</div>
 																</div>
@@ -934,9 +934,9 @@ json-tree .branch-preview::after {
 																		<label class="head-text-black col-md-2 control-lable"
 																			   for="file">Mock Response: </label>
 																		<div class="col-md-7">
-																	<textarea ng-model="mockRequest.output" name="output"
+																	<textarea ng-model="mockMsgRequest.output" name="output"
 																			  class="response form-control input-sm bk-textarea"
-																			  rows="3"> {{mockRequest.output}}</textarea>
+																			  rows="3"> {{mockMsgRequest.output}}</textarea>
 																			<div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm-message.output.$error.required">This
 																			is a required field</span>
@@ -950,11 +950,11 @@ json-tree .branch-preview::after {
 																			   for="file">Response Header Params: (Key/Value) </label>
 																		<div class="col-md-7">
 																			<table id="page">
-																				<tr ng-repeat="(resKey, resValue) in mockRequest.responseHeaderParams">
+																				<tr ng-repeat="(resKey, resValue) in mockMsgRequest.responseHeaderParams">
 																					<td><span >{{resKey}}</span></td>
 																					<td><span >{{resValue}}</span></td>
 																					<td>
-																						<img height="30" width="30" ng-click="ctrl.removeParam(resKey, mockRequest.responseHeaderParams);"
+																						<img height="30" width="30" ng-click="ctrl.removeParam(resKey, mockMsgRequest.responseHeaderParams);"
 																							 src= "static/img/minus-img.png"
 																							 alt="Remove">
 
@@ -971,7 +971,7 @@ json-tree .branch-preview::after {
 																								type="text" ng-model="ctrl.responseHeaderParamValue"/>
 																					</td>
 																					<td>
-																						<img height="30" width="30" ng-click="ctrl.addResponseHeaderParam(mockRequest, ctrl.responseHeaderParamKey,ctrl.responseHeaderParamValue);"
+																						<img height="30" width="30" ng-click="ctrl.addResponseHeaderParam(mockMsgRequest, ctrl.responseHeaderParamKey,ctrl.responseHeaderParamValue);"
 																							 src= "static/img/plus-img.png"
 																							 alt="Add">
 																					</td>
@@ -986,7 +986,7 @@ json-tree .branch-preview::after {
 																		<label class="head-text-black col-md-2 control-lable"
 																			   for="file">Exclude List: </label>
 																		<div class="col-md-7">
-																			<input type="text" ng-model="mockRequest.excludeList"
+																			<input type="text" ng-model="mockMsgRequest.excludeList"
 																				   name="excludeList" class="input form-control input-sm"
 																				   value="Add Excluded parameters in comma separated value Example:
 																				createDate,receiveDate**">
@@ -996,11 +996,11 @@ json-tree .branch-preview::after {
 																<div class="row nomargin">
 																	<div class="form-actions floatRight nomargin">
 																		<input type="submit"
-																			   value="{{!mockRequest.id ? 'Add' : 'Update'}}"
+																			   value="{{!mockMsgRequest.id ? 'Add' : 'Update'}}"
 																			   class="btn btn-primary btn-sm"
 																			   ng-disabled="myForm-message.$invalid">
 																		<button type="button"
-																				ng-click="ctrl.reset(myForm-message, mockRequest)"
+																				ng-click="ctrl.reset(myForm-message, mockMsgRequest)"
 																				class="btn btn-primary btn-sm"
 																				ng-disabled="myForm-message.$pristine">Reset Form</button>
 																		<button type="button" class="btn btn-primary btn-sm"
@@ -1116,7 +1116,7 @@ json-tree .branch-preview::after {
 									<td>
 										<!-- 							<button type="button" ng-click="ctrl.edit(u.id)"
                 class="btn btn-success custom-width">Edit</button> -->
-										<button type="button" ng-click="ctrl.remove(mockMsgRequest.id)"
+										<button type="button" ng-click="ctrl.removeMsg(mockMsgRequest.id)"
 														class="btn btn-danger custom-width">Remove</button>
 									</td>
 								</tr>

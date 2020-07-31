@@ -1,0 +1,12 @@
+{
+  "Kafka" : [
+    {
+      "broker" : "localhost:9092",
+      "topics": [
+             "virtualan.input", "virtualan.output"
+      ],
+      "consumer" : "consumer.properties",
+      "producer" : "producer.properties"
+    }
+  ]
+}

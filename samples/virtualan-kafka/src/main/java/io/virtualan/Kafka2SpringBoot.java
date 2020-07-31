@@ -24,12 +24,13 @@ public class Kafka2SpringBoot {
     @Autowired
     private Config config;
 
-    @Autowired
-    private EmbeddedKafkaBroker broker;
-
     public static void main(String[] args) {
         new SpringApplication(Kafka2SpringBoot.class).run(args);
     }
+
+    @Autowired
+    private EmbeddedKafkaBroker broker;
+
 
     @Configuration
     public static class Config {

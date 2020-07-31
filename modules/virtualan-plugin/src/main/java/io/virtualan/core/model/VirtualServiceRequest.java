@@ -34,6 +34,7 @@ public class VirtualServiceRequest {
     private String httpStatusCode;
     private String url;
     private String type;
+    private String requestType;
     private long usageCount;
     private int priority;
     private String method;
@@ -99,6 +100,13 @@ public class VirtualServiceRequest {
         this.responseType = responseType;
     }
 
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
 
     public Object getHeaderParam(String param) {
         return getHeaderParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());

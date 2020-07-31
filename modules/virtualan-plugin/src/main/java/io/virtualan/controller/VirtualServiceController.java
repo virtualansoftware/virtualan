@@ -17,7 +17,6 @@ package io.virtualan.controller;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -141,7 +140,7 @@ public class VirtualServiceController {
     @RequestMapping(value = "/virtualservices", method = RequestMethod.GET)
     public ResponseEntity<List<VirtualServiceRequest>> listAllMockLoadRequests() {
         final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
-        final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> Type.REST.toString().equalsIgnoreCase(x.getType())).collect(
+        final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.REST.toString().equalsIgnoreCase(x.getRequestType())).collect(
             Collectors.toList());
         if (mockRestLoadRequests.isEmpty()) {
             return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);
@@ -165,7 +164,7 @@ public class VirtualServiceController {
 
         try {
 
-            virtualServiceRequest.setType(Type.REST.toString());
+            virtualServiceRequest.setRequestType(RequestType.REST.toString());
             validateExpectedInput(virtualServiceRequest);
             // find the operationId for the given Request. It required for the Automation test cases
             virtualServiceUtil.findOperationIdForService(virtualServiceRequest);

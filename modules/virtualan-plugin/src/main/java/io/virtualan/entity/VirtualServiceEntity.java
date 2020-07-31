@@ -43,6 +43,9 @@ public class VirtualServiceEntity implements Serializable {
     @Column(name = "input")
     private String input;
 
+    @Column(name = "requestType")
+    private String requestType;
+
     @Column(name = "output")
     private String output;
     
@@ -140,6 +143,13 @@ public class VirtualServiceEntity implements Serializable {
 
     public VirtualServiceEntity() {
 
+    }
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
     }
 
     public VirtualServiceEntity(String operationId, String input, String output) {
