@@ -170,7 +170,6 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     };
         
     self.loadData = fetchAllMockRequest();
-    self.loadData = fetchAllMsgMockRequest();
 
     function fetchAllMsgMockRequest(){
         	MockService.fetchAllMsgMockRequest()
