@@ -15,6 +15,7 @@
 package io.virtualan.core;
 
 
+import io.virtualan.api.WSResource;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -54,6 +55,7 @@ import io.virtualan.custom.message.ResponseException;
 import io.virtualan.requestbody.RequestBody;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
+import org.springframework.ws.soap.SoapFaultException;
 
 /**
  * This class is base utility service class to perform all virtual service operations
@@ -406,9 +408,12 @@ public class VirtualServiceUtil {
             Collections.sort(returnMockResponseList, new BestMatchComparator());
             VirtualServiceUtil.log.info("Sorted list : " + returnMockResponseList);
             rMockResponse = returnMockResponseList.stream()
-                    .filter(x -> x.isExactMatch()).findAny().orElse(null); 
+                    .filter(x -> x.isExactMatch()).findAny().orElse(null);
             if(rMockResponse != null) {
 	            rMockResponse = returnMockResponseList.iterator().next();
+	            if(WSResource.isExists(method)){
+	                return returnSoapResponse(method, rMockResponse.getMockResponse().getOutput());
+              }
 	            if (rMockResponse.getHeaderResponse() != null) {
 	                responseEntity = buildResponseEntity(rMockResponse.getMockResponse(),
 	                        rMockResponse.getHeaderResponse());
@@ -429,6 +434,24 @@ public class VirtualServiceUtil {
 
 
 
+
+    private Object returnSoapResponse(Method method, String response){
+            if (response != null) {
+                Type mySuperclass = null;
+
+                try {
+                    mySuperclass = method.getGenericReturnType();
+                    this.objectMapper.readValue(response, this.objectMapper.constructType(mySuperclass));
+                    return this.objectMapper.readValue(response, this.objectMapper.constructType(mySuperclass));
+                } catch (Exception ex) {
+                    log.error(" GenericReturnType  >>> mySuperclass " + mySuperclass);
+                    throw new SoapFaultException("MOCK NOT FOUND ("+ex.getMessage()+")  GenericReturnType  >>> mySuperclass " + method.getReturnType());
+                }
+            } else {
+                throw new SoapFaultException("MOCK NOT FOUND");
+            }
+    }
+
     private Object returnResponse(Method method, ResponseEntity responseEntity, String response)
             throws ResponseException {
         VirtualServiceUtil.log.info(" responseEntity.getHeaders() :" + responseEntity.getHeaders());
@@ -436,10 +459,10 @@ public class VirtualServiceUtil {
             final String responseOut = xmlConverter.returnAsXml(method, responseEntity, response);
             if (method.getReturnType().equals(Response.class)) {
                 return Response.status(responseEntity.getStatusCode().value()).entity(responseOut)
-                        .build();
+                    .build();
             } else if (method.getReturnType().equals(ResponseEntity.class)) {
                 return new ResponseEntity(responseOut, responseEntity.getHeaders(),
-                        responseEntity.getStatusCode());
+                    responseEntity.getStatusCode());
             }
             Type mySuperclass = null;
             try {
@@ -448,11 +471,15 @@ public class VirtualServiceUtil {
                 return objectMapper.readValue(response, objectMapper.constructType(mySuperclass));
             } catch (final Exception e) {
                 VirtualServiceUtil.log
-                        .error(" GenericReturnType  >>> mySuperclass " + mySuperclass);
+                    .error(" GenericReturnType  >>> mySuperclass " + mySuperclass);
             }
         }
 
-        if (responseEntity != null) {
+         if (responseEntity != null) {
+             if(WSResource.isExists(method)){
+                 SoapFaultException SoapFaultException = new SoapFaultException(responseEntity.getBody().toString());
+                 throw SoapFaultException;
+             }
             final ResponseException responseException = new ResponseException();
             if (VirtualServiceType.CXF_JAX_RS.compareTo(getVirtualServiceType()) == 0) {
                 responseException

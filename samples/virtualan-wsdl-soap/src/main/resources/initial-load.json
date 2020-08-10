@@ -1,0 +1,27 @@
+[{
+  "operationId": "sayHello",
+  "url": "http://virtualan.io/types/helloworld",
+  "method": "sayHello",
+  "type": "Response",
+  "input": "{\n   \"firstName\": \"Elan\",\n   \"lastName\": \"Thangamani\"\n}",
+  "output": "{ \"greeting\": \"Welcome Elan Thangamani\"\n}",
+  "resource": "http://virtualan.io/types/helloworld"
+},
+  {
+    "operationId": "FahrenheitToCelsius",
+    "url": "https://www.w3schools.com/xml/",
+    "method": "FahrenheitToCelsius",
+    "type": "Response",
+    "input": "{\n   \"fahrenheit\": \"10\" \n}",
+    "output": "{ \"fahrenheitToCelsiusResult\": \"20\"\n}",
+    "resource": "https://www.w3schools.com/xml/"
+  },
+  {
+    "operationId": "Add",
+    "url": "https://Example.org/ICalculator",
+    "method": "Add",
+    "type": "Response",
+    "input": "{\n   \"a\": \"10\", \"b\": \"5\" \n}",
+    "output": "{ \"result\": \"15\"\n}",
+    "resource": "https://Example.org/ICalculator"
+  }]
