@@ -1,5 +1,6 @@
 package io.virtualan.controller;
 
+import io.virtualan.core.model.RequestType;
 import io.virtualan.core.model.VirtualServiceMessageRequest;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;

@@ -42,6 +42,72 @@ paths:
             $ref: '#/definitions/VirtualServiceStatus'
       security:
         - basicAuth: []
+  /virtualservices/message:
+    post:
+      tags:
+        - VirtualServices
+      summary: Create Message Mock service data for the Virtual services
+      description: Create Message Mock data
+      operationId: "createMsgMockRequest"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: VirtualServiceMessageRequest
+          description: Create message Mock service data
+          required: true
+          schema:
+            $ref: '#/definitions/VirtualServiceMessageRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/VirtualServiceMessageRequest'
+        '400':
+          description: Business Exception
+          schema:
+            $ref: '#/definitions/VirtualServiceStatus'
+        '500':
+          description: Server Error
+          schema:
+            $ref: '#/definitions/VirtualServiceStatus'
+      security:
+        - basicAuth: []
+  /virtualservices/soap:
+    post:
+      tags:
+        - VirtualServices
+      summary: Create Mock service data for the Virtual services soap
+      description: Create Mock service data soap
+      operationId: "createSoapMockRequest"
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: VirtualServiceRequest
+          description: Create Mock service data
+          required: true
+          schema:
+            $ref: '#/definitions/VirtualServiceRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/VirtualServiceRequest'
+        '400':
+          description: Business Exception
+          schema:
+            $ref: '#/definitions/VirtualServiceStatus'
+        '500':
+          description: Server Error
+          schema:
+            $ref: '#/definitions/VirtualServiceStatus'
+      security:
+        - basicAuth: []
   /virtualservices/{id}:
     get:
       tags:
@@ -115,6 +181,55 @@ definitions:
         type: string
       method:
         type: string
+      requestType:
+        type: string
+          desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
+      type:
+        type: string
+        desc: "possible values are Response, Rule and Script"
+      rule:
+        type: string
+        desc: "rule could be a groovy script or spring expression language business rule"
+      input:
+        type: string
+      output:
+        type: string
+      availableParams:
+        type: array
+        items:
+          $ref: "#/definitions/VirtualServiceKeyValue"
+      headerParams:
+        type: array
+        items:
+          $ref: "#/definitions/VirtualServiceHeaderKeyValue"
+      excludeList:
+        type: string
+      resource:
+        type: string
+      mockStatus:
+        $ref: "#/definitions/VirtualServiceStatus"
+  VirtualServiceMessageRequest:
+    type: object
+    required:
+      - brokerUrl
+      - requestTopicOrQueueName
+      - type
+      - requestType
+    properties:
+      id:
+        type: integer
+        format: int64
+      responseTopicOrQueueName:
+        type: string
+      requestTopicOrQueueName:
+        type: string
+      brokerUrl:
+        type: string
+      method:
+        type: string
+      requestType:
+        type: string
+          desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
       type:
         type: string
         desc: "possible values are Response, Rule and Script"
