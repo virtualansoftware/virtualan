@@ -49,9 +49,8 @@ public class ApiType {
             return VirtualServiceType.SPRING;
         } else if (clazz.isAnnotationPresent(Path.class)) {
             return VirtualServiceType.CXF_JAX_RS;
-        } else {
-            return VirtualServiceType.NON_REST;
         }
+        return null;
     }
 
 
@@ -94,7 +93,7 @@ public class ApiType {
         }
         log.error(
                 "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
-        return VirtualServiceType.NON_REST;
+        return null;
     }
 
 
