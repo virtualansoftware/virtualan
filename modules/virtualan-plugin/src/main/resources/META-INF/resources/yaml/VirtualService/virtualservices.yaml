@@ -13,8 +13,8 @@ paths:
     post:
       tags:
         - VirtualServices
-      summary: Create Mock service data for the Virtual services
-      description: Create Mock service data
+      summary: Create REST Mock service data for the Virtual services
+      description: Create REST Mock service data
       operationId: "createMockRequest"
       produces:
         - application/json
@@ -23,7 +23,7 @@ paths:
       parameters:
         - in: body
           name: VirtualServiceRequest
-          description: Create Mock service data
+          description: Create REST Mock service data
           required: true
           schema:
             $ref: '#/definitions/VirtualServiceRequest'
@@ -79,8 +79,8 @@ paths:
     post:
       tags:
         - VirtualServices
-      summary: Create Mock service data for the Virtual services soap
-      description: Create Mock service data soap
+      summary: Create SOAP Mock service data for the Virtual services
+      description: Create SOAP Mock service data soap
       operationId: "createSoapMockRequest"
       produces:
         - application/json
@@ -183,7 +183,7 @@ definitions:
         type: string
       requestType:
         type: string
-          desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
+        desc: Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP
       type:
         type: string
         desc: "possible values are Response, Rule and Script"
@@ -229,7 +229,7 @@ definitions:
         type: string
       requestType:
         type: string
-          desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
+        desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
       type:
         type: string
         desc: "possible values are Response, Rule and Script"

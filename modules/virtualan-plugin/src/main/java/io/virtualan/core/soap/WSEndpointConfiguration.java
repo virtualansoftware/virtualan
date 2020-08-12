@@ -18,22 +18,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-@Configuration
-@EnableAspectJAutoProxy
+@Component
+@ConditionalOnProperty(name = {"virtualan.soap.wsdl", "virtualan.soap.package"}, matchIfMissing = true)
 public class WSEndpointConfiguration implements BeanFactoryAware {
+
+  @Autowired
+  private SoapEndpointCodeGenerator soapEndpointCodeGenerator;
 
   private static final Logger log = LoggerFactory.getLogger(WSEndpointConfiguration.class);
 
@@ -49,7 +53,7 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
     this.beanFactory = beanFactory;
   }
 
-  public String getName(Document xmlDocument, String expression)
+  private String getName(Document xmlDocument, String expression)
       throws XPathExpressionException {
     XPath xPath = XPathFactory.newInstance().newXPath();
     NodeList nodeList = (NodeList) xPath.compile(expression)
@@ -62,7 +66,7 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   }
 
 
-  public Map<String, SoapService> getWSOperation(File file)
+  private Map<String, SoapService> getWSOperation(File file)
       throws XPathExpressionException, IOException, ParserConfigurationException, SAXException {
     FileInputStream fileIS = new FileInputStream(file);
     DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -100,7 +104,7 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
     return wsServiceMockList;
   }
 
-  public String buildClassType(String str) {
+  private String buildClassType(String str) {
     return soapPackage + "." + str.substring(0, 1).toUpperCase() + str.substring(1);
   }
 
@@ -116,10 +120,10 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
     DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
     for (Resource fileEntry : resources) {
       log.info("WSDL File processing... >> " + fileEntry.getFile().getName());
-      wsServiceMockList.putAll(new WSEndpointConfiguration().getWSOperation(fileEntry.getFile()));
+      wsServiceMockList.putAll(getWSOperation(fileEntry.getFile()));
     }
     GenericBeanDefinition virtualanSOAPWS = new GenericBeanDefinition();
-    virtualanSOAPWS.setBeanClass(SoapEndpointCodeGenerator.buildEndpointClass(wsServiceMockList));
+    virtualanSOAPWS.setBeanClass(soapEndpointCodeGenerator.buildEndpointClass(wsServiceMockList));
     beanRegistry.registerBeanDefinition("virtualanSOAPWS", virtualanSOAPWS);
 
   }

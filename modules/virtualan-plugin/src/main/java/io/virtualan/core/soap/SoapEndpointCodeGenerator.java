@@ -17,10 +17,12 @@ import javassist.bytecode.MethodInfo;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+@Component
+@ConditionalOnProperty(name = {"virtualan.soap.wsdl", "virtualan.soap.package"}, matchIfMissing = true)
 public class SoapEndpointCodeGenerator {
-
   public static Class buildEndpointClass(Map<String, SoapService> soapWsServices)
       throws Exception {
     ClassPool pool = ClassPool.getDefault();
