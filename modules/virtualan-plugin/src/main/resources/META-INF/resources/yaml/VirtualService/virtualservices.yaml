@@ -42,6 +42,27 @@ paths:
             $ref: '#/definitions/VirtualServiceStatus'
       security:
         - basicAuth: []
+    get:
+      tags:
+        - VirtualServices
+      summary: Get all Mock service data
+      description: Get All Mock service data
+      operationId: "readAllMockRequest"
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/VirtualServiceRequest'
+        '400':
+          description: Business Exception
+        '500':
+          description: Server Error
+      security:
+        - basicAuth: []
   /virtualservices/message:
     post:
       tags:
