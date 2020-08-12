@@ -21,8 +21,7 @@ public class MessageUtil {
 	
 	@Autowired
 	private VirtualServiceValidRequest virtualServiceValidRequest;
-	
-	
+
 	@Autowired
 	private VirtualServiceUtil virtualServiceUtil;
 	

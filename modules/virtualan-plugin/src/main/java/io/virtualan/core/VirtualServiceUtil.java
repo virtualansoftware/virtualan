@@ -101,6 +101,8 @@ public class VirtualServiceUtil {
             setVirtualServiceInfo(
                     virtualServiceInfoFactory.getVirtualServiceInfo(virtualServiceType.getType()));
             this.virtualServiceType = virtualServiceType;
+        } else {
+            this.virtualServiceType = VirtualServiceType.NON_REST;
         }
 
     }
@@ -109,7 +111,9 @@ public class VirtualServiceUtil {
     public void init() throws ClassNotFoundException, JsonProcessingException,
             InstantiationException, IllegalAccessException {
         setVirtualServiceType(ApiType.findApiType());
-        if (getVirtualServiceType() != null) {
+        if (getVirtualServiceType() == VirtualServiceType.NON_REST ) {
+            virtualServiceInfo = getVirtualServiceInfo();
+        }if (getVirtualServiceType() != null ) {
             virtualServiceInfo = getVirtualServiceInfo();
             virtualServiceInfo.loadVirtualServices();
             virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
