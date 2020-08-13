@@ -8,6 +8,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -36,8 +37,10 @@ public class JMSListener implements MessageListener {
         messageObject.jsonObject = (JSONObject) new JSONTokener((text)).nextValue();
         VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
         virtualServiceRequest.setInput(messageObject.jsonObject.toString());
-        virtualServiceRequest.setOperationId(message.getStringProperty("destinationName"));
-        virtualServiceRequest.setResource(message.getStringProperty("destinationName"));
+        String inputTopic = message.getJMSDestination().toString();
+        messageObject.setInboundTopic(inputTopic.substring(inputTopic.indexOf("/")+2,inputTopic.length()));
+        virtualServiceRequest.setOperationId(messageObject.getInboundTopic());
+        virtualServiceRequest.setResource(messageObject.getInboundTopic());
         ReturnMockResponse response = messageUtil.getMatchingRecord(virtualServiceRequest);
         if (response != null && response.getMockResponse() != null) {
           messageObject.outputMessage = response.getMockResponse().getOutput();
@@ -48,7 +51,7 @@ public class JMSListener implements MessageListener {
           } else {
             log.info("Response configured.. with (" + messageObject.outboundTopic + ") :"
                 + messageObject.outputMessage);
-            JMSMessageSender.sendMessage(messageObject.outboundTopic, messageObject.outputMessage);
+            JMSMessageSender.sendMessage(messageObject.inboundTopic, messageObject.outboundTopic, messageObject.outputMessage);
           }
         } else {
           log.info("No response configured for the given input");

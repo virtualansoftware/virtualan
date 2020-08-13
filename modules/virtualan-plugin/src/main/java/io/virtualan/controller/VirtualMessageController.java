@@ -106,7 +106,11 @@ public class VirtualMessageController {
       request.setUrl(virtualServiceMessageRequest.getBrokerUrl());
       request.setMethod(virtualServiceMessageRequest.getResponseTopicOrQueueName());
       request.setOperationId(virtualServiceMessageRequest.getRequestTopicOrQueueName());
-      request.setRequestType(RequestType.KAFKA.toString());
+      if(virtualServiceMessageRequest.getRequestType() == null ) {
+        request.setRequestType(RequestType.KAFKA.toString());
+      } else {
+        request.setRequestType(virtualServiceMessageRequest.getRequestType());
+      }
       ResponseEntity responseEntity = checkIfServiceDataAlreadyExists(request);
 
       if (responseEntity != null) {

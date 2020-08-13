@@ -35,11 +35,11 @@ public class JMSMessageSender {
   @Autowired
   private BeanFactory beanFactory;
 
-  public static void sendMessage(String queueName, String message) {
+  public static void sendMessage(String inboundTopic, String outboudTopic, String message) {
     log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
     log.info("sending: " + message);
 
-    JMSTemplateLookup.getJmsTemplate(queueName).send(queueName, new MessageCreator() {
+    JMSTemplateLookup.getJmsTemplate(inboundTopic).send(outboudTopic, new MessageCreator() {
       @Override
       public Message createMessage(Session session) throws JMSException {
         return session.createTextMessage(message);
@@ -82,7 +82,7 @@ public class JMSMessageSender {
 
         if (conf.getSenderQueueName() != null) {
           JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory(conf));
-          JMSTemplateLookup.loadTemplate(conf.getSenderQueueName(), jmsTemplate);
+          JMSTemplateLookup.loadTemplate(conf.getReceiverQueueName(), jmsTemplate);
           log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
         }
         log.info("JMS conf loaded : " + conf);
