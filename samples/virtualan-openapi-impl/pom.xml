@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.virtualan</groupId>
-	<artifactId>virtualan-openapi-impl</artifactId>
+	<artifactId>virtualan-openapi-rest</artifactId>
 	<packaging>jar</packaging>
-	<name>virtualan-openapi-impl</name>
+	<name>virtualan-openapi-rest</name>
 	<version>1.3.5-SNAPSHOT</version>
 	<properties>
 		<virtualan.version>1.3.5-SNAPSHOT</virtualan.version>
