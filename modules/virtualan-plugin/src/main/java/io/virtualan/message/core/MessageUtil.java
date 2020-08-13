@@ -6,6 +6,10 @@ import io.virtualan.core.util.BestMatchComparator;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.VirtualServiceValidRequest;
+import io.virtualan.message.core.jms.JMSListener;
+import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +21,19 @@ import java.util.Map;
 
 @Component("messageUtil")
 public class MessageUtil {
-	
-	
+
+	private static final Logger log = LoggerFactory.getLogger(MessageUtil.class);
+
+
 	@Autowired
 	private VirtualServiceValidRequest virtualServiceValidRequest;
 
 	@Autowired
 	private VirtualServiceUtil virtualServiceUtil;
-	
+
+	@PostConstruct
+	public void init() {
+	}
 	
 	public ReturnMockResponse isResponseExists(final Map<Integer, ReturnMockResponse> returnMockResponseMap) throws IOException {
 		final List<ReturnMockResponse> returnMockResponseList =
@@ -53,9 +62,26 @@ public class MessageUtil {
 					.setParams(Converter.converter(mockTransferObject.getAvailableParams()));
 			mockServiceRequest.setResource(mockTransferObject.getResource());
 			mockServiceRequest.setInput(mockTransferObject.getInput());
-			final Map<Integer, ReturnMockResponse> returnMockResponseMap =
-					isResponseExists(mockDataSetupMap, mockServiceRequest);
-			
+
+
+			//Rule Execution
+			Map<Integer, ReturnMockResponse> returnMockResponseMap =
+					virtualServiceUtil.validateBusinessRules(mockDataSetupMap, mockServiceRequest);
+
+			//No Rule conditions exists/met then run the script
+			if(returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
+				returnMockResponseMap = virtualServiceValidRequest.checkScriptResponse(mockDataSetupMap, mockServiceRequest);
+			}
+
+			//No script conditions exists/met then run the mock response
+			if(returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
+				returnMockResponseMap =
+						isResponseExists(mockDataSetupMap, mockServiceRequest);
+			}
+			if(returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
+				 returnMockResponseMap = isResponseExists(mockDataSetupMap, mockServiceRequest);
+			}
+
 			if (returnMockResponseMap.size() > 0) {
 				return isResponseExists(returnMockResponseMap);
 			}

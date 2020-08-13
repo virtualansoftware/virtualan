@@ -102,6 +102,9 @@ public class VirtualServiceUtil {
                     virtualServiceInfoFactory.getVirtualServiceInfo(virtualServiceType.getType()));
             this.virtualServiceType = virtualServiceType;
         } else {
+            setVirtualServiceInfo(
+                virtualServiceInfoFactory.getVirtualServiceInfo(
+                    virtualServiceType.NON_REST.getType()));
             this.virtualServiceType = VirtualServiceType.NON_REST;
         }
 
@@ -352,7 +355,7 @@ public class VirtualServiceUtil {
         return isValid;
     }
     
-    private Map<Integer, ReturnMockResponse> validateBusinessRules(
+    public Map<Integer, ReturnMockResponse> validateBusinessRules(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
             MockServiceRequest mockServiceRequest) throws IOException {
             return virtualServiceValidRequest.validBusinessRuleForInputObject(mockDataSetupMap,

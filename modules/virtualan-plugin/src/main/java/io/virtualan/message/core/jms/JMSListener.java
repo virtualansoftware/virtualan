@@ -15,21 +15,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
+import org.springframework.stereotype.Service;
 
 @ConditionalOnResource(resources = {"classpath:conf/jms-config.json"})
+@Service
 public class JMSListener implements MessageListener {
 
   private static final Logger log = LoggerFactory.getLogger(JMSListener.class);
-  String queueName;
   @Autowired
   private MessageUtil messageUtil;
 
-  public JMSListener(String queueName) {
-    this.queueName = queueName;
-  }
 
   @Override
   public void onMessage(Message message) {
+    String queueName = null;
     if (message instanceof TextMessage) {
       try {
         String text = ((TextMessage) message).getText();
@@ -37,22 +36,23 @@ public class JMSListener implements MessageListener {
         messageObject.jsonObject = (JSONObject) new JSONTokener((text)).nextValue();
         VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
         virtualServiceRequest.setInput(messageObject.jsonObject.toString());
-        virtualServiceRequest.setOperationId(messageObject.inboundTopic);
-        virtualServiceRequest.setResource(messageObject.inboundTopic);
+        virtualServiceRequest.setOperationId(message.getStringProperty("destinationName"));
+        virtualServiceRequest.setResource(message.getStringProperty("destinationName"));
         ReturnMockResponse response = messageUtil.getMatchingRecord(virtualServiceRequest);
         if (response != null && response.getMockResponse() != null) {
           messageObject.outputMessage = response.getMockResponse().getOutput();
           messageObject.outboundTopic = response.getMockRequest().getMethod();
+          queueName = response.getMockRequest().getMethod();;
           if (messageObject.outputMessage == null || messageObject.outboundTopic == null) {
             log.info("No outputMessage response configured..");
           } else {
             log.info("Response configured.. with (" + messageObject.outboundTopic + ") :"
                 + messageObject.outputMessage);
-            JMSMessageSender.sendMessage(messageObject.outboundTopic, text);
+            JMSMessageSender.sendMessage(messageObject.outboundTopic, messageObject.outputMessage);
           }
         } else {
           log.info("No response configured for the given input");
-          JMSMessageSender.sendMessage(queueName, text);
+          //JMSMessageSender.sendMessage(queueName, text);
         }
 
       } catch (JSONException e) {
