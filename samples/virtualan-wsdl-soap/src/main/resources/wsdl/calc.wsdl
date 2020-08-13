@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:tns="https://Example.org"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  name="HelloWorld" targetNamespace="https://Example.org">
+  <wsdl:binding name="DefaultBinding_ICalculator" type="tns:ICalculator">
+    <soap:binding transport="https://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="Add">
+      <soap:operation style="document" soapAction="https://Example.org/ICalculator/Add"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Subtract">
+      <soap:operation style="document" soapAction="https://Example.org/ICalculator/Subtract"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:message name="ICalculator_Add_OutputMessage">
+    <wsdl:part element="tns:AddResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ICalculator_Subtract_InputMessage">
+    <wsdl:part element="tns:Subtract" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ICalculator_Subtract_OutputMessage">
+    <wsdl:part element="tns:SubtractResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ICalculator_Add_InputMessage">
+    <wsdl:part element="tns:Add" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="ICalculator">
+    <wsdl:operation name="Add">
+      <wsdl:input message="tns:ICalculator_Add_InputMessage"/>
+      <wsdl:output message="tns:ICalculator_Add_OutputMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="Subtract">
+      <wsdl:input message="tns:ICalculator_Subtract_InputMessage"/>
+      <wsdl:output message="tns:ICalculator_Subtract_OutputMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:service name="CalculatorService">
+    <wsdl:port binding="tns:DefaultBinding_ICalculator" name="ICalculator">
+      <soap:address location="https://Example.org/ICalculator"/>
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+      attributeFormDefault="unqualified" elementFormDefault="qualified"
+      targetNamespace="https://Example.org/ICalculator" version="1.0">
+      <xsd:element name="Add">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="a" type="xsd:int"/>
+            <xsd:element minOccurs="0" name="b" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="AddResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="result" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Subtract">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="a" type="xsd:int"/>
+            <xsd:element minOccurs="0" name="b" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="SubtractResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="result" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+</wsdl:definitions>

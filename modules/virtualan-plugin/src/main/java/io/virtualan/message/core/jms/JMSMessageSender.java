@@ -15,8 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -29,11 +32,14 @@ public class JMSMessageSender {
 
   private static final Logger log = LoggerFactory.getLogger(JMSMessageSender.class);
 
-  public static void sendMessage(String queueName, String message) {
+  @Autowired
+  private BeanFactory beanFactory;
+
+  public static void sendMessage(String inboundTopic, String outboudTopic, String message) {
     log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
     log.info("sending: " + message);
 
-    JMSTemplateLookup.getJmsTemplate(queueName).send(queueName, new MessageCreator() {
+    JMSTemplateLookup.getJmsTemplate(inboundTopic).send(outboudTopic, new MessageCreator() {
       @Override
       public Message createMessage(Session session) throws JMSException {
         return session.createTextMessage(message);
@@ -76,7 +82,7 @@ public class JMSMessageSender {
 
         if (conf.getSenderQueueName() != null) {
           JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory(conf));
-          JMSTemplateLookup.loadTemplate(conf.getSenderQueueName(), jmsTemplate);
+          JMSTemplateLookup.loadTemplate(conf.getReceiverQueueName(), jmsTemplate);
           log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
         }
         log.info("JMS conf loaded : " + conf);
@@ -106,17 +112,17 @@ public class JMSMessageSender {
   }
 
   public void registerListenerBeans(JMSConfigurationDomain conf) {
-    DefaultListableBeanFactory beanFactory =
-        new DefaultListableBeanFactory();
+    GenericBeanDefinition jmsBean = new GenericBeanDefinition();
+    jmsBean.setBeanClass(JMSListener.class);
     BeanDefinitionBuilder bean = BeanDefinitionBuilder
         .rootBeanDefinition(DefaultMessageListenerContainer.class)
         .addPropertyValue("connectionFactory", connectionFactory(conf))
           .addPropertyValue("destinationName", conf.getReceiverQueueName())
-        .addPropertyValue("messageListener", new JMSListener(conf.getSenderQueueName()));
-    beanFactory.registerBeanDefinition(conf.getSystem(), bean.getBeanDefinition());
+        .addPropertyValue("messageListener", jmsBean);
+    DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
+    beanRegistry.registerBeanDefinition(conf.getSystem(), bean.getBeanDefinition());
 
     DefaultMessageListenerContainer messageListenerContainer = beanFactory.getBean(conf.getSystem(), DefaultMessageListenerContainer.class);
-
     if (!messageListenerContainer.isRunning()) {
       log.info(conf.getSystem() + " bean registered successfully.. and Started JmsListenerContainer");
       messageListenerContainer.start();

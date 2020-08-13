@@ -1,11 +1,11 @@
 Feature: Test Pet API
   Scenario: User calls service to get a pet by its id
     Given a pet exists with an id of 1000
-    When a user GET the pet by id
+    When a user GET the petId by id
     Then verify the status code is 500
     And verify response includes following in the response
       | code		| MISSING_MOCK_DATA     |
-      | message		| Mock response was not added for the given parameter    |
+      | message		| Mock response was not added for the given parameter|
 
   Scenario: Setup a mock service for Pet with POST call with "Mock Request Body" validation failure
     Given set Pet Mock data for the following given input
@@ -108,7 +108,7 @@ Feature: Test Pet API
 
   Scenario: User calls service to GET a pet by its id
     Given a pet exists with an id of 110
-    When a user GET the pet by id
+    When a user GET the petId by id
     Then verify the status code is 200
     And verify response includes following in the response
       | id		| 110     	   |
@@ -131,7 +131,7 @@ Feature: Test Pet API
 
   Scenario: User calls service to DELETE a pet by its id
     Given a pet exists with an id of 120
-    When a user DELETE the pet by id
+    When a user DELETE the petId by id
     Then verify the status code is 200
     And verify response includes following in the response
       | id		| 120     	   |
@@ -156,8 +156,22 @@ Feature: Test Pet API
   Scenario: User calls service to PUT and create Pet
     Given update a pet with given a pet id 130 with input
       | input | {   "category": {     "id": 130,     "name": "Fish-PUT"   },   "id": 130,   "name": "GoldFish-PUT",   "photoUrls": [     "/fish/"   ],   "status": "available",   "tags": [     {       "id": 130,       "name": "Fish-PUT"     }   ] }  |
-    When a user PUT the pet with id
+    When a user PUT the petId with id
     Then verify the status code is 200
     And verify response includes following in the response
       | id		| 130     	   |
       | name		| GoldFish-PUT |
+
+  Scenario: User check if high risk level for the give dateOfbirth and zipcode
+    Given create a risk with given input
+      | input                 | {   "birthday" : "1964-02-02",   "postalCode" : "1201" }|
+    When a user POST the risk with id
+    Then verify the status code is 200
+    And verify risk response with 70 includes in the response
+
+  Scenario: User check if low risk level for the give dateOfbirth and zipcode
+    Given create a risk with given input
+      | input                 | {   "birthday" : "2013-02-02",   "postalCode" : "60563" }|
+    When a user POST the risk with id
+    Then verify the status code is 200
+    And verify risk response with 35 includes in the response

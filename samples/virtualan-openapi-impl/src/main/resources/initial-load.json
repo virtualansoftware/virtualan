@@ -3,6 +3,7 @@
     "url": "/pets/{petId}",
     "operationId": "getPetById",
     "httpStatusCode": "200",
+    "resource": "pets",
     "method": "GET",
     "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": 101,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
     "availableParams": [

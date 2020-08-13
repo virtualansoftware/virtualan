@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <name>virtualan-wsdl-soap</name>
+  <groupId>io.virtualan</groupId>
+  <artifactId>virtualan-wsdl-sv-demo</artifactId>
+  <description>Virtualan Auto WSDL Service virtualization</description>
+  <version>1.0.0-SNAPSHOT</version>
+  <modelVersion>4.0.0</modelVersion>
+  <properties>
+    <java.version>1.8</java.version>
+    <maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
+  </properties>
+  <url>http://virtualan.io</url>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <version>2.2.4.RELEASE</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <configuration>
+          <bindingIncludes>bindings.xjb</bindingIncludes>
+          <generatePackage>io.virtualan.ws.domain</generatePackage>
+          <schemaDirectory>${project.basedir}/src/main/resources/wsdl/
+          </schemaDirectory>
+          <schemaIncludes>
+            <include>*.wsdl</include>
+          </schemaIncludes>
+          <args>
+            <arg>-XtoString</arg>
+            <arg>-Xequals</arg>
+            <arg>-XhashCode</arg>
+          </args>
+          <plugins>
+          <plugin>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>jaxb2-basics</artifactId>
+            <version>0.11.1</version>
+          </plugin>
+          </plugins>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <version>${maven-jaxb2-plugin.version}</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <artifactId>spring-boot-starter-web-services</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
+      <groupId>org.springframework.boot</groupId>
+      <version>2.2.4.RELEASE</version>
+    </dependency>
+
+
+    <dependency>
+      <artifactId>virtualan-plugin</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>activemq-all</artifactId>
+          <groupId>org.apache.activemq</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
+      <groupId>io.virtualan</groupId>
+      <version>1.3.5-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>spring-context</artifactId>
+      <groupId>org.springframework</groupId>
+      <version>5.2.8.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jvnet.jaxb2_commons</groupId>
+      <artifactId>jaxb2-basics</artifactId>
+      <version>0.11.1</version>
+    </dependency>
+
+    <!-- HyperSQL DB -->
+    <dependency>
+      <artifactId>hsqldb</artifactId>
+      <groupId>org.hsqldb</groupId>
+      <version>2.5.1</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>javassist</artifactId>
+      <groupId>javassist</groupId>
+      <version>3.12.1.GA</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+      <scope>provided</scope>
+      <version>1.18.10</version>
+    </dependency>
+
+  </dependencies>
+</project>

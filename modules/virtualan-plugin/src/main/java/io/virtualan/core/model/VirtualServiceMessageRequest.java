@@ -33,6 +33,7 @@ public class VirtualServiceMessageRequest {
     private String httpStatusCode;
     private String brokerUrl;
     private String type;
+    private String requestType;
     private long usageCount;
     private int priority;
     private String responseTopicOrQueueName;
@@ -80,6 +81,14 @@ public class VirtualServiceMessageRequest {
 
     public void setHeaderParams(List<VirtualServiceKeyValue> headerParams) {
         this.headerParams = headerParams;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
     }
 
     public String getResource() {

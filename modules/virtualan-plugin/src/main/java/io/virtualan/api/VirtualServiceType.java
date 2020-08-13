@@ -23,7 +23,7 @@ package io.virtualan.api;
  **/
 public enum VirtualServiceType {
     SPRING("springVirtualServiceInfo"), CXF_JAX_RS("cxfVirtualServiceInfo"), OPEN_API(
-            "openApiVirtualServiceInfo");
+            "openApiVirtualServiceInfo"),  NON_REST("nonRestVirtualServiceInfo") ;
 
     String type;
 

@@ -15,10 +15,13 @@
 
 package io.virtualan.aop;
 
+import io.virtualan.api.WSResource;
+import io.virtualan.core.model.RequestType;
 import io.virtualan.core.VirtualServiceInfo;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +35,7 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import javax.xml.soap.SOAPException;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -46,7 +50,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.virtualan.annotation.VirtualService;
@@ -55,6 +58,7 @@ import io.virtualan.api.VirtualServiceType;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.MockServiceRequest;
 import io.virtualan.custom.message.ResponseException;
+import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 
 
 /**
@@ -70,17 +74,13 @@ import io.virtualan.custom.message.ResponseException;
 @Component
 public class ApiVirtualAspect {
 
-
     private static Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
-
 
     @Autowired
     HttpServletRequest request;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-
 
     @Autowired
     private VirtualServiceUtil virtualServiceUtil;
@@ -100,30 +100,55 @@ public class ApiVirtualAspect {
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-            throws ResponseException, IOException {
+        throws ResponseException, IOException, SOAPException {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();
         MethodSignature methodSignature =
                 (MethodSignature) thisJoinPoint.getStaticPart().getSignature();
         Method method = methodSignature.getMethod();
-        
+
         Class targetClass = thisJoinPoint.getTarget().getClass();
-        if (targetClass.isAnnotationPresent(VirtualService.class)) {
-            String parentPath = ApiResource.getResourceParent(targetClass);
-            mockServiceRequest.setResource(parentPath);
-        }
-        if(mockServiceRequest.getResource() == null) {
-        	mockServiceRequest.setResource(ApiResource.getResource(method));
-        }
-        mockServiceRequest.setOperationId(method.getName());
-        readInputParam(args, methodSignature, mockServiceRequest);
 
-        Map<String, String> headersInfo = getHeadersInfo();
-        mockServiceRequest.setHeaderParams(headersInfo);
+        SimpleEntry<Boolean, Class> isVirtualan = isVirtualService(targetClass);
+        if (isVirtualan.getKey()) {
+            String parentPath = null;
+            if (WSResource.isExists(method)){
+                SimpleEntry<String, String> path =  WSResource.getResourceParent(method);
+                mockServiceRequest.setResource(path.getValue());
+                mockServiceRequest.setOperationId(method.getName());
+                mockServiceRequest.setRequestType(RequestType.SOAP);
+                readWSInputParam(args, methodSignature, mockServiceRequest);
+            }else {
+                parentPath = ApiResource.getResourceParent(isVirtualan.getValue());
+                if(mockServiceRequest.getResource() == null) {
+                    mockServiceRequest.setResource(ApiResource.getResource(method));
+                } else {
+                    mockServiceRequest.setResource(parentPath);
+                }
+                mockServiceRequest.setOperationId(method.getName());
+                readInputParam(args, methodSignature, mockServiceRequest);
 
+                Map<String, String> headersInfo = getHeadersInfo();
+                mockServiceRequest.setHeaderParams(headersInfo);
+            }
+        }
         return getVirtualServiceUtil().returnResponse(method, mockServiceRequest);
     }
+
+    public SimpleEntry<Boolean, Class> isVirtualService(Class<?> claszzz) {
+        if(claszzz.isAnnotationPresent(VirtualService.class) ) {
+            return new SimpleEntry<>(true, claszzz);
+        } else {
+            for (Class clazz : claszzz.getInterfaces()) {
+                if (clazz.isAnnotationPresent(VirtualService.class)) {
+                    return new SimpleEntry<>(true, clazz);
+                }
+            }
+        }
+        return new SimpleEntry<>(false, Object.class);
+    }
+
 
     private Map<String, String> getHeadersInfo() {
         Map<String, String> map = new HashMap<String, String>();
@@ -135,6 +160,34 @@ public class ApiVirtualAspect {
         }
         return map;
     }
+
+
+    private void readWSInputParam(Object[] args, MethodSignature methodSignature,
+        MockServiceRequest mockServiceRequest) {
+        Method method = methodSignature.getMethod();
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        assert args.length == parameterAnnotations.length;
+        for (int argIndex = 0; argIndex < args.length; argIndex++) {
+            if (parameterAnnotations[argIndex] != null
+                && parameterAnnotations[argIndex].length > 0) {
+                String requestParamName = null;
+                for (Annotation annotation : parameterAnnotations[argIndex]) {
+                    if (annotation instanceof RequestPayload) {
+                        try {
+                            mockServiceRequest.setInputObjectType(Class.forName(
+                                (methodSignature.getParameterTypes()[argIndex]).getName()));
+                            mockServiceRequest.setInput(args[argIndex]);
+                        } catch (ClassNotFoundException e) {
+                            log.error(e.getMessage());
+                        }
+                        mockServiceRequest.setInput(args[argIndex]);
+                    }
+                }
+            }
+        }
+
+    }
+
 
     // TODO - Code Array List
     private void readInputParam(Object[] args, MethodSignature methodSignature,

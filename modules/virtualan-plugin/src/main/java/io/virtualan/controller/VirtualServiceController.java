@@ -15,6 +15,7 @@
 
 package io.virtualan.controller;
 
+import io.virtualan.core.model.RequestType;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
@@ -140,7 +141,7 @@ public class VirtualServiceController {
     @RequestMapping(value = "/virtualservices", method = RequestMethod.GET)
     public ResponseEntity<List<VirtualServiceRequest>> listAllMockLoadRequests() {
         final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
-        final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.REST.toString().equalsIgnoreCase(x.getRequestType())).collect(
+        final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.REST.toString().equalsIgnoreCase(x.getRequestType()) || x.getRequestType() == null).collect(
             Collectors.toList());
         if (mockRestLoadRequests.isEmpty()) {
             return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);

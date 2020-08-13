@@ -341,10 +341,11 @@
 				</property>
 			</activation>
 			<modules>
-				<!--<module>test/virtualan-test-data</module> -->
+				<module>samples/virtualan-amq</module>
+				<module>samples/virtualan-kafka</module>
+				<module>samples/virtualan-wsdl-soap</module>
 				<module>samples/virtualan-openapi-spring</module>
-				<!--<module>samples/virtualan-openapi-cxf</module>
-				<module>samples/virtualan-openapi-spring-mapping</module>-->
+				<module>samples/virtualan-openapi-mongo</module>
 				<module>samples/virtualan-openapi-impl</module>
 			</modules>
 		</profile>

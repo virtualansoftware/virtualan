@@ -94,7 +94,11 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 		virtualServiceRequest.setAvailableParams(getParams(jsonObject.optJSONArray("availableParams")));
 		virtualServiceRequest.setHeaderParams(getParams(jsonObject.optJSONArray("headerParams")));
 		virtualServiceRequest.setExcludeList(jsonObject.optString("excludeList"));
-		virtualServiceUtil.findOperationIdForService(virtualServiceRequest);
+		if(jsonObject.optString("operationId").equals("") ) {
+			virtualServiceUtil.findOperationIdForService(virtualServiceRequest);
+		} else {
+			virtualServiceRequest.setOperationId(jsonObject.optString("operationId"));
+		}
 		return virtualServiceRequest;
 	}
 	

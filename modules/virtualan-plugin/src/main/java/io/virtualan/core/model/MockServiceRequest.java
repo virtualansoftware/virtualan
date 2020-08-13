@@ -28,12 +28,11 @@ import java.util.Optional;
 public class MockServiceRequest {
     String resource = null;
     String operationId = null;
+    RequestType requestType = null;
     String type = null;
     Map<String, String> params = null;
     Map<String, Class> paramsType = null;
-    
     Map<String, Object> parameters = null;
-    
     Map<String, String> headerParams = null;
     Class inputObjectType = null;
     Object input = null;
@@ -69,6 +68,14 @@ public class MockServiceRequest {
 
     public void setHeaderParams(Map<String, String> headerParams) {
         this.headerParams = headerParams;
+    }
+
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(RequestType requestType) {
+        this.requestType = requestType;
     }
 
     public Object getInput() {
