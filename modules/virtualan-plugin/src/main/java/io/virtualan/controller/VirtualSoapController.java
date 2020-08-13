@@ -67,25 +67,14 @@ public class VirtualSoapController {
   }
 
   @RequestMapping(value = "/virtualservices/soap", method = RequestMethod.GET)
-  public ResponseEntity<List<VirtualServiceMessageRequest>> listAllMockMessageLoadRequests() {
+  public ResponseEntity<List<VirtualServiceRequest>> listAllMockMessageLoadRequests() {
     final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
-
-    List<VirtualServiceMessageRequest> msgList = new ArrayList<>();
-    for ( VirtualServiceRequest request :mockLoadRequests) {
-      VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
-      if(RequestType.KAFKA.toString().equalsIgnoreCase(request.getRequestType())) {
-        BeanUtils.copyProperties(request, virtualServiceMessageRequest);
-        virtualServiceMessageRequest.setBrokerUrl(request.getUrl());
-        virtualServiceMessageRequest.setResponseTopicOrQueueName(request.getMethod());
-        virtualServiceMessageRequest.setRequestTopicOrQueueName(request.getOperationId());
-        msgList.add(virtualServiceMessageRequest);
-      }
+    final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.REST.toString().equalsIgnoreCase(x.getRequestType()) || x.getRequestType() == null).collect(
+        Collectors.toList());
+    if (mockRestLoadRequests.isEmpty()) {
+      return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);
     }
-
-    if (msgList.isEmpty()) {
-      return new ResponseEntity<List<VirtualServiceMessageRequest>>(HttpStatus.NO_CONTENT);
-    }
-    return new ResponseEntity<List<VirtualServiceMessageRequest>>(msgList, HttpStatus.OK);
+    return new ResponseEntity<List<VirtualServiceRequest>>(mockRestLoadRequests, HttpStatus.OK);
   }
 
   @RequestMapping(value = "/virtualservices/soap", method = RequestMethod.POST)
