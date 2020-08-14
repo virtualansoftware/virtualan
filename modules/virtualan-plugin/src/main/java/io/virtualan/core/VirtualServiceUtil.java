@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -111,6 +112,7 @@ public class VirtualServiceUtil {
     }
     
     @PostConstruct
+    @Order(1)
     public void init() throws ClassNotFoundException, JsonProcessingException,
             InstantiationException, IllegalAccessException {
         setVirtualServiceType(ApiType.findApiType());

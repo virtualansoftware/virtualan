@@ -1,4 +1,4 @@
-package io.virtualan;
+package org.openapitools.configuration;
 
 import javax.jms.Queue;
 import org.apache.activemq.command.ActiveMQQueue;
