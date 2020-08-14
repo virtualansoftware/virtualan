@@ -62,7 +62,7 @@ public class MessagingApplication {
 	private MessageUtil messageUtil;
 	
 	private static String bootstrapServers;
-	private static List<String> topics;
+	private static List<String> topics = new ArrayList<>();
 
 	@PostConstruct
 	public void init() {
@@ -70,8 +70,10 @@ public class MessagingApplication {
 			JSONObject obj =  getJsonObject().optJSONObject(0);
 			if(obj != null ) {
 				bootstrapServers = obj.getString("broker");
-				topics = obj.getJSONArray("topics").toList().stream().map(x -> x.toString()).collect(
-						Collectors.toList());
+				JSONArray array = obj.getJSONArray("topics");
+				for(int i =0 ; i < array.length(); i++) {
+					topics.add(array.get(i).toString());
+				}
 				Set<String> names = getTopics();
 				for (String topic : topics) {
 					boolean contains = names.contains(topic);

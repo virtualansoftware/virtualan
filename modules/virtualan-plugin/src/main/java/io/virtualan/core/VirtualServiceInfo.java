@@ -149,7 +149,7 @@ public interface VirtualServiceInfo {
                         buildVirtualServiceInfo(virtualServiceEntry);
                 if (!mockAPILoadChoice.isEmpty()) {
                     Map<String, Map<String, VirtualServiceRequest>> resourceGroup =
-                            mockAPILoadChoice.entrySet().stream()
+                            mockAPILoadChoice.entrySet().stream().filter(x -> !"virtualanendpoint".equalsIgnoreCase(x.getKey()))
                                     .collect(Collectors.groupingBy(f -> f.getValue().getResource(),
                                             Collectors.toMap(f -> f.getKey(), f -> f.getValue())));
                     mockLoadChoice.putAll(resourceGroup);
