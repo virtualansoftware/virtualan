@@ -2,7 +2,7 @@
   "AMQ" : [
     {
       "systemName": "Virtualan-1",
-      "broker-url" : "tcp://localhost:61616",
+      "broker-url" : "vm://embedded",
       "user": "admin",
       "password" :"admin",
       "request-queue": "virtualan.input",
