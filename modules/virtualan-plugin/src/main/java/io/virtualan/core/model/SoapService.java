@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class SoapService {
 
+  private String localPart;
   private String ns;
   private String method;
   private String requestClassName;

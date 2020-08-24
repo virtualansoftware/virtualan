@@ -102,11 +102,6 @@ public class VirtualServiceUtil {
             setVirtualServiceInfo(
                     virtualServiceInfoFactory.getVirtualServiceInfo(virtualServiceType.getType()));
             this.virtualServiceType = virtualServiceType;
-        } else {
-            setVirtualServiceInfo(
-                virtualServiceInfoFactory.getVirtualServiceInfo(
-                    virtualServiceType.NON_REST.getType()));
-            this.virtualServiceType = VirtualServiceType.NON_REST;
         }
 
     }
