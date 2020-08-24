@@ -1,16 +1,16 @@
 [{
-  "operationId": "sayHello",
+  "operationId": "person",
   "url": "http://virtualan.io/types/helloworld",
-  "method": "sayHello",
+  "method": "person",
   "type": "Response",
   "input": "{\n   \"firstName\": \"Elan\",\n   \"lastName\": \"Thangamani\"\n}",
   "output": "{ \"greeting\": \"Welcome Elan Thangamani\"\n}",
   "resource": "http://virtualan.io/types/helloworld"
 },
   {
-    "operationId": "FahrenheitToCelsius",
+    "operationId": "fahrenheitToCelsius",
     "url": "https://www.w3schools.com/xml/",
-    "method": "FahrenheitToCelsius",
+    "method": "fahrenheitToCelsius",
     "type": "Response",
     "input": "{\n   \"fahrenheit\": \"10\" \n}",
     "output": "{ \"fahrenheitToCelsiusResult\": \"20\"\n}",

@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <name>virtualan-wsdl-soap</name>
+  <name>virtualan-wsdl-sv-demo</name>
   <groupId>io.virtualan</groupId>
   <artifactId>virtualan-wsdl-sv-demo</artifactId>
   <description>Virtualan Auto WSDL Service virtualization</description>
@@ -20,27 +20,30 @@
         <groupId>org.springframework.boot</groupId>
         <version>2.2.4.RELEASE</version>
       </plugin>
+
+
       <plugin>
         <artifactId>maven-jaxb2-plugin</artifactId>
         <configuration>
-          <bindingIncludes>bindings.xjb</bindingIncludes>
+          <bindingIncludes>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingIncludes>
           <generatePackage>io.virtualan.ws.domain</generatePackage>
           <schemaDirectory>${project.basedir}/src/main/resources/wsdl/
           </schemaDirectory>
           <schemaIncludes>
             <include>*.wsdl</include>
           </schemaIncludes>
+          <generateDirectory>src/main/gen1</generateDirectory>
           <args>
             <arg>-XtoString</arg>
             <arg>-Xequals</arg>
             <arg>-XhashCode</arg>
           </args>
           <plugins>
-          <plugin>
-            <groupId>org.jvnet.jaxb2_commons</groupId>
-            <artifactId>jaxb2-basics</artifactId>
-            <version>0.11.1</version>
-          </plugin>
+            <plugin>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId>jaxb2-basics</artifactId>
+              <version>0.6.2</version>
+            </plugin>
           </plugins>
         </configuration>
         <executions>
@@ -54,14 +57,77 @@
         <version>${maven-jaxb2-plugin.version}</version>
       </plugin>
 
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>2.6</version>
+        <dependencies>
+          <!-- put the XJC plugins on the jaxws-maven-plugin's classpath -->
+          <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>jaxb2-basics</artifactId>
+            <version>0.6.4</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <bindingFiles>
+            <bindingFile>${project.basedir}/src/main/resources/xjb/disable-wrappings.xjb</bindingFile>
+          </bindingFiles>
+          <xjcArgs>
+            <xjcArg>-Xequals</xjcArg>
+            <xjcArg>-XtoString</xjcArg>
+            <xjcArg>-XhashCode</xjcArg>
+          </xjcArgs>
+          <wsdlDirectory>src/main/resources/wsdl/</wsdlDirectory>
+          <packageName>io.virtualan.ws.domain</packageName>
+          <sourceDestDir>src/main/gen</sourceDestDir>
+        </configuration>
+        <executions>
+          <execution>
+            <id>wsimport-virtualan</id>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <move todir="src/main/gen/" >
+                  <fileset dir="src/main/gen1/"/>
+                </move>
+                <delete>
+                  <fileset dir="src/main/gen/">
+                    <include name="**/package-info.java"/>
+                  </fileset>
+                  </delete>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
         <configuration>
           <source>8</source>
           <target>8</target>
         </configuration>
-        <groupId>org.apache.maven.plugins</groupId>
       </plugin>
+
     </plugins>
   </build>
   <dependencies>
@@ -102,7 +168,7 @@
     <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
       <artifactId>jaxb2-basics</artifactId>
-      <version>0.11.1</version>
+      <version>0.6.2</version>
     </dependency>
 
     <!-- HyperSQL DB -->
@@ -123,6 +189,11 @@
       <groupId>org.projectlombok</groupId>
       <scope>provided</scope>
       <version>1.18.10</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.jaxb2_commons</groupId>
+      <artifactId>jaxb2-basics-runtime</artifactId>
+      <version>0.6.4</version>
     </dependency>
 
   </dependencies>

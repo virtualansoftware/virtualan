@@ -1,10 +1,18 @@
 package io.virtualan.core.soap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.virtualan.core.model.SoapService;
+import io.virtualan.core.model.VirtualServiceRequest;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -17,19 +25,39 @@ import javassist.bytecode.MethodInfo;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.SystemPropertyUtils;
+
 @Configuration
 @Component
 @ConditionalOnProperty(name = {"virtualan.soap.wsdl", "virtualan.soap.package"}, matchIfMissing = true)
 public class SoapEndpointCodeGenerator {
+
+  static Logger log = LoggerFactory.getLogger(SoapEndpointCodeGenerator.class);
+
+
   public static Class buildEndpointClass(Map<String, SoapService> soapWsServices)
       throws Exception {
     ClassPool pool = ClassPool.getDefault();
     CtClass cc = pool.makeClass("io.virtualan.VirtualanEndpoint");
     addClassAnnotation(cc);
-    for (Map.Entry<String, SoapService> soapWsServiceEntry : soapWsServices.entrySet()) {
+    for (Entry<String, SoapService> soapWsServiceEntry : soapWsServices.entrySet()) {
       SoapService soapService = soapWsServiceEntry.getValue();
       String methodSignature = generateMethod(soapService);
       CtMethod method = CtMethod.make(methodSignature, cc);
@@ -45,7 +73,7 @@ public class SoapEndpointCodeGenerator {
   private static void addMethodAnnotation(CtClass cc, SoapService soapService, CtMethod method) {
     Map<String, String> keyValue = new HashMap();
     keyValue.put("namespace", soapService.getNs());
-    keyValue.put("localPart", soapService.getMethod());
+    keyValue.put("localPart", soapService.getLocalPart());
     ConstPool cpool = cc.getClassFile().getConstPool();
     AnnotationsAttribute attr =
         new AnnotationsAttribute(cpool, AnnotationsAttribute.visibleTag);
@@ -98,7 +126,6 @@ public class SoapEndpointCodeGenerator {
         .append("{ return null; }");
     return sb.toString();
   }
-
   public static void addClassAnnotation(CtClass clazz) throws Exception {
     ClassFile cfile = clazz.getClassFile();
     ConstPool cpool = cfile.getConstPool();
@@ -114,4 +141,114 @@ public class SoapEndpointCodeGenerator {
     cfile.addAttribute(attr);
   }
 
+  protected List<Class> findMyTypes(String basePackage) throws IOException, ClassNotFoundException
+  {
+    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
+
+    List<Class> candidates = new ArrayList<Class>();
+    String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
+        resolveBasePackage(basePackage) + "/" + "**/*.class";
+    Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
+    for (Resource resource : resources) {
+      if (resource.isReadable()) {
+        MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+        if (isCandidate(metadataReader)) {
+          candidates.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
+        }
+      }
+    }
+    return candidates;
+  }
+
+  private String resolveBasePackage(String basePackage) {
+    return ClassUtils.convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
+  }
+
+  private boolean isCandidate(MetadataReader metadataReader) throws ClassNotFoundException
+  {
+    try {
+      Class c = Class.forName(metadataReader.getClassMetadata().getClassName());
+      if (c.getAnnotation(WebService.class) != null) {
+        return true;
+      }
+    }
+    catch(Throwable e){
+    }
+    return false;
+  }
+
+
+  private Map<String, VirtualServiceRequest> buildVirtualServiceInfo(
+      Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
+      InstantiationException, IllegalAccessException, ClassNotFoundException {
+    Map<String, VirtualServiceRequest> mockAPILoadChoice =
+        new LinkedHashMap<String, VirtualServiceRequest>();
+    for (Method method : virtualServiceEntry.getValue().getDeclaredMethods()) {
+      WebMethod[] annotInstance = method.getAnnotationsByType(WebMethod.class);
+      if (annotInstance != null && annotInstance.length > 0) {
+//        VirtualServiceRequest mockReturn = buildServiceDetails(virtualServiceEntry, method);
+//        if (mockReturn != null) {
+//          mockAPILoadChoice.put(method.getName(), mockReturn);
+//        }
+      }
+    }
+    return mockAPILoadChoice;
+  }
+//
+//  default VirtualServiceRequest buildServiceDetails(Entry<String, Class> virtualServiceEntry,
+//      Method method) throws JsonProcessingException, InstantiationException,
+//      IllegalAccessException, ClassNotFoundException {
+//
+//    String rootResource = ApiResource.getResourceParent(virtualServiceEntry.getValue());
+//    VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
+//    virtualServiceRequest.setDesc(getResourceDesc(method));
+//    virtualServiceRequest.setResponseType(buildResponseType(method));
+//    virtualServiceRequest.setOperationId(method.getName());
+//    virtualServiceRequest.setHttpStatusMap(getHttpStatusMap());
+//    VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
+//    if(rootResource != null) {
+//      virtualServiceRequest.setUrl("/"+rootResource + virtualServiceKeyValue.getValue());
+//      virtualServiceRequest.setResource(rootResource);
+//    } else {
+//      virtualServiceRequest.setUrl(virtualServiceKeyValue.getValue());
+//      virtualServiceRequest
+//          .setResource(ApiResource.getResourceByURL(virtualServiceKeyValue.getValue()));
+//    }
+//    virtualServiceRequest.setMethod(virtualServiceKeyValue.getKey());
+//    buildInput(method, virtualServiceRequest);
+//    return virtualServiceRequest;
+//  }
+
+  public static void main(String[] args) {
+    //findVirtualSoapServices();
+    //findAnnotatedClasses("io.virtualan");
+  }
+
+
+  public static void findAnnotatedClasses(String scanPackage) {
+    ClassPathScanningCandidateComponentProvider provider = createComponentScanner();
+    for (BeanDefinition beanDef : provider.findCandidateComponents(scanPackage)) {
+      System.out.println(beanDef);
+    }
+  }
+
+  private static ClassPathScanningCandidateComponentProvider createComponentScanner() {
+    // Don't pull default filters (@Component, etc.):
+    ClassPathScanningCandidateComponentProvider provider
+        = new ClassPathScanningCandidateComponentProvider(false);
+    provider.addIncludeFilter(new AnnotationTypeFilter(WebService.class));
+    return provider;
+  }
+
+//  private void printMetadata(BeanDefinition beanDef) {
+//    try {
+//      Class<?> cl = Class.forName(beanDef.getBeanClassName());
+//      Findable findable = cl.getAnnotation(WebService.class);
+//      System.out.printf("Found class: %s, with meta name: %s%n",
+//          cl.getSimpleName(), findable.name());
+//    } catch (Exception e) {
+//      System.err.println("Got exception: " + e.getMessage());
+//    }
+//  }
 }

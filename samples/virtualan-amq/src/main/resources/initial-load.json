@@ -1,5 +1,5 @@
 [{
-  "brokerUrl": "tcp://localhost:61616",
+  "brokerUrl": "vm://embedded",
   "requestTopicOrQueueName": "virtualan.input",
   "resource": "virtualan.input",
   "requestType" : "AMQ",

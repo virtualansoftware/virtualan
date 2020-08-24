@@ -85,9 +85,12 @@ public class OpenAPI2SpringBoot implements CommandLineRunner {
 @Configuration
 public static class Config {
 
+    @Autowired
+    private EmbeddedKafkaBroker broker;
+
+
     private int kafkaPort;
 
-    private int zkPort;
 
     @Bean
     public EmbeddedKafkaBroker broker() throws IOException {
@@ -96,7 +99,6 @@ public static class Config {
         ss.close();
 
         EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(1, false) ;
-        //embeddedKafkaBroker.zkPort(this.zkPort);
         embeddedKafkaBroker.kafkaPorts(this.kafkaPort);
         return embeddedKafkaBroker;
 
