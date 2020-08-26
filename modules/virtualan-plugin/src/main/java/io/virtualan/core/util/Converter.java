@@ -1,5 +1,7 @@
 package io.virtualan.core.util;
 
+import io.virtualan.core.model.ContentType;
+import io.virtualan.core.model.RequestType;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,10 +20,10 @@ public class Converter {
     private static final String PARAM_DELIMITER = ":_:";
 
 
-    public static Map<String, String> converter(List<VirtualServiceKeyValue> paranList) {
+    public static Map<String, String> converter(List<VirtualServiceKeyValue> paramList) {
         final Map<String, String> mapkeyValue = new HashMap<>();
-        if (paranList != null && paranList.size() > 0) {
-            for (final VirtualServiceKeyValue availableParam : paranList) {
+        if (paramList != null && paramList.size() > 0) {
+            for (final VirtualServiceKeyValue availableParam : paramList) {
                 if (availableParam.getValue() != null) {
                     mapkeyValue.put(availableParam.getKey(), availableParam.getValue());
                 }
@@ -33,6 +35,9 @@ public class Converter {
     public static VirtualServiceRequest converterEToR(VirtualServiceEntity mockEntity) {
         final VirtualServiceRequest request = new VirtualServiceRequest();
         BeanUtils.copyProperties(mockEntity, request);
+        if(mockEntity.getContentType() != null) {
+            request.setContentType(ContentType.valueOf(mockEntity.getContentType()));
+        }
         request.setAvailableParams(Converter.readParameter(mockEntity.getAvailableParamsList()));
         request.setHeaderParams(Converter.readParameter(mockEntity.getHeaderParamsList()));
         return request;
@@ -58,6 +63,9 @@ public class Converter {
     public static VirtualServiceEntity converterRToE(VirtualServiceRequest mockRequest) {
         final VirtualServiceEntity mockEntity = new VirtualServiceEntity();
         BeanUtils.copyProperties(mockRequest, mockEntity);
+        if(mockRequest.getContentType() != null) {
+            mockEntity.setContentType(mockRequest.getContentType().name());
+        }
         mockEntity
                 .setAvailableParamsList(Converter.readParameters(mockRequest.getAvailableParams()));
         mockEntity.setHeaderParamsList(Converter.readParameters(mockRequest.getHeaderParams()));

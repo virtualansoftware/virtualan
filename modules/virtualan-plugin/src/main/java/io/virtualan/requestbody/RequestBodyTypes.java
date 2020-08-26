@@ -14,11 +14,14 @@
 
 package io.virtualan.requestbody;
 
+import io.virtualan.core.model.ContentType;
+import io.virtualan.core.util.XMLConverter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -145,11 +148,24 @@ public enum RequestBodyTypes {
         }
 
         @Override
-        public boolean compareRequestBody(RequestBody requestBody) throws IOException {
+        public boolean compareRequestBody(RequestBody requestBody) throws IOException, JAXBException {
             if (requestBody.getExpectedInput() == null) {
                 return true;
             }
-            if (requestBody.getInputRequest() != null) {
+            if (ContentType.XML.equals(requestBody.getContentType())){
+                if (requestBody.getInputRequest() != null) {
+                    return EqualsBuilder.reflectionEquals(
+                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),requestBody.getExpectedInput()),
+                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),
+                            requestBody.getInputRequest()),
+                        requestBody.getExcludeList());
+
+                } else {
+                    return EqualsBuilder.reflectionEquals(
+                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),requestBody.getExpectedInput()),
+                            requestBody.getActualInput(), requestBody.getExcludeList());
+                }
+            } else if (requestBody.getInputRequest() != null) {
                 return EqualsBuilder.reflectionEquals(
                         requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
                                 requestBody.getInputObjectType()),
@@ -183,7 +199,8 @@ public enum RequestBodyTypes {
 
     public abstract String getDefaultMessageBody(RequestBody requestBody) throws IOException;
 
-    public abstract boolean compareRequestBody(RequestBody requestBody) throws IOException;
+    public abstract boolean compareRequestBody(RequestBody requestBody)
+        throws IOException, JAXBException;
 
     public static RequestBodyTypes fromString(String requestBodyType) {
         for (RequestBodyTypes currentType : RequestBodyTypes.values()) {

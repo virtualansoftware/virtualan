@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.jws.WebParam;
+import javax.xml.ws.RequestWrapper;
+import javax.xml.ws.ResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -19,11 +21,12 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
 @Component
 @Configuration
-@ConditionalOnProperty(name = {"virtualan.soap.wsdl", "virtualan.soap.package"}, matchIfMissing = false)
+@ConditionalOnProperty(name = { "virtualan.soap.package"}, matchIfMissing = false)
 public class WSEndpointConfiguration implements BeanFactoryAware {
 
   final static Map<String, SoapService> wsServiceMockList = new HashMap<>();
@@ -33,8 +36,6 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   private SoapEndpointCodeGenerator soapEndpointCodeGenerator;
 
   private BeanFactory beanFactory;
-  @Value("${virtualan.soap.wsdl:classpath*:/wsdl/*}")
-  private String wsdlLocation;
   @Value("${virtualan.soap.package:io.virtualan.ws.domain}")
   private String soapPackage;
 
@@ -48,7 +49,8 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   public void loadSoapWSservice() throws Exception {
     DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
 
-    List<Class> portTypeList = soapEndpointCodeGenerator.findMyTypes("io.virtualan");
+    //TODO MUST
+    List<Class> portTypeList = soapEndpointCodeGenerator.findMyTypes(soapPackage);
     for(Class clazz : portTypeList) {
       Method[] methods = clazz.getDeclaredMethods();
       Arrays.stream(methods).forEach( method  -> {
@@ -63,19 +65,31 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   }
 
   public void loadParameters(Method method) {
-    Annotation[][] annotations = method.getParameterAnnotations();
-    for (Annotation[] annotationRow : annotations) {
-      for (Annotation annotation : annotationRow) {
-        if (annotation instanceof WebParam) {
-          WebParam clzzz = (WebParam) annotation;
-          SoapService soapService = new SoapService();
-          soapService.setNs(clzzz.targetNamespace());
-          soapService.setMethod(method.getName());
-          soapService.setLocalPart(clzzz.name());
-          soapService.setRequestClassName(method.getParameters()[0].getType().getCanonicalName());
-          soapService.setResponseClassName(method.getReturnType().getTypeName());
-          wsServiceMockList.put(soapService.getNs() + "_" + soapService.getMethod(), soapService);
-          return;
+    RequestWrapper requestWrapper = AnnotationUtils.findAnnotation(method, RequestWrapper.class);
+    if(requestWrapper != null) {
+      SoapService soapService = new SoapService();
+      soapService.setNs(requestWrapper.targetNamespace());
+      soapService.setMethod(method.getName());
+      soapService.setLocalPart(requestWrapper.localName());
+      soapService.setRequestClassName(requestWrapper.className());
+      ResponseWrapper responseWrapper = AnnotationUtils.findAnnotation(method, ResponseWrapper.class);
+      soapService.setResponseClassName(responseWrapper.className());
+      wsServiceMockList.put(soapService.getNs() + "_" + soapService.getMethod(), soapService);
+    } else {
+      Annotation[][] annotations = method.getParameterAnnotations();
+      for (Annotation[] annotationRow : annotations) {
+        for (Annotation annotation : annotationRow) {
+          if (annotation instanceof WebParam) {
+            WebParam clzzz = (WebParam) annotation;
+            SoapService soapService = new SoapService();
+            soapService.setNs(clzzz.targetNamespace());
+            soapService.setMethod(method.getName());
+            soapService.setLocalPart(clzzz.name());
+            soapService.setRequestClassName(method.getParameters()[0].getType().getCanonicalName());
+            soapService.setResponseClassName(method.getReturnType().getTypeName());
+            wsServiceMockList.put(soapService.getNs() + "_" + soapService.getMethod(), soapService);
+            return;
+          }
         }
       }
     }

@@ -35,6 +35,7 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -75,13 +76,10 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 public class ApiVirtualAspect {
 
     private static Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
-
     @Autowired
     HttpServletRequest request;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private VirtualServiceUtil virtualServiceUtil;
 
@@ -95,12 +93,11 @@ public class ApiVirtualAspect {
 
     @Pointcut("@annotation(io.virtualan.annotation.ApiVirtual)")
     public void apiVirtualServicePointcut() {
-
     }
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-        throws ResponseException, IOException, SOAPException {
+        throws ResponseException, IOException, SOAPException, JAXBException {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();

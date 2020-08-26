@@ -15,6 +15,7 @@
 package io.virtualan.core.util;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -24,9 +25,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamResult;
 
+import org.aspectj.weaver.patterns.TypePatternQuestions.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,20 @@ public class XMLConverter {
     }
 
 
+
+    public static Object xmlToObject(Class type, String xmlString) throws JAXBException {
+        StringWriter outWriter = new StringWriter();
+        StreamResult result = new StreamResult(outWriter);
+        try {
+            final JAXBContext jxbContext = JAXBContext.newInstance(type);
+            final Unmarshaller jaxbUnmarshaller = jxbContext.createUnmarshaller();
+            Object object = jaxbUnmarshaller.unmarshal(new StringReader(xmlString));
+            return object;
+        } catch (final JAXBException e) {
+            XMLConverter.log.error("Unable to convert as xml :" + e.getMessage());
+            throw e;
+        }
+    }
 
     public static String objectToXML(Class type, Object obj) {
         StringWriter outWriter = new StringWriter();

@@ -15,6 +15,7 @@
 package io.virtualan.core.model;
 
 import java.util.List;
+import lombok.Data;
 
 /**
  * This is Mock service response data from virtualan.
@@ -23,19 +24,12 @@ import java.util.List;
  * @author Elan Thangamani
  *
  **/
+@Data
 public class MockResponse {
 
     String output;
     String httpStatusCode;
     List<VirtualServiceKeyValue> headerParams;
-
-    public List<VirtualServiceKeyValue> getHeaderParams() {
-        return headerParams;
-    }
-
-    public void setHeaderParams(List<VirtualServiceKeyValue> headerParams) {
-        this.headerParams = headerParams;
-    }
 
     public MockResponse(String output, String httpStatusCode) {
         this.output = output;
@@ -48,26 +42,5 @@ public class MockResponse {
         return this;
     }
     
-    public String getOutput() {
-        return output;
-    }
-
-    public void setOutput(String output) {
-        this.output = output;
-    }
-
-    public String getHttpStatusCode() {
-        return httpStatusCode;
-    }
-
-    public void setHttpStatusCode(String httpStatusCode) {
-        this.httpStatusCode = httpStatusCode;
-    }
-
-    @Override
-    public String toString() {
-        return "MockResponse [output=" + output + ", httpStatusCode=" + httpStatusCode
-                + ", headerParams=" + headerParams + "]";
-    }
 
 }

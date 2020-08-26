@@ -5,23 +5,17 @@
   "type": "Response",
   "input": "{\n   \"firstName\": \"Elan\",\n   \"lastName\": \"Thangamani\"\n}",
   "output": "{ \"greeting\": \"Welcome Elan Thangamani\"\n}",
-  "resource": "http://virtualan.io/types/helloworld"
-},
-  {
-    "operationId": "fahrenheitToCelsius",
-    "url": "https://www.w3schools.com/xml/",
-    "method": "fahrenheitToCelsius",
-    "type": "Response",
-    "input": "{\n   \"fahrenheit\": \"10\" \n}",
-    "output": "{ \"fahrenheitToCelsiusResult\": \"20\"\n}",
-    "resource": "https://www.w3schools.com/xml/"
-  },
-  {
-    "operationId": "Add",
-    "url": "https://Example.org/ICalculator",
-    "method": "Add",
-    "type": "Response",
-    "input": "{\n   \"a\": \"10\", \"b\": \"5\" \n}",
-    "output": "{ \"result\": \"15\"\n}",
-    "resource": "https://Example.org/ICalculator"
-  }]
+  "resource": "http://virtualan.io/types/helloworld",
+  "requestType" : "SOAP"
+},{
+  "operationId": "person",
+  "url": "http://virtualan.io/types/helloworld",
+  "method": "person",
+  "type": "Response",
+  "input": "<hel:person xmlns:hel=\"http://virtualan.io/types/helloworld\"> \t<hel:firstName>Suki</hel:firstName> \t<hel:lastName>Elan</hel:lastName> </hel:person>",
+  "output": "<ns2:greeting xmlns:ns2=\"http://virtualan.io/types/helloworld\">             <ns2:greeting>Welcome SOAP World!!!</ns2:greeting></ns2:greeting>",
+  "resource": "http://virtualan.io/types/helloworld",
+   "contentType": "XML",
+  "requestType" : "SOAP"
+}
+]

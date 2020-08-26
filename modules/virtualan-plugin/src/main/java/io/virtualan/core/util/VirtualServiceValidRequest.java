@@ -21,6 +21,7 @@ import java.util.Map;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.mapson.Mapson;
+import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,9 +115,9 @@ public class VirtualServiceValidRequest {
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
             if("RULE".equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
-                System.out.println("Rule key : " + mockRequestResponse.getKey().getRule());
-                System.out.println("Rule Input : " + mockServiceRequest);
-                System.out.println("Rule evaluated flag :" +ruleEvaluator.expressionEvaluator(mockServiceRequest, mockRequestResponse.getKey().getRule()));
+                log.info("Rule key : " + mockRequestResponse.getKey().getRule());
+                log.info("Rule Input : " + mockServiceRequest);
+                log.info("Rule evaluated flag :" +ruleEvaluator.expressionEvaluator(mockServiceRequest, mockRequestResponse.getKey().getRule()));
                 if(ruleEvaluator.expressionEvaluator(mockServiceRequest,mockRequestResponse.getKey().getRule())) {
                     final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                             mockRequestResponse, 1);
@@ -200,7 +201,7 @@ public class VirtualServiceValidRequest {
     
     public Map<Integer, ReturnMockResponse> validForInputObject(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
@@ -251,7 +252,7 @@ public class VirtualServiceValidRequest {
 
     public Map<Integer, ReturnMockResponse> validForNoParam(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
@@ -296,6 +297,7 @@ public class VirtualServiceValidRequest {
         requestBody.setExpectedInput(mockRequestResponse.getKey().getInput());
         requestBody.setInputObjectType(mockServiceRequest.getInputObjectType());
         requestBody.setActualInput(mockServiceRequest.getInput());
+        requestBody.setContentType(mockRequestResponse.getKey().getContentType());
         return requestBody;
     }
 

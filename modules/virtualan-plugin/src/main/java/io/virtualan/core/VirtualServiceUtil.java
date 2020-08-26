@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.virtualan.api.ApiType;
 import io.virtualan.core.model.*;
+import javax.xml.bind.JAXBException;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,6 +172,7 @@ public class VirtualServiceUtil {
                 mockRequest.setVirtualServiceId(mockTransferObject.getId());
                 mockRequest.setUsageCount(mockTransferObject.getUsageCount());
                 mockRequest.setInput(input);
+                mockRequest.setContentType(mockTransferObject.getContentType());
                 mockRequest.setRule(mockTransferObject.getRule());
                 mockRequest.setType(mockTransferObject.getType());
                 mockRequest.setExcludeSet(excludeSet);
@@ -260,7 +262,8 @@ public class VirtualServiceUtil {
 
     private long isResposeExists(VirtualServiceRequest mockTransferObject,
             final Class inputObjectType, final MockServiceRequest mockServiceRequest,
-            final Map<Integer, ReturnMockResponse> returnMockResponseMap) throws IOException {
+            final Map<Integer, ReturnMockResponse> returnMockResponseMap)
+        throws IOException, JAXBException {
         final List<ReturnMockResponse> returnMockResponseList =
                 new ArrayList<>(returnMockResponseMap.values());
         Collections.sort(returnMockResponseList, new BestMatchComparator());
@@ -292,6 +295,7 @@ public class VirtualServiceUtil {
         requestBody.setExpectedInput(rMockResponse.getMockRequest().getInput());
         requestBody.setInputObjectType(inputObjectType);
         requestBody.setInputRequest(mockTransferObject.getInput());
+        requestBody.setContentType(rMockResponse.getMockRequest().getContentType());
         return requestBody;
     }
 
@@ -364,7 +368,7 @@ public class VirtualServiceUtil {
 
     private Map<Integer, ReturnMockResponse> isResponseExists(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
                 && mockServiceRequest.getInput() == null) {
             return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
@@ -382,7 +386,7 @@ public class VirtualServiceUtil {
 
 
     public Object returnResponse(Method method, MockServiceRequest mockServiceRequest)
-            throws IOException, ResponseException, JSONException {
+        throws IOException, ResponseException, JSONException, JAXBException {
         VirtualServiceUtil.log
                 .info(" mockServiceRequest.getResource() : " + mockServiceRequest.getResource());
         final Map<MockRequest, MockResponse> mockDataSetupMap = readDynamicResponse(
@@ -417,7 +421,7 @@ public class VirtualServiceUtil {
             if(rMockResponse != null) {
 	            rMockResponse = returnMockResponseList.iterator().next();
 	            if(WSResource.isExists(method)){
-	                return returnSoapResponse(method, rMockResponse.getMockResponse().getOutput());
+	                return returnSoapResponse(method, rMockResponse);
               }
 	            if (rMockResponse.getHeaderResponse() != null) {
 	                responseEntity = buildResponseEntity(rMockResponse.getMockResponse(),
@@ -440,14 +444,17 @@ public class VirtualServiceUtil {
 
 
 
-    private Object returnSoapResponse(Method method, String response){
-            if (response != null) {
+    private Object returnSoapResponse(Method method,  ReturnMockResponse rMockResponse)
+        throws JAXBException {
+            if (rMockResponse.getMockResponse().getOutput() != null) {
+                if(ContentType.XML.equals(rMockResponse.getMockRequest().getContentType())) {
+                    return XMLConverter.xmlToObject(method.getReturnType(), rMockResponse.getMockResponse().getOutput());
+                }
                 Type mySuperclass = null;
 
                 try {
                     mySuperclass = method.getGenericReturnType();
-                    this.objectMapper.readValue(response, this.objectMapper.constructType(mySuperclass));
-                    return this.objectMapper.readValue(response, this.objectMapper.constructType(mySuperclass));
+                    return this.objectMapper.readValue(rMockResponse.getMockResponse().getOutput(), this.objectMapper.constructType(mySuperclass));
                 } catch (Exception ex) {
                     log.error(" GenericReturnType  >>> mySuperclass " + mySuperclass);
                     throw new SoapFaultException("MOCK NOT FOUND ("+ex.getMessage()+")  GenericReturnType  >>> mySuperclass " + method.getReturnType());

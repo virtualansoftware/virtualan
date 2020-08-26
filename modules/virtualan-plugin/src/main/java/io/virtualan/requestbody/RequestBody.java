@@ -14,9 +14,11 @@
 
 package io.virtualan.requestbody;
 
+import io.virtualan.core.model.ContentType;
 import java.util.Collection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 
 /**
  * This is Virtual Service request body.
@@ -24,82 +26,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author  Elan Thangamani
  * 
  **/
+@Data
 public class RequestBody {
 
-    Object actualInput;
-    String inputRequest;
-    String expectedInput;
-    Collection<String> excludeList;
-    Class inputObjectType;
-    String inputObjectTypeName;
-    ObjectMapper objectMapper;
-
-
-    public String getInputObjectTypeName() {
-        return inputObjectTypeName;
-    }
-
-    public void setInputObjectTypeName(String inputObjectTypeName) {
-        this.inputObjectTypeName = inputObjectTypeName;
-    }
-
-
-
-    public String getInputRequest() {
-        return inputRequest;
-    }
-
-    public void setInputRequest(String inputRequest) {
-        this.inputRequest = inputRequest;
-    }
-
-    public Object getActualInput() {
-        return actualInput;
-    }
-
-    public void setActualInput(Object actualInput) {
-        this.actualInput = actualInput;
-    }
-
-    public String getExpectedInput() {
-        return expectedInput;
-    }
-
-    public void setExpectedInput(String expectedInput) {
-        this.expectedInput = expectedInput;
-    }
-
-    public Collection<String> getExcludeList() {
-        return excludeList;
-    }
-
-    public void setExcludeList(Collection<String> excludeList) {
-        this.excludeList = excludeList;
-    }
-
-    public Class getInputObjectType() {
-        return inputObjectType;
-    }
-
-    public void setInputObjectType(Class inputObjectType) {
-        this.inputObjectType = inputObjectType;
-    }
-
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private Object actualInput;
+    private String inputRequest;
+    private String expectedInput;
+    private Collection<String> excludeList;
+    private Class inputObjectType;
+    private String inputObjectTypeName;
+    private ObjectMapper objectMapper;
+    private ContentType contentType;
 
     @Override
     public String toString() {
-        return "RequestBody [actualInput=" + actualInput + ", inputRequest=" + inputRequest
-                + ", expectedInput=" + expectedInput + ", excludeList=" + excludeList
-                + ", inputObjectType=" + inputObjectType + ", inputObjectTypeName="
-                + inputObjectTypeName + ", objectMapper=" + objectMapper + "]";
+        return "RequestBody{" +
+            "actualInput=" + actualInput +
+            ", inputRequest='" + inputRequest + '\'' +
+            ", expectedInput='" + expectedInput + '\'' +
+            ", excludeList=" + excludeList +
+            ", inputObjectType=" + inputObjectType +
+            ", inputObjectTypeName='" + inputObjectTypeName + '\'' +
+            ", objectMapper=" + objectMapper +
+            ", contentType=" + contentType +
+            '}';
     }
-
-
 }

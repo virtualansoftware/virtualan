@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 
 /**
  * Virtual Service Request from external system.
@@ -27,6 +28,7 @@ import java.util.Map;
  * @author  Elan Thangamani
  * 
  **/
+@Data
 public class VirtualServiceRequest {
 
     private long id;
@@ -51,69 +53,16 @@ public class VirtualServiceRequest {
     private String desc;
     private VirtualServiceStatus mockStatus;
     private java.util.Calendar lastUsedDateTime;
-    
-    public String getRule() {
-        return rule;
-    }
-    
-    public void setRule(String rule) {
-        this.rule = rule;
-    }
-    
-    public int getPriority() {
-        return priority;
-    }
-    
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-    
-    public long getUsageCount() {
-        return usageCount;
-    }
+    private ContentType contentType;
 
-    public void setUsageCount(long usageCount) {
-        this.usageCount = usageCount;
-    }
 
-    public List<VirtualServiceKeyValue> getHeaderParams() {
-        return headerParams;
-    }
-
-    public void setHeaderParams(List<VirtualServiceKeyValue> headerParams) {
-        this.headerParams = headerParams;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public Map<String, VirtualServiceApiResponse> getResponseType() {
-        return responseType;
-    }
-
-    public void setResponseType(Map<String, VirtualServiceApiResponse> responseType) {
-        this.responseType = responseType;
-    }
-
-    public String getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
 
     public Object getHeaderParam(String param) {
-        return getHeaderParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+        return headerParams.stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
     }
 
     public Object getAvailableParam(String param) {
-        return getAvailableParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+        return availableParams.stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
     }
 
     public String groovyTemplateObj() {
@@ -126,23 +75,6 @@ public class VirtualServiceRequest {
             "    return responseObject.builder();\n" +
             " }} \n";
     }
-
-    public String getType() {
-        return type;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getExcludeList() {
-        return excludeList;
-    }
-
-    public void setExcludeList(String excludeList) {
-        this.excludeList = excludeList;
-    }
-
     private Map<String, String> httpStatusMap;
 
     public VirtualServiceRequest(long id, String operationId, String input, String output) {
@@ -152,129 +84,35 @@ public class VirtualServiceRequest {
         this.output = output;
     }
 
-    public Map<String, String> getHttpStatusMap() {
-        return httpStatusMap;
-    }
-
-    public void setHttpStatusMap(Map<String, String> httpStatusMap) {
-        this.httpStatusMap = httpStatusMap;
-    }
-
     public VirtualServiceRequest() {}
 
-    public long getId() {
-        return id;
+    @Override
+    public String toString() {
+        return "VirtualServiceRequest{" +
+            "id=" + id +
+            ", operationId='" + operationId + '\'' +
+            ", httpStatusCode='" + httpStatusCode + '\'' +
+            ", url='" + url + '\'' +
+            ", type='" + type + '\'' +
+            ", requestType='" + requestType + '\'' +
+            ", usageCount=" + usageCount +
+            ", priority=" + priority +
+            ", method='" + method + '\'' +
+            ", inputObjectType=" + inputObjectType +
+            ", outputObjectType='" + outputObjectType + '\'' +
+            ", input='" + input + '\'' +
+            ", rule='" + rule + '\'' +
+            ", output='" + output + '\'' +
+            ", availableParams=" + availableParams +
+            ", headerParams=" + headerParams +
+            ", responseType=" + responseType +
+            ", excludeList='" + excludeList + '\'' +
+            ", resource='" + resource + '\'' +
+            ", desc='" + desc + '\'' +
+            ", mockStatus=" + mockStatus +
+            ", lastUsedDateTime=" + lastUsedDateTime +
+            ", contentType=" + contentType +
+            ", httpStatusMap=" + httpStatusMap +
+            '}';
     }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public List<VirtualServiceKeyValue> getAvailableParams() {
-        return availableParams;
-    }
-
-    public void setAvailableParams(List<VirtualServiceKeyValue> availableParams) {
-        this.availableParams = availableParams;
-    }
-
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    public String getInput() {
-        return input;
-    }
-
-    public void setInput(String input) {
-        this.input = input;
-    }
-
-    public String getOutput() {
-        return output;
-    }
-
-    public void setOutput(String output) {
-        this.output = output;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public String getHttpStatusCode() {
-        return httpStatusCode;
-    }
-
-    public void setHttpStatusCode(String httpStatusCode) {
-        this.httpStatusCode = httpStatusCode;
-    }
-
-    public Class getInputObjectType() {
-        return inputObjectType;
-    }
-
-    public void setInputObjectType(Class inputObjectType) {
-        this.inputObjectType = inputObjectType;
-    }
-
-    public String getOutputObjectType() {
-        return outputObjectType;
-    }
-
-    public void setOutputObjectType(String outputObjectType) {
-        this.outputObjectType = outputObjectType;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public VirtualServiceStatus getMockStatus() {
-        return mockStatus;
-    }
-
-    public void setMockStatus(VirtualServiceStatus mockStatus) {
-        this.mockStatus = mockStatus;
-    }
-
-	public java.util.Calendar getLastUsedDateTime() {
-		return lastUsedDateTime;
-	}
-
-	public void setLastUsedDateTime(java.util.Calendar lastUsedDateTime) {
-		this.lastUsedDateTime = lastUsedDateTime;
-	}
-
-	@Override
-	public String toString() {
-		return "VirtualServiceRequest [id=" + id + ", operationId=" + operationId + ", httpStatusCode=" + httpStatusCode
-				+ ", url=" + url + ", usageCount=" + usageCount + ", method=" + method + ", inputObjectType="
-				+ inputObjectType + ", outputObjectType=" + outputObjectType + ", input=" + input + ", output=" + output
-				+ ", availableParams=" + availableParams + ", headerParams=" + headerParams + ", responseType="
-				+ responseType + ", excludeList=" + excludeList + ", resource=" + resource + ", desc=" + desc
-				+ ", mockStatus=" + mockStatus + ", lastUsedDateTime=" + lastUsedDateTime + ", httpStatusMap="
-				+ httpStatusMap + "]";
-	}
-
 }
