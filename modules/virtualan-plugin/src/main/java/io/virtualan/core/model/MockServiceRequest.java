@@ -16,6 +16,7 @@ package io.virtualan.core.model;
 
 import java.util.Map;
 import java.util.Optional;
+import lombok.Data;
 
 
 /**
@@ -25,6 +26,7 @@ import java.util.Optional;
  * @author  Elan Thangamani
  * 
  **/
+@Data
 public class MockServiceRequest {
     String resource = null;
     String operationId = null;
@@ -37,85 +39,7 @@ public class MockServiceRequest {
     Class inputObjectType = null;
     Object input = null;
     Object rule = null;
-    
-    public Object getRule() {
-        return rule;
-    }
-    
-    public void setRule(Object rule) {
-        this.rule = rule;
-    }
-    
-    public String getType() {
-        return type;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public Map<String, Class> getParamsType() {
-        return paramsType;
-    }
-
-    public void setParamsType(Map<String, Class> paramsType) {
-        this.paramsType = paramsType;
-    }
-
-    public Map<String, String> getHeaderParams() {
-        return headerParams;
-    }
-
-    public void setHeaderParams(Map<String, String> headerParams) {
-        this.headerParams = headerParams;
-    }
-
-    public RequestType getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(RequestType requestType) {
-        this.requestType = requestType;
-    }
-
-    public Object getInput() {
-        return input;
-    }
-
-    public void setInput(Object input) {
-        this.input = input;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    public Map<String, String> getParams() {
-        return params;
-    }
-
-    public void setParams(Map<String, String> params) {
-        this.params = params;
-    }
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
-    
-    public void setParameters(Map<String, Object> parameters) {
-        this.parameters = parameters;
-    }
+    private ContentType contentType;
 
     public Object getHeaderParam(String param) {
         return getHeaderParams().entrySet().stream()
@@ -136,21 +60,22 @@ public class MockServiceRequest {
     }
 
 
-
-    public Class getInputObjectType() {
-        return inputObjectType;
-    }
-
-    public void setInputObjectType(Class inputObjectType) {
-        this.inputObjectType = inputObjectType;
-    }
-
     @Override
     public String toString() {
-        return "MockServiceRequest [resource=" + resource + ", operationId=" + operationId
-                + ", params=" + params + ", paramsType=" + paramsType + ", headerParams="
-                + headerParams + ", inputObjectType=" + inputObjectType + ", inputObject="
-                + input + "]";
+        return "MockServiceRequest{" +
+            "resource='" + resource + '\'' +
+            ", operationId='" + operationId + '\'' +
+            ", requestType=" + requestType +
+            ", type='" + type + '\'' +
+            ", params=" + params +
+            ", paramsType=" + paramsType +
+            ", parameters=" + parameters +
+            ", headerParams=" + headerParams +
+            ", inputObjectType=" + inputObjectType +
+            ", input=" + input +
+            ", rule=" + rule +
+            ", contentType=" + contentType +
+            '}';
     }
 }
 

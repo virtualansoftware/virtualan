@@ -21,104 +21,46 @@
         <version>2.2.4.RELEASE</version>
       </plugin>
 
-
       <plugin>
-        <artifactId>maven-jaxb2-plugin</artifactId>
-        <configuration>
-          <bindingIncludes>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingIncludes>
-          <generatePackage>io.virtualan.ws.domain</generatePackage>
-          <schemaDirectory>${project.basedir}/src/main/resources/wsdl/
-          </schemaDirectory>
-          <schemaIncludes>
-            <include>*.wsdl</include>
-          </schemaIncludes>
-          <generateDirectory>src/main/gen1</generateDirectory>
-          <args>
-            <arg>-XtoString</arg>
-            <arg>-Xequals</arg>
-            <arg>-XhashCode</arg>
-          </args>
-          <plugins>
-            <plugin>
-              <groupId>org.jvnet.jaxb2_commons</groupId>
-              <artifactId>jaxb2-basics</artifactId>
-              <version>0.6.2</version>
-            </plugin>
-          </plugins>
-        </configuration>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
+        <version>3.3.7</version>
         <executions>
           <execution>
+            <id>virtualan-generate-sources</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceRoot>${basedir}/src/main/gen</sourceRoot>
+              <wsdlOptions>
+                <wsdlOption>
+                  <wsdl>${basedir}/src/main/resources/wsdl/helloworld.wsdl</wsdl>
+                  <extraargs>
+                    <extraarg>-verbose</extraarg>
+                    <extraarg>-xjc-Xequals</extraarg>
+                    <extraarg>-xjc-XhashCode</extraarg>
+                    <extraarg>-xjc-XtoString</extraarg>
+                  </extraargs>
+                  <bindingFiles>
+                    <bindingFile>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingFile>
+                  </bindingFiles>
+                </wsdlOption>
+              </wsdlOptions>
+
+            </configuration>
+
             <goals>
-              <goal>generate</goal>
+              <goal>wsdl2java</goal>
             </goals>
           </execution>
         </executions>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <version>${maven-jaxb2-plugin.version}</version>
-      </plugin>
-
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxws-maven-plugin</artifactId>
-        <version>2.6</version>
         <dependencies>
-          <!-- put the XJC plugins on the jaxws-maven-plugin's classpath -->
           <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>jaxb2-basics</artifactId>
-            <version>0.6.4</version>
+            <version>0.6.5</version>
           </dependency>
         </dependencies>
-        <configuration>
-          <bindingFiles>
-            <bindingFile>${project.basedir}/src/main/resources/xjb/disable-wrappings.xjb</bindingFile>
-          </bindingFiles>
-          <xjcArgs>
-            <xjcArg>-Xequals</xjcArg>
-            <xjcArg>-XtoString</xjcArg>
-            <xjcArg>-XhashCode</xjcArg>
-          </xjcArgs>
-          <wsdlDirectory>src/main/resources/wsdl/</wsdlDirectory>
-          <packageName>io.virtualan.ws.domain</packageName>
-          <sourceDestDir>src/main/gen</sourceDestDir>
-        </configuration>
-        <executions>
-          <execution>
-            <id>wsimport-virtualan</id>
-            <goals>
-              <goal>wsimport</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <tasks>
-                <move todir="src/main/gen/" >
-                  <fileset dir="src/main/gen1/"/>
-                </move>
-                <delete>
-                  <fileset dir="src/main/gen/">
-                    <include name="**/package-info.java"/>
-                  </fileset>
-                  </delete>
-              </tasks>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <groupId>org.apache.maven.plugins</groupId>
@@ -128,6 +70,36 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/java</source>
+                <source>src/main/gen</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

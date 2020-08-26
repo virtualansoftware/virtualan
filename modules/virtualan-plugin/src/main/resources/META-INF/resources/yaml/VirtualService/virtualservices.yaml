@@ -202,6 +202,9 @@ definitions:
         type: string
       method:
         type: string
+      contentType:
+        type: string
+        desc: Mandatory for XML.. valida values XML and JSON
       requestType:
         type: string
         desc: Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP
@@ -251,6 +254,9 @@ definitions:
       requestType:
         type: string
         desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
+      contentType:
+        type: string
+        desc: Mandatory for XML.. valida values XML and JSON
       type:
         type: string
         desc: "possible values are Response, Rule and Script"

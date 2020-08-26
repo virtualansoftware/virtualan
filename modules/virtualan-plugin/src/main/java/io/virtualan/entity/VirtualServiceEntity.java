@@ -16,7 +16,7 @@ package io.virtualan.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Calendar;
+import lombok.Data;
 
 /**
  * This is Virtual Service entity.
@@ -26,6 +26,7 @@ import java.util.Calendar;
  **/
 @Entity
 @Table(name = "virtual_service")
+@Data
 public class VirtualServiceEntity implements Serializable {
 
     private static final long serialVersionUID = -1801714432822866390L;
@@ -67,6 +68,10 @@ public class VirtualServiceEntity implements Serializable {
     @Column(name = "url")
     private String url;
 
+
+    @Column(name = "contentType")
+    private String contentType;
+
     //CONSUMER-PRODUCER
     //CONSUMER
     @Column(name = "method")
@@ -92,168 +97,37 @@ public class VirtualServiceEntity implements Serializable {
 
     @Column(name = "usageCount")
     private long usageCount;
-    
-    public int getPriority() {
-        return priority;
-    }
-    
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-    
-    public String getRule() {
-        return rule;
-    }
-    
-    public void setRule(String rule) {
-        this.rule = rule;
-    }
-    
-    public Calendar getLastUsedDateTime() {
-        return lastUsedDateTime;
-    }
-
-    public void setLastUsedDateTime(Calendar lastUsedDateTime) {
-        this.lastUsedDateTime = lastUsedDateTime;
-    }
-
-    public long getUsageCount() {
-        return usageCount;
-    }
-
-    public void setUsageCount(long usageCount) {
-        this.usageCount = usageCount;
-    }
-
-    public String getHeaderParamsList() {
-        return headerParamsList;
-    }
-
-    public void setHeaderParamsList(String headerParamsList) {
-        this.headerParamsList = headerParamsList;
-    }
-
-    public String getAvailableParamsList() {
-        return availableParamsList;
-    }
-
-    public void setAvailableParamsList(String availableParamsList) {
-        this.availableParamsList = availableParamsList;
-    }
 
     public VirtualServiceEntity() {
 
     }
-    public String getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
-
     public VirtualServiceEntity(String operationId, String input, String output) {
         this.operationId = operationId;
         this.input = input;
         this.output = output;
     }
 
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
-
-    public String getExcludeList() {
-        return excludeList;
-    }
-
-    public void setExcludeList(String excludeList) {
-        this.excludeList = excludeList;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    public String getInput() {
-        return input;
-    }
-
-    public void setInput(String input) {
-        this.input = input;
-    }
-
-    public String getOutput() {
-        return output;
-    }
-
-    public void setOutput(String output) {
-        this.output = output;
-    }
-
-    public String getHttpStatusCode() {
-        return httpStatusCode;
-    }
-
-    public void setHttpStatusCode(String httpStatusCode) {
-        this.httpStatusCode = httpStatusCode;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-    
-    public String getType() {
-        return type;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
     @Override
     public String toString() {
         return "VirtualServiceEntity{" +
-                "id=" + id +
-                ", operationId='" + operationId + '\'' +
-                ", input='" + input + '\'' +
-                ", output='" + output + '\'' +
-                ", httpStatusCode='" + httpStatusCode + '\'' +
-                ", resource='" + resource + '\'' +
-                ", url='" + url + '\'' +
-                ", method='" + method + '\'' +
-                ", excludeList='" + excludeList + '\'' +
-                ", availableParamsList='" + availableParamsList + '\'' +
-                ", headerParamsList='" + headerParamsList + '\'' +
-                ", lastUsedDateTime=" + lastUsedDateTime +
-                ", usageCount=" + usageCount +
-                '}';
+            "id=" + id +
+            ", operationId='" + operationId + '\'' +
+            ", input='" + input + '\'' +
+            ", requestType='" + requestType + '\'' +
+            ", output='" + output + '\'' +
+            ", priority=" + priority +
+            ", type='" + type + '\'' +
+            ", httpStatusCode='" + httpStatusCode + '\'' +
+            ", resource='" + resource + '\'' +
+            ", url='" + url + '\'' +
+            ", contentType='" + contentType + '\'' +
+            ", method='" + method + '\'' +
+            ", excludeList='" + excludeList + '\'' +
+            ", rule='" + rule + '\'' +
+            ", availableParamsList='" + availableParamsList + '\'' +
+            ", headerParamsList='" + headerParamsList + '\'' +
+            ", lastUsedDateTime=" + lastUsedDateTime +
+            ", usageCount=" + usageCount +
+            '}';
     }
 }

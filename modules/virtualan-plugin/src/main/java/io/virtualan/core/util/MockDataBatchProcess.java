@@ -2,6 +2,7 @@ package io.virtualan.core.util;
 
 import io.virtualan.api.ApiType;
 import io.virtualan.core.VirtualServiceUtil;
+import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import org.apache.cxf.helpers.IOUtils;
@@ -93,7 +94,11 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 				virtualServiceRequest.setMethod(jsonObject.optString("responseTopicOrQueueName"));
 			}
 			virtualServiceRequest.setType(jsonObject.optString("type"));
-			virtualServiceRequest.setRequestType(jsonObject.optString("requestRype"));
+			virtualServiceRequest.setRequestType(jsonObject.optString("requestType"));
+			if(jsonObject.optString("contentType") != "") {
+				virtualServiceRequest
+						.setContentType(ContentType.valueOf(jsonObject.optString("contentType")));
+			}
 			virtualServiceRequest.setRule(jsonObject.optString("rule"));
 			if(!"".equalsIgnoreCase(jsonObject.optString("url"))
 					|| !"".equalsIgnoreCase(jsonObject.optString("brokerUrl"))) {

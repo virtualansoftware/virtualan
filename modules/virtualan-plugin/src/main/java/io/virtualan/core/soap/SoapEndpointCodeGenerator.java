@@ -46,7 +46,7 @@ import org.springframework.util.SystemPropertyUtils;
 
 @Configuration
 @Component
-@ConditionalOnProperty(name = {"virtualan.soap.wsdl", "virtualan.soap.package"}, matchIfMissing = true)
+@ConditionalOnProperty(name = {"virtualan.soap.package"}, matchIfMissing = true)
 public class SoapEndpointCodeGenerator {
 
   static Logger log = LoggerFactory.getLogger(SoapEndpointCodeGenerator.class);
@@ -126,6 +126,7 @@ public class SoapEndpointCodeGenerator {
         .append("{ return null; }");
     return sb.toString();
   }
+
   public static void addClassAnnotation(CtClass clazz) throws Exception {
     ClassFile cfile = clazz.getClassFile();
     ConstPool cpool = cfile.getConstPool();
@@ -141,11 +142,25 @@ public class SoapEndpointCodeGenerator {
     cfile.addAttribute(attr);
   }
 
-  protected List<Class> findMyTypes(String basePackage) throws IOException, ClassNotFoundException
-  {
-    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resourcePatternResolver);
 
+  public static void findAnnotatedClasses(String scanPackage) {
+    ClassPathScanningCandidateComponentProvider provider = createComponentScanner();
+    for (BeanDefinition beanDef : provider.findCandidateComponents(scanPackage)) {
+      System.out.println(beanDef);
+    }
+  }
+
+  private static ClassPathScanningCandidateComponentProvider createComponentScanner() {
+    ClassPathScanningCandidateComponentProvider provider
+        = new ClassPathScanningCandidateComponentProvider(false);
+    provider.addIncludeFilter(new AnnotationTypeFilter(WebService.class));
+    return provider;
+  }
+
+  protected List<Class> findMyTypes(String basePackage) throws IOException, ClassNotFoundException {
+    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
+        resourcePatternResolver);
     List<Class> candidates = new ArrayList<Class>();
     String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
         resolveBasePackage(basePackage) + "/" + "**/*.class";
@@ -162,22 +177,20 @@ public class SoapEndpointCodeGenerator {
   }
 
   private String resolveBasePackage(String basePackage) {
-    return ClassUtils.convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
+    return ClassUtils
+        .convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
   }
 
-  private boolean isCandidate(MetadataReader metadataReader) throws ClassNotFoundException
-  {
+  private boolean isCandidate(MetadataReader metadataReader) throws ClassNotFoundException {
     try {
       Class c = Class.forName(metadataReader.getClassMetadata().getClassName());
       if (c.getAnnotation(WebService.class) != null) {
         return true;
       }
-    }
-    catch(Throwable e){
+    } catch (Throwable e) {
     }
     return false;
   }
-
 
   private Map<String, VirtualServiceRequest> buildVirtualServiceInfo(
       Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
@@ -195,60 +208,5 @@ public class SoapEndpointCodeGenerator {
     }
     return mockAPILoadChoice;
   }
-//
-//  default VirtualServiceRequest buildServiceDetails(Entry<String, Class> virtualServiceEntry,
-//      Method method) throws JsonProcessingException, InstantiationException,
-//      IllegalAccessException, ClassNotFoundException {
-//
-//    String rootResource = ApiResource.getResourceParent(virtualServiceEntry.getValue());
-//    VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
-//    virtualServiceRequest.setDesc(getResourceDesc(method));
-//    virtualServiceRequest.setResponseType(buildResponseType(method));
-//    virtualServiceRequest.setOperationId(method.getName());
-//    virtualServiceRequest.setHttpStatusMap(getHttpStatusMap());
-//    VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
-//    if(rootResource != null) {
-//      virtualServiceRequest.setUrl("/"+rootResource + virtualServiceKeyValue.getValue());
-//      virtualServiceRequest.setResource(rootResource);
-//    } else {
-//      virtualServiceRequest.setUrl(virtualServiceKeyValue.getValue());
-//      virtualServiceRequest
-//          .setResource(ApiResource.getResourceByURL(virtualServiceKeyValue.getValue()));
-//    }
-//    virtualServiceRequest.setMethod(virtualServiceKeyValue.getKey());
-//    buildInput(method, virtualServiceRequest);
-//    return virtualServiceRequest;
-//  }
 
-  public static void main(String[] args) {
-    //findVirtualSoapServices();
-    //findAnnotatedClasses("io.virtualan");
-  }
-
-
-  public static void findAnnotatedClasses(String scanPackage) {
-    ClassPathScanningCandidateComponentProvider provider = createComponentScanner();
-    for (BeanDefinition beanDef : provider.findCandidateComponents(scanPackage)) {
-      System.out.println(beanDef);
-    }
-  }
-
-  private static ClassPathScanningCandidateComponentProvider createComponentScanner() {
-    // Don't pull default filters (@Component, etc.):
-    ClassPathScanningCandidateComponentProvider provider
-        = new ClassPathScanningCandidateComponentProvider(false);
-    provider.addIncludeFilter(new AnnotationTypeFilter(WebService.class));
-    return provider;
-  }
-
-//  private void printMetadata(BeanDefinition beanDef) {
-//    try {
-//      Class<?> cl = Class.forName(beanDef.getBeanClassName());
-//      Findable findable = cl.getAnnotation(WebService.class);
-//      System.out.printf("Found class: %s, with meta name: %s%n",
-//          cl.getSimpleName(), findable.name());
-//    } catch (Exception e) {
-//      System.err.println("Got exception: " + e.getMessage());
-//    }
-//  }
 }

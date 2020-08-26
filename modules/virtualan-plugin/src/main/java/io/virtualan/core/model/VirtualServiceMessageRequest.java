@@ -35,6 +35,7 @@ public class VirtualServiceMessageRequest {
     private String type;
     private String requestType;
     private long usageCount;
+    private ContentType contentType;
     private int priority;
     private String responseTopicOrQueueName;
     private Class inputObjectType;
