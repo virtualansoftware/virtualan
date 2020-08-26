@@ -44,15 +44,6 @@
                     <bindingFile>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingFile>
                   </bindingFiles>
                 </wsdlOption>
-                <wsdlOption>
-                  <wsdl>${basedir}/src/main/resources/wsdl/VTATWS.wsdl</wsdl>
-                  <extraargs>
-                    <extraarg>-verbose</extraarg>
-                    <extraarg>-xjc-Xequals</extraarg>
-                    <extraarg>-xjc-XhashCode</extraarg>
-                    <extraarg>-xjc-XtoString</extraarg>
-                  </extraargs>
-                </wsdlOption>
               </wsdlOptions>
 
             </configuration>
