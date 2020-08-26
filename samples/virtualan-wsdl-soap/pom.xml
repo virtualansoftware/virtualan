@@ -24,7 +24,7 @@
       <plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-codegen-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.7</version>
         <executions>
           <execution>
             <id>virtualan-generate-sources</id>
@@ -115,11 +115,6 @@
       <version>2.2.4.RELEASE</version>
     </dependency>
 
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.3.0</version>
-    </dependency>
 
     <dependency>
       <artifactId>virtualan-plugin</artifactId>
