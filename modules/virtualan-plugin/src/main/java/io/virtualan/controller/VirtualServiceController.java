@@ -140,9 +140,7 @@ public class VirtualServiceController {
     
     @RequestMapping(value = "/virtualservices", method = RequestMethod.GET)
     public ResponseEntity<List<VirtualServiceRequest>> listAllMockLoadRequests() {
-        final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
-        final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.REST.toString().equalsIgnoreCase(x.getRequestType()) || x.getRequestType() == null).collect(
-            Collectors.toList());
+        final List<VirtualServiceRequest> mockRestLoadRequests = virtualService.findAllMockRequests();
         if (mockRestLoadRequests.isEmpty()) {
             return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);
         }

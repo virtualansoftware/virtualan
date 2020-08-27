@@ -152,6 +152,7 @@ public enum RequestBodyTypes {
             if (requestBody.getExpectedInput() == null) {
                 return true;
             }
+
             if (ContentType.XML.equals(requestBody.getContentType())){
                 if (requestBody.getInputRequest() != null) {
                     return EqualsBuilder.reflectionEquals(
