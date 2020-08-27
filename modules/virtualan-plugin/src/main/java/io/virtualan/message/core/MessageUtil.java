@@ -1,13 +1,18 @@
 package io.virtualan.message.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.*;
 import io.virtualan.core.util.BestMatchComparator;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.VirtualServiceValidRequest;
+import io.virtualan.core.util.XMLConverter;
 import io.virtualan.message.core.jms.JMSListener;
 import javax.annotation.PostConstruct;
+import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,9 @@ public class MessageUtil {
 
 	private static final Logger log = LoggerFactory.getLogger(MessageUtil.class);
 
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Autowired
 	private VirtualServiceValidRequest virtualServiceValidRequest;
@@ -62,6 +70,8 @@ public class MessageUtil {
 					.setParams(Converter.converter(mockTransferObject.getAvailableParams()));
 			mockServiceRequest.setResource(mockTransferObject.getResource());
 			mockServiceRequest.setInput(mockTransferObject.getInput());
+			mockServiceRequest.setContentType(mockTransferObject.getContentType());
+			mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
 
 
 			//Rule Execution
@@ -96,7 +106,7 @@ public class MessageUtil {
 	
 	private Map<Integer, ReturnMockResponse> isResponseExists(
 			final Map<MockRequest, MockResponse> mockDataSetupMap,
-			MockServiceRequest mockServiceRequest) throws IOException {
+			MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
 		return virtualServiceValidRequest.validObject(mockDataSetupMap,
 				mockServiceRequest);
 	}
@@ -104,7 +114,6 @@ public class MessageUtil {
 	public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject) {
 		
 		try {
-			
 			final Map<MockRequest, MockResponse> mockDataSetupMap = virtualServiceUtil.readDynamicResponse(
 					mockTransferObject.getResource(), mockTransferObject.getOperationId());
 			final MockServiceRequest mockServiceRequest = new MockServiceRequest();
@@ -115,7 +124,20 @@ public class MessageUtil {
 			mockServiceRequest
 					.setParams(Converter.converter(mockTransferObject.getAvailableParams()));
 			mockServiceRequest.setResource(mockTransferObject.getResource());
-			mockServiceRequest.setInput(mockTransferObject.getInput());
+
+			if (mockTransferObject.getInputObjectType() != null) {
+				if(ContentType.XML.equals(mockTransferObject.getContentType())){
+					mockServiceRequest.setInput(
+							XMLConverter.xmlToObject(mockTransferObject.getInputObjectType(),mockTransferObject.getInput()));
+				} else {
+					mockServiceRequest.setInput(objectMapper.readValue(mockTransferObject.getInput(), mockTransferObject.getInputObjectType()));
+				}
+			} else {
+				mockServiceRequest.setInput(mockTransferObject.getInput());
+			}
+			mockServiceRequest.setContentType(mockTransferObject.getContentType());
+			mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
+
 			final Map<Integer, ReturnMockResponse> returnMockResponseMap =
 					isResponseExists(mockDataSetupMap, mockServiceRequest);
 			

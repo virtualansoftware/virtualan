@@ -35,6 +35,10 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   @Autowired
   private SoapEndpointCodeGenerator soapEndpointCodeGenerator;
 
+  public Map<String, SoapService> getWsServiceMockList() {
+    return wsServiceMockList;
+  }
+
   private BeanFactory beanFactory;
   @Value("${virtualan.soap.package:io.virtualan.ws.domain}")
   private String soapPackage;

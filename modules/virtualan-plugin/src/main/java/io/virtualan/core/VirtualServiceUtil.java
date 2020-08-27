@@ -366,9 +366,9 @@ public class VirtualServiceUtil {
     
     
 
-    private Map<Integer, ReturnMockResponse> isResponseExists(
-            final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
+    public Map<Integer, ReturnMockResponse> isResponseExists(
+        final Map<MockRequest, MockResponse> mockDataSetupMap,
+        MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
                 && mockServiceRequest.getInput() == null) {
             return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,

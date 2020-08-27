@@ -14,6 +14,7 @@
  */
 package io.virtualan.core.util;
 
+import io.virtualan.core.model.ContentType;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +55,10 @@ public class VirtualServiceValidRequest {
     
     @Autowired
     private RuleEvaluator ruleEvaluator;
-    
+
+    @Autowired
+    private VirtualServiceUtil virtualServiceUtil;
+
     @Autowired
     private ScriptExecutor scriptExecutor;
     
@@ -166,27 +170,34 @@ public class VirtualServiceValidRequest {
     
     public Map<Integer, ReturnMockResponse> validObject(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
-        Map<String, String> actualMap = Mapson.buildMAPsonFromJson(mockServiceRequest.getInput().toString());
-        
-        for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
+        if(ContentType.XML.equals(mockServiceRequest.getContentType())) {
+            return virtualServiceUtil.isResponseExists(mockDataSetupMap, mockServiceRequest);
+        } else {
+            Map<String, String> actualMap = Mapson
+                .buildMAPsonFromJson(mockServiceRequest.getInput().toString());
+            for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
-            final RequestBody requestBody =
+                final RequestBody requestBody =
                     buildRequestBody(mockServiceRequest, mockRequestResponse);
-            final int numberAttrMatch = virtualServiceParamComparator
+                final int numberAttrMatch = virtualServiceParamComparator
                     .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
-            
-            Map<String, String> expectedMap = Mapson.buildMAPsonFromJson(mockRequestResponse.getKey().getInput());
-            if(areEqual(actualMap, expectedMap)) {
-                count++;
-                final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
+
+                Map<String, String> expectedMap = Mapson
+                    .buildMAPsonFromJson(mockRequestResponse.getKey().getInput());
+                if (areEqual(actualMap, expectedMap)) {
+                    count++;
+                    final ReturnMockResponse returnMockResponse = returnMockResponse(
+                        mockServiceRequest,
                         mockRequestResponse, numberAttrMatch);
-                boolean isMatched = virtualServiceParamComparator.isAllParamPresent(mockServiceRequest,returnMockResponse);
-                
-                returnMockResponse.setExactMatch(isMatched);
-                matchMap.put(count, returnMockResponse);
+                    boolean isMatched = virtualServiceParamComparator
+                        .isAllParamPresent(mockServiceRequest, returnMockResponse);
+
+                    returnMockResponse.setExactMatch(isMatched);
+                    matchMap.put(count, returnMockResponse);
+                }
             }
         }
         return matchMap;
