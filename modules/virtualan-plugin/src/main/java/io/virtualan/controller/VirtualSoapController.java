@@ -26,8 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class VirtualSoapController {
   private MessageSource messageSource;
   @Autowired
   private VirtualService virtualService;
-  @Autowired
+  @Autowired(required = false)
   private WSEndpointConfiguration wsEndpointConfiguration;
 
   public ResponseEntity checkIfServiceDataAlreadyExists(
@@ -133,33 +133,5 @@ public class VirtualSoapController {
           messageSource.getMessage("VS_UNEXPECTED_ERROR", null, locale) + e.getMessage()),
           HttpStatus.BAD_REQUEST);
     }
-  }
-
-
-  private JSONArray getJsonObject() throws Exception {
-    InputStream stream = VirtualSoapController.class.getClassLoader()
-        .getResourceAsStream("conf/kafka.json");
-    if (stream != null) {
-      String jmsConfigJson = readString(stream);
-      JSONObject jsonObject = new JSONObject(jmsConfigJson);
-      return jsonObject.optJSONArray("Kafka");
-    }
-    return new JSONArray();
-  }
-
-  public String readString(InputStream inputStream) throws IOException {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-      return br.lines().collect(Collectors.joining(System.lineSeparator()));
-    }
-  }
-
-
-  public JSONArray getArray(String[] stringArray) {
-    JSONArray array = new JSONArray();
-		for (String name : stringArray) {
-			array.put(name);
-		}
-    return array;
-
   }
 }
