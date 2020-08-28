@@ -16,6 +16,8 @@
 
 package io.virtualan.core.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +31,7 @@ import lombok.Data;
  * 
  **/
 @Data
+@JsonInclude(Include.NON_NULL)
 public class VirtualServiceRequest {
 
     private long id;

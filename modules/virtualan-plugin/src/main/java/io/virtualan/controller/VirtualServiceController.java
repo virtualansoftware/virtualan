@@ -15,6 +15,7 @@
 
 package io.virtualan.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.virtualan.core.model.RequestType;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -102,6 +103,8 @@ public class VirtualServiceController {
 
     private ObjectMapper getObjectMapper() {
         objectMapper.findAndRegisterModules();
+        objectMapper.setSerializationInclusion(Include.NON_NULL);
+
         return objectMapper.enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE,
                 DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
         // ,DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
@@ -388,7 +391,7 @@ public class VirtualServiceController {
         final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
         final PathMatchingResourcePatternResolver resolver =
                 new PathMatchingResourcePatternResolver(classLoader);
-        return resolver.getResources("classpath:META-INF/resources/yaml/" + name + "/*.yaml");
+        return resolver.getResources("classpath:META-INF/resources/yaml/" + name + "/*.*");
     }
 
 

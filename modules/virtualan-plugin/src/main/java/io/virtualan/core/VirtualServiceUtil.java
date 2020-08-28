@@ -15,6 +15,7 @@
 package io.virtualan.core;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.virtualan.api.WSResource;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -139,6 +140,7 @@ public class VirtualServiceUtil {
 
     private ObjectMapper getObjectMapper() {
         objectMapper.findAndRegisterModules();
+        objectMapper.setSerializationInclusion(Include.NON_NULL);
         return objectMapper.enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE,
                 DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
         // ,DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
