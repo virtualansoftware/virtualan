@@ -15,59 +15,33 @@
 package io.virtualan.core.model;
 
 
+import lombok.Data;
+
 /**
  * Virtual Service status.
  *
  * @author Elan Thangamani
  *
  **/
+@Data
 public class VirtualServiceStatus {
 
     private String code;
-
     private String message;
 
-
     private VirtualServiceRequest virtualServiceRequest;
-
-    
+    private VirtualServiceMessageRequest virtualServiceMessageRequest;
 
     public VirtualServiceStatus() {
+    }
 
-    }
-    
-    
-    public VirtualServiceStatus(String code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-    
     public VirtualServiceStatus(String code) {
         this.code = code;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
+    public VirtualServiceStatus(String code, String message) {
         this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
         this.message = message;
-    }
-
-    public VirtualServiceRequest getVirtualServiceRequest() {
-        return virtualServiceRequest;
-    }
-
-    public void setVirtualServiceRequest(VirtualServiceRequest virtualServiceRequest) {
-        this.virtualServiceRequest = virtualServiceRequest;
     }
 
 }

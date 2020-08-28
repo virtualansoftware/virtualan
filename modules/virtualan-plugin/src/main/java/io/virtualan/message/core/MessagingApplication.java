@@ -1,7 +1,5 @@
 package io.virtualan.message.core;
 
-import io.virtualan.controller.VirtualMessageController;
-import io.virtualan.core.model.MockResponse;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.util.ReturnMockResponse;
 import java.io.BufferedReader;
@@ -25,7 +23,6 @@ import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,13 +31,11 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.MessageChannelSpec;
 import org.springframework.integration.kafka.dsl.Kafka;
 import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.listener.ConsumerProperties;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -63,6 +58,8 @@ public class MessagingApplication {
 	
 	private static String bootstrapServers;
 	private static List<String> topics = new ArrayList<>();
+	Map<String, Object> producerConfig = new HashMap<>();
+	Map<String, Object> consumerConfigs = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
@@ -81,12 +78,45 @@ public class MessagingApplication {
 						topicList.add(addNewTopic(topic));
 					}
 				}
+				bootstrapServers = obj.getString("broker");
+				Map configProps = loadProperties(obj.optString("consumer"));
+				if (configProps != null) {
+					consumerConfigs.putAll(configProps);
+				}
+				Map configProducerProps = loadProperties(obj.optString("producer"));
+				if (configProps != null) {
+					producerConfig.putAll(configProducerProps);
+				}
 				if (topicList != null)
 					addTopic(topicList);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Unable to load the kafka configuration");
 		}
+	}
+
+	private Map<String, String> loadProperties(String propFileName){
+		 InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+		Map<String, String> mapList = new HashMap<>();
+		 Properties properties = new Properties();
+		if (inputStream != null) {
+			try {
+				properties.load(inputStream);
+				if(properties != null) {
+					properties.forEach((k, v) -> {
+						String sk = k.toString();
+						String sv = v.toString();
+						mapList.put(sk, sv);
+					});
+					return mapList;
+				}
+			} catch (IOException e) {
+				log.warn("property file '" + propFileName + "' not found in the classpath.. loading default setting " + e.getMessage());
+			}
+		} else {
+			log.warn("property file '" + propFileName + "' not found in the classpath.. loading default setting");
+		}
+		return null;
 	}
 
 	private static JSONArray getJsonObject() throws Exception {
@@ -129,7 +159,7 @@ public class MessagingApplication {
 		Short replication = 1;
 		return new NewTopic(topic, partitions, replication).configs(configs);
 	}
-	
+
 	private static Set<String> getTopics() throws Exception {
 		AdminClient admin = getAdminClient();
 		ListTopicsResult listTopics = admin.listTopics();
@@ -140,32 +170,35 @@ public class MessagingApplication {
 	public ProducerFactory<String, Object> producerFactory() {
 		return new DefaultKafkaProducerFactory<String, Object>(producerConfigs());
 	}
-	
+
+
 	@Bean
 	public Map<String, Object> producerConfigs() {
-		Map<String, Object> properties = new HashMap<>();
-		properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
-		properties.put("acks", "all");
-		properties.put("retries", 0);
-		return properties;
+		producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		if( producerConfig.size() == 1) {
+			producerConfig.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+			producerConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+			producerConfig.put(ProducerConfig.LINGER_MS_CONFIG, 1);
+			producerConfig.put("acks", "all");
+			producerConfig.put("retries", 0);
+		}
+		return producerConfig;
 	}
-	
+
 	@Bean
 	public Map<String, Object> consumerConfigs() {
-		Map<String, Object> properties = new HashMap<>();
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		properties.put(ConsumerConfig.GROUP_ID_CONFIG, "virtualan-consumer-1");
-		properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-		properties.put("max.poll.records", 1);
-		properties.put("max.poll.interval.ms", 1000);
-		properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-		properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
-		return properties;
+			consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		if(consumerConfigs.size() == 1) {
+			consumerConfigs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+			consumerConfigs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+			consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, "virtualan-consumer-1");
+			consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+			consumerConfigs.put("max.poll.records", 1);
+			consumerConfigs.put("max.poll.interval.ms", 1000);
+			consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+			consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
+		}
+		return consumerConfigs;
 	}
 	
 	@Bean
