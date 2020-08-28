@@ -65,8 +65,8 @@ public class SoapEndpointCodeGenerator {
       addParameterAnnotation(cc, method);
       addMethodAnnotation(cc, soapService, method);
     }
-    cc.getClassFile()
-        .write(new DataOutputStream(new FileOutputStream("VirtualanEndpoint.class")));
+    //cc.getClassFile()
+    //    .write(new DataOutputStream(new FileOutputStream("VirtualanEndpoint.class")));
     return cc.toClass();
   }
 
