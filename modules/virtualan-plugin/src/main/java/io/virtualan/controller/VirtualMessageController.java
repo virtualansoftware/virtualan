@@ -56,7 +56,13 @@ public class VirtualMessageController {
       final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
           messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
       virtualServiceRequest.setId(id);
-      virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
+      VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
+      BeanUtils.copyProperties(virtualServiceRequest, virtualServiceMessageRequest);
+      virtualServiceMessageRequest.setBrokerUrl(virtualServiceRequest.getUrl());
+      virtualServiceMessageRequest.setResponseTopicOrQueueName(virtualServiceRequest.getMethod());
+      virtualServiceMessageRequest.setRequestTopicOrQueueName(virtualServiceRequest.getOperationId());
+      virtualServiceStatus.setVirtualServiceMessageRequest(virtualServiceMessageRequest);
+
       return new ResponseEntity<VirtualServiceStatus>(virtualServiceStatus,
           HttpStatus.BAD_REQUEST);
     }
@@ -80,7 +86,8 @@ public class VirtualMessageController {
     List<VirtualServiceMessageRequest> msgList = new ArrayList<>();
     for ( VirtualServiceRequest request :mockLoadRequests) {
       VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
-      if(RequestType.KAFKA.toString().equalsIgnoreCase(request.getRequestType())) {
+      if(RequestType.KAFKA.name().equalsIgnoreCase(request.getRequestType())
+          || RequestType.AMQ.name().equalsIgnoreCase((request.getRequestType()))) {
         BeanUtils.copyProperties(request, virtualServiceMessageRequest);
         virtualServiceMessageRequest.setBrokerUrl(request.getUrl());
         virtualServiceMessageRequest.setResponseTopicOrQueueName(request.getMethod());
@@ -119,10 +126,15 @@ public class VirtualMessageController {
 
       final VirtualServiceRequest mockTransferObject =
           virtualService.saveMockRequest(request);
-
-      mockTransferObject.setMockStatus(
+      VirtualServiceMessageRequest virtualServiceMessageRequestResponse = new VirtualServiceMessageRequest();
+      BeanUtils.copyProperties(mockTransferObject, virtualServiceMessageRequestResponse);
+      virtualServiceMessageRequestResponse.setBrokerUrl(mockTransferObject.getUrl());
+      virtualServiceMessageRequestResponse.setResponseTopicOrQueueName(mockTransferObject.getMethod());
+      virtualServiceMessageRequestResponse.setRequestTopicOrQueueName(mockTransferObject.getOperationId());
+      virtualServiceMessageRequestResponse.setMockStatus(
           new VirtualServiceStatus(messageSource.getMessage("VS_SUCCESS", null, locale)));
-      return new ResponseEntity<>(mockTransferObject, HttpStatus.CREATED);
+
+      return new ResponseEntity<VirtualServiceMessageRequest>(virtualServiceMessageRequestResponse, HttpStatus.CREATED);
 
     } catch (final Exception e) {
       return new ResponseEntity<VirtualServiceStatus>(new VirtualServiceStatus(

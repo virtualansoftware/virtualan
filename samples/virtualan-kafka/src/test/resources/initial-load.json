@@ -1,0 +1,11 @@
+[{
+  "operationId": "person",
+  "url": "http://virtualan.io/types/helloworld",
+  "method": "person",
+  "type": "Response",
+  "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+  "output": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+  "resource": "http://virtualan.io/types/helloworld",
+  "requestType" : "SOAP"
+}
+]
