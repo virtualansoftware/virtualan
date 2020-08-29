@@ -17,6 +17,7 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.LoaderClassPath;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
@@ -55,6 +56,8 @@ public class SoapEndpointCodeGenerator {
   public static Class buildEndpointClass(Map<String, SoapService> soapWsServices)
       throws Exception {
     ClassPool pool = ClassPool.getDefault();
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    pool.insertClassPath(new LoaderClassPath(cl));
     CtClass cc = pool.makeClass("io.virtualan.VirtualanEndpoint");
     addClassAnnotation(cc);
     for (Entry<String, SoapService> soapWsServiceEntry : soapWsServices.entrySet()) {
@@ -65,11 +68,10 @@ public class SoapEndpointCodeGenerator {
       addParameterAnnotation(cc, method);
       addMethodAnnotation(cc, soapService, method);
     }
-//    log.info("##########################");
-//    cc.getClassFile()
-//        .write(new DataOutputStream(System.out));
-//    log.info("##########################");
-//
+    if(log.isDebugEnabled()) {
+      cc.getClassFile()
+          .write(new DataOutputStream(new FileOutputStream("VirtualanEndpoint.java")));
+    }
    return cc.toClass();
   }
 
