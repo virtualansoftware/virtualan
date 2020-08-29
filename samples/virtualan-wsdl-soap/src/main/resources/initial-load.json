@@ -8,5 +8,16 @@
   "resource": "http://virtualan.io/types/helloworld",
    "contentType": "XML",
   "requestType" : "SOAP"
-}
+},
+  {
+    "operationId": "person",
+    "url": "http://virtualan.io/types/helloworld",
+    "method": "person",
+    "type": "Response",
+    "input": "<hel:person xmlns:hel=\"http://virtualan.io/types/helloworld\"> \t<hel:firstName>Elan</hel:firstName> \t<hel:lastName>Thangamani</hel:lastName> </hel:person>",
+    "output": "<ns2:greeting xmlns:ns2=\"http://virtualan.io/types/helloworld\">             <ns2:greeting>Welcome World SV!!!</ns2:greeting></ns2:greeting>",
+    "resource": "http://virtualan.io/types/helloworld",
+    "contentType": "XML",
+    "requestType" : "SOAP"
+  }
 ]

@@ -36,7 +36,6 @@
                 <wsdlOption>
                   <wsdl>${basedir}/src/main/resources/wsdl/helloworld.wsdl</wsdl>
                   <extraargs>
-                    <extraarg>-verbose</extraarg>
                     <extraarg>-xjc-Xequals</extraarg>
                     <extraarg>-xjc-XhashCode</extraarg>
                     <extraarg>-xjc-XtoString</extraarg>
@@ -45,7 +44,39 @@
                     <bindingFile>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingFile>
                   </bindingFiles>
                 </wsdlOption>
-              </wsdlOptions>
+                <wsdlOption>
+                  <autoNameResolution>true</autoNameResolution>
+                  <wsdl>${basedir}/src/main/resources/wsdl/sforce-49/partner.wsdl</wsdl>
+                  <extraargs>
+                    <extraarg>-xjc-Xequals</extraarg>
+                    <extraarg>-xjc-XhashCode</extraarg>
+                    <extraarg>-xjc-XtoString</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>com.sforce.partner</extraarg>
+                  </extraargs>
+                  <bindingFiles>
+                    <bindingFile>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingFile>
+                  </bindingFiles>
+                </wsdlOption>
+                <wsdlOption>
+                  <autoNameResolution>true</autoNameResolution>
+                  <wsdl>${basedir}/src/main/resources/wsdl/sforce-49/apex.wsdl</wsdl>
+                  </wsdlOption>
+                <wsdlOption>
+                  <autoNameResolution>true</autoNameResolution>
+                  <wsdl>${basedir}/src/main/resources/wsdl/sforce-49/apex.wsdl</wsdl>
+                  <extraargs>
+                    <extraarg>-xjc-Xequals</extraarg>
+                    <extraarg>-xjc-XhashCode</extraarg>
+                    <extraarg>-xjc-XtoString</extraarg>
+                    <extraarg>-p</extraarg>
+                    <extraarg>com.sforce.apex</extraarg>
+                  </extraargs>
+                  <bindingFiles>
+                    <bindingFile>${project.basedir}/src/main/resources/xjb/bindings.xjb</bindingFile>
+                  </bindingFiles>
+                </wsdlOption>
+            </wsdlOptions>
 
             </configuration>
 
