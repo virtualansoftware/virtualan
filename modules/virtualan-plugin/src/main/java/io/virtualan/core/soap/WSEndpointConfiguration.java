@@ -48,11 +48,9 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
     this.beanFactory = beanFactory;
   }
 
-
   @PostConstruct
   public void loadSoapWSservice() throws Exception {
     DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
-
     Arrays.stream(soapPackage.split(";")).forEach( packageName -> {
       List<Class> portTypeList = soapEndpointCodeGenerator.findMyTypes(packageName);
       for(Class clazz : portTypeList) {
