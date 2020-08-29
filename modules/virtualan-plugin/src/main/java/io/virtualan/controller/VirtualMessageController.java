@@ -4,6 +4,7 @@ import io.virtualan.core.model.RequestType;
 import io.virtualan.core.model.VirtualServiceMessageRequest;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
+import io.virtualan.core.util.Converter;
 import io.virtualan.message.core.MessageUtil;
 import io.virtualan.service.VirtualService;
 import java.io.BufferedReader;
@@ -42,6 +43,9 @@ public class VirtualMessageController {
   @Autowired
   private VirtualService virtualService;
 
+  @Autowired
+  private Converter converter;
+
   @RequestMapping(value = "/virtualservices/load-topics", method = RequestMethod.GET)
   public ResponseEntity<String> listAllTopics()
       throws Exception {
@@ -56,6 +60,7 @@ public class VirtualMessageController {
       final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
           messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
       virtualServiceRequest.setId(id);
+      virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
       VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
       BeanUtils.copyProperties(virtualServiceRequest, virtualServiceMessageRequest);
       virtualServiceMessageRequest.setBrokerUrl(virtualServiceRequest.getUrl());
@@ -86,6 +91,7 @@ public class VirtualMessageController {
     List<VirtualServiceMessageRequest> msgList = new ArrayList<>();
     for ( VirtualServiceRequest request :mockLoadRequests) {
       VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
+      request = converter.convertAsJson(request);
       if(RequestType.KAFKA.name().equalsIgnoreCase(request.getRequestType())
           || RequestType.AMQ.name().equalsIgnoreCase((request.getRequestType()))) {
         BeanUtils.copyProperties(request, virtualServiceMessageRequest);
@@ -105,11 +111,10 @@ public class VirtualMessageController {
   @RequestMapping(value = "/virtualservices/message", method = RequestMethod.POST)
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceMessageRequest virtualServiceMessageRequest) {
-
     try {
-
       VirtualServiceRequest request = new VirtualServiceRequest();
       BeanUtils.copyProperties(virtualServiceMessageRequest, request);
+      converter.convertJsonAsString(request);
       request.setUrl(virtualServiceMessageRequest.getBrokerUrl());
       request.setMethod(virtualServiceMessageRequest.getResponseTopicOrQueueName());
       request.setOperationId(virtualServiceMessageRequest.getRequestTopicOrQueueName());
@@ -124,8 +129,8 @@ public class VirtualMessageController {
         return responseEntity;
       }
 
-      final VirtualServiceRequest mockTransferObject =
-          virtualService.saveMockRequest(request);
+      VirtualServiceRequest mockTransferObject = virtualService.saveMockRequest(request);
+      mockTransferObject = converter.convertAsJson(mockTransferObject);
       VirtualServiceMessageRequest virtualServiceMessageRequestResponse = new VirtualServiceMessageRequest();
       BeanUtils.copyProperties(mockTransferObject, virtualServiceMessageRequestResponse);
       virtualServiceMessageRequestResponse.setBrokerUrl(mockTransferObject.getUrl());
@@ -133,9 +138,7 @@ public class VirtualMessageController {
       virtualServiceMessageRequestResponse.setRequestTopicOrQueueName(mockTransferObject.getOperationId());
       virtualServiceMessageRequestResponse.setMockStatus(
           new VirtualServiceStatus(messageSource.getMessage("VS_SUCCESS", null, locale)));
-
       return new ResponseEntity<VirtualServiceMessageRequest>(virtualServiceMessageRequestResponse, HttpStatus.CREATED);
-
     } catch (final Exception e) {
       return new ResponseEntity<VirtualServiceStatus>(new VirtualServiceStatus(
           messageSource.getMessage("VS_UNEXPECTED_ERROR", null, locale) + e.getMessage()),

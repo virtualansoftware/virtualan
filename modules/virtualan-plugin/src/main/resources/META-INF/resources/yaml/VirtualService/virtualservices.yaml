@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Virtual Service API
-  version: 1.1.0
+  version: 2.0.2
   title: Virtual Service API
 basePath: /
 schemes:
@@ -215,9 +215,17 @@ definitions:
         type: string
         desc: "rule could be a groovy script or spring expression language business rule"
       input:
-        type: string
+        anyOf:
+          - type: string
+          - type: array
+            items: {}
+          - type: object
       output:
-        type: string
+        anyOf:
+          - type: string
+          - type: array
+            items: {}
+          - type: object
       availableParams:
         type: array
         items:
@@ -264,9 +272,17 @@ definitions:
         type: string
         desc: "rule could be a groovy script or spring expression language business rule"
       input:
-        type: string
+        anyOf:
+          - type: string
+          - type: array
+            items: {}
+          - type: object
       output:
-        type: string
+        anyOf:
+          - type: string
+          - type: array
+            items: {}
+          - type: object
       availableParams:
         type: array
         items:

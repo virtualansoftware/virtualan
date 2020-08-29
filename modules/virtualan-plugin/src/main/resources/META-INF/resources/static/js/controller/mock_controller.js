@@ -110,8 +110,13 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     }
 
     self.loadJson = function (value) {
-      self.jsonObj = JSON.parse(value);
-      self.jsonStr = JSON.parse(value.toString());
+      if(typeof value === 'object' && value !== null ) {
+        self.jsonObj = JSON.parse(JSON.stringify(value));
+        self.jsonStr = JSON.parse(JSON.stringify(value));
+      } else {
+        self.jsonObj = JSON.parse(value);
+        self.jsonStr = JSON.parse(value);
+      }
     };
 
 

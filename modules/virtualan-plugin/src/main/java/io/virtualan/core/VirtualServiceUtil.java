@@ -80,6 +80,8 @@ public class VirtualServiceUtil {
     private VirtualService virtualService;
 
     @Autowired
+    private Converter converter;
+    @Autowired
     private MessageSource messageSource;
 
     private final Locale locale = LocaleContextHolder.getLocale();
@@ -162,8 +164,8 @@ public class VirtualServiceUtil {
             final List<VirtualServiceRequest> mockTransferObjectList =
                     virtualService.readByOperationId(resource, operationId);
             for (final VirtualServiceRequest mockTransferObject : mockTransferObjectList) {
-                final String input = mockTransferObject.getInput();
-                final String output = mockTransferObject.getOutput();
+                final String input = mockTransferObject.getInput() != null ? mockTransferObject.getInput() .toString() : null;
+                final String output = mockTransferObject.getOutput() != null ? mockTransferObject.getOutput().toString() : null;
 
                 Set<String> excludeSet = null;
                 if (mockTransferObject.getExcludeList() != null) {
@@ -214,6 +216,7 @@ public class VirtualServiceUtil {
             final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
                     messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
             virtualServiceRequest.setId(id);
+            virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
             virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
             return new ResponseEntity<VirtualServiceStatus>(virtualServiceStatus,
                     HttpStatus.BAD_REQUEST);
@@ -239,11 +242,11 @@ public class VirtualServiceUtil {
                     .setParams(Converter.converter(mockTransferObject.getAvailableParams()));
             mockServiceRequest.setResource(mockTransferObject.getResource());
     
-            if (inputObjectType != null) {
+            if (inputObjectType != null && mockTransferObject.getInput() != null) {
                 mockServiceRequest.setInput(getObjectMapper()
-                        .readValue(mockTransferObject.getInput(), inputObjectType));
+                        .readValue(mockTransferObject.getInput().toString(), inputObjectType));
             } else if(mockTransferObject.getInput() != null){
-                mockServiceRequest.setInput(mockTransferObject.getInput());
+                mockServiceRequest.setInput(mockTransferObject.getInput().toString());
             }
             
             final Map<Integer, ReturnMockResponse> returnMockResponseMap =
@@ -296,7 +299,7 @@ public class VirtualServiceUtil {
         requestBody.setExcludeList(rMockResponse.getMockRequest().getExcludeSet());
         requestBody.setExpectedInput(rMockResponse.getMockRequest().getInput());
         requestBody.setInputObjectType(inputObjectType);
-        requestBody.setInputRequest(mockTransferObject.getInput());
+        requestBody.setInputRequest(mockTransferObject.getInput() != null ? mockTransferObject.getInput().toString() : null);
         requestBody.setContentType(rMockResponse.getMockRequest().getContentType());
         return requestBody;
     }

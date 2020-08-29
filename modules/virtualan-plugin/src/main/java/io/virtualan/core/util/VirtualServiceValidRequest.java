@@ -80,8 +80,9 @@ public class VirtualServiceValidRequest {
             VirtualServiceRequest mockTransferObject) throws ClassNotFoundException, IOException {
         final VirtualServiceApiResponse apiResponse = mockTransferObjectActual.getResponseType()
                 .get(mockTransferObject.getHttpStatusCode());
-        if (apiResponse != null && apiResponse.getObjectType() != null) {
-            objectMapper.readValue(mockTransferObject.getOutput(),
+        if (apiResponse != null && apiResponse.getObjectType() != null
+                && mockTransferObject.getOutput() != null) {
+            objectMapper.readValue(mockTransferObject.getOutput().toString(),
                     Class.forName(apiResponse.getObjectType()));
         }
         return true;
