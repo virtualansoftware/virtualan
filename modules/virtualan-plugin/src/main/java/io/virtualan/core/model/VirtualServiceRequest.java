@@ -45,9 +45,9 @@ public class VirtualServiceRequest {
     private String method;
     private Class inputObjectType;
     private String outputObjectType;
-    private String input;
+    private Object input;
     private String rule;
-    private String output;
+    private Object output;
     private List<VirtualServiceKeyValue> availableParams = new ArrayList<>();
     private List<VirtualServiceKeyValue> headerParams  = new ArrayList<>();
     private Map<String, VirtualServiceApiResponse> responseType;

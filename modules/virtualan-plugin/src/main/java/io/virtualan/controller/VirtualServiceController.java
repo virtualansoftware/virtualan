@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2018 Virtualan Contributors (https://virtualan.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -16,6 +16,8 @@
 package io.virtualan.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.RequestType;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -34,8 +36,11 @@ import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import java.util.stream.Collectors;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -62,6 +67,7 @@ import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
+import org.springframework.xml.transform.StringSource;
 
 
 /**
@@ -76,16 +82,16 @@ import io.virtualan.service.VirtualService;
 public class VirtualServiceController {
 
     private static final Logger log = LoggerFactory.getLogger(VirtualServiceController.class);
-    
+
     @Autowired
     private RuleEvaluator ruleEvaluator;
-    
+
     @Autowired
     private ScriptExecutor scriptExecutor;
-    
+
     @Autowired
     private Converter converter;
-    
+
     @Autowired
     private VirtualService virtualService;
 
@@ -95,7 +101,7 @@ public class VirtualServiceController {
     @Autowired
     private MessageSource messageSource;
 
-    
+
     Locale locale = LocaleContextHolder.getLocale();
 
     @Autowired
@@ -106,12 +112,12 @@ public class VirtualServiceController {
         objectMapper.setSerializationInclusion(Include.NON_NULL);
 
         return objectMapper.enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE,
-                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-        // ,DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
+            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+            // ,DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES
         );
     }
-    
-    
+
+
     public VirtualService getVirtualService() {
         return virtualService;
     }
@@ -134,45 +140,48 @@ public class VirtualServiceController {
 
     @RequestMapping(value = "/virtualservices/load", method = RequestMethod.GET)
     public Map<String, Map<String, VirtualServiceRequest>> listAllMockLoadRequest()
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException,
-            IOException {
+        throws InstantiationException, IllegalAccessException, ClassNotFoundException,
+        IOException {
         return virtualServiceUtil.getVirtualServiceInfo() != null ? virtualServiceUtil.getVirtualServiceInfo().loadVirtualServices()
-                : new HashMap<>();
+            : new HashMap<>();
     }
-    
-    
+
+
     @RequestMapping(value = "/virtualservices", method = RequestMethod.GET)
     public ResponseEntity<List<VirtualServiceRequest>> listAllMockLoadRequests() {
         final List<VirtualServiceRequest> mockRestLoadRequests = virtualService.findAllMockRequests();
         if (mockRestLoadRequests.isEmpty()) {
             return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<VirtualServiceRequest>>(mockRestLoadRequests, HttpStatus.OK);
+        List<VirtualServiceRequest> response =
+            mockRestLoadRequests.stream().map(x  -> converter.convertAsJson(x)).collect(Collectors.toList());
+        return new ResponseEntity<List<VirtualServiceRequest>>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/virtualservices/{id}", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<VirtualServiceRequest> getMockLoadRequest(@PathVariable("id") long id) {
-        final VirtualServiceRequest mockLoadRequest = virtualService.findById(id);
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<VirtualServiceRequest> getMockLoadRequest(@PathVariable("id") long id)
+        throws JsonProcessingException {
+        VirtualServiceRequest mockLoadRequest = virtualService.findById(id);
         if (mockLoadRequest == null) {
             return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NOT_FOUND);
         }
+        mockLoadRequest = converter.convertAsJson(mockLoadRequest);
         return new ResponseEntity<VirtualServiceRequest>(mockLoadRequest, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/virtualservices", method = RequestMethod.POST)
     public ResponseEntity createMockRequest(
-            @RequestBody VirtualServiceRequest virtualServiceRequest) {
-
+        @RequestBody VirtualServiceRequest virtualServiceRequest) {
         try {
-
+            converter.convertJsonAsString(virtualServiceRequest);
             virtualServiceRequest.setRequestType(RequestType.REST.toString());
             validateExpectedInput(virtualServiceRequest);
             // find the operationId for the given Request. It required for the Automation test cases
             virtualServiceUtil.findOperationIdForService(virtualServiceRequest);
             ResponseEntity responseEntity  = validateRequestBody(virtualServiceRequest);
             if (responseEntity != null) {
-                    return responseEntity;
+                return responseEntity;
             }  else {
                 responseEntity = validateResponseBody(virtualServiceRequest);
                 if (responseEntity != null) {
@@ -185,71 +194,71 @@ public class VirtualServiceController {
                 return responseEntity;
             }
 
-            final VirtualServiceRequest mockTransferObject =
-                    virtualService.saveMockRequest(virtualServiceRequest);
-
+            VirtualServiceRequest mockTransferObject = virtualService.saveMockRequest(virtualServiceRequest);
+            mockTransferObject = converter.convertAsJson(mockTransferObject);
             mockTransferObject.setMockStatus(
-                    new VirtualServiceStatus(messageSource.getMessage("VS_SUCCESS", null, locale)));
+                new VirtualServiceStatus(messageSource.getMessage("VS_SUCCESS", null, locale)));
             return new ResponseEntity<>(mockTransferObject, HttpStatus.CREATED);
 
         } catch (final Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<VirtualServiceStatus>(new VirtualServiceStatus(
-                    messageSource.getMessage("VS_UNEXPECTED_ERROR", null, locale) + e.getMessage()),
-                    HttpStatus.BAD_REQUEST);
+                messageSource.getMessage("VS_UNEXPECTED_ERROR", null, locale) + e.getMessage()),
+                HttpStatus.BAD_REQUEST);
         }
     }
 
-    
+
+
+
 
     private ResponseEntity validateResponseBody(VirtualServiceRequest mockLoadRequest) {
         try {
             virtualServiceUtil.isMockResponseBodyValid(mockLoadRequest);
         } catch (NoSuchMessageException | InvalidMockResponseException e) {
             return new ResponseEntity<VirtualServiceStatus>(new VirtualServiceStatus(
-                    messageSource.getMessage("VS_RESPONSE_BODY_MISMATCH", null, locale)
-                            + e.getMessage()),
-                    HttpStatus.BAD_REQUEST);
+                messageSource.getMessage("VS_RESPONSE_BODY_MISMATCH", null, locale)
+                    + e.getMessage()),
+                HttpStatus.BAD_REQUEST);
         }
         return null;
     }
-    
-   
+
+
 
     private ResponseEntity validateRequestBody(VirtualServiceRequest virtualServiceRequest) throws IllegalAccessException, InstantiationException {
         if (virtualServiceUtil.getVirtualServiceInfo() != null) {
-                final Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo().getInputType(virtualServiceRequest);
+            final Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo().getInputType(virtualServiceRequest);
             if (inputObjectType == null && (virtualServiceRequest.getInput() == null
-                        || virtualServiceRequest.getInput().length() == 0)) {
-                    return null;
+                || virtualServiceRequest.getInput().toString().length() == 0)) {
+                return null;
             } else if (virtualServiceRequest.getInput() != null
-                    && virtualServiceRequest.getInput().length() > 0 && inputObjectType != null) {
+                && virtualServiceRequest.getInput().toString().length() > 0 && inputObjectType != null) {
                 final io.virtualan.requestbody.RequestBody requestBody =
-                        new io.virtualan.requestbody.RequestBody();
+                    new io.virtualan.requestbody.RequestBody();
                 requestBody.setObjectMapper(getObjectMapper());
-                requestBody.setInputRequest(virtualServiceRequest.getInput());
+                requestBody.setInputRequest(virtualServiceRequest.getInput().toString());
                 requestBody.setInputObjectType(inputObjectType);
                 Object object = null;
                 try {
                     object = RequestBodyTypes.fromString(inputObjectType.getTypeName())
-                            .getValidMockRequestBody(requestBody);
+                        .getValidMockRequestBody(requestBody);
                 } catch (NoSuchMessageException | IOException e) {
                     e.printStackTrace();
                     object = null;
                 }
                 if (object == null) {
                     return new ResponseEntity<VirtualServiceStatus>(
-                            new VirtualServiceStatus(messageSource
-                                    .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
-                            HttpStatus.BAD_REQUEST);
+                        new VirtualServiceStatus(messageSource
+                            .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
+                        HttpStatus.BAD_REQUEST);
                 }
-    
+
                 if ("RULE".equalsIgnoreCase(virtualServiceRequest.getType())) {
                     try {
                         MockServiceRequest mockServiceRequest = new MockServiceRequest();
                         try {
                             object = RequestBodyTypes.fromString(inputObjectType.getTypeName())
-                                    .getValidMockRequestBody(requestBody);
+                                .getValidMockRequestBody(requestBody);
                         } catch (NoSuchMessageException | IOException e) {
                             e.printStackTrace();
                             object = null;
@@ -261,17 +270,17 @@ public class VirtualServiceController {
                         ruleEvaluator.expressionEvaluatorForMockCreation(mockServiceRequest, virtualServiceRequest.getRule());
                     } catch (Exception e) {
                         return new ResponseEntity<VirtualServiceStatus>(
-                                new VirtualServiceStatus(e.getMessage(), messageSource
-                                        .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
-                                HttpStatus.BAD_REQUEST);
+                            new VirtualServiceStatus(e.getMessage(), messageSource
+                                .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
+                            HttpStatus.BAD_REQUEST);
                     }
-        
+
                 } else if ("SCRIPT".equalsIgnoreCase(virtualServiceRequest.getType())) {
                     try {
                         MockServiceRequest mockServiceRequest = new MockServiceRequest();
                         try {
                             object = RequestBodyTypes.fromString(inputObjectType.getTypeName())
-                                    .getValidMockRequestBody(requestBody);
+                                .getValidMockRequestBody(requestBody);
                         } catch (NoSuchMessageException | IOException e) {
                             e.printStackTrace();
                             object = null;
@@ -282,40 +291,40 @@ public class VirtualServiceController {
                         mockResponse = scriptExecutor.executeScript (mockServiceRequest, mockResponse, virtualServiceRequest.getRule());
                         if(mockResponse == null){
                             return new ResponseEntity<VirtualServiceStatus>(
-                                    new VirtualServiceStatus("Its not a valid mock response setup!!! Verify the script? ", messageSource
-                                            .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
-                                    HttpStatus.BAD_REQUEST);
+                                new VirtualServiceStatus("Its not a valid mock response setup!!! Verify the script? ", messageSource
+                                    .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
+                                HttpStatus.BAD_REQUEST);
                         } else {
                             //Validate Mock Set up data for script and rule
                         }
                     } catch (Exception e) {
                         return new ResponseEntity<VirtualServiceStatus>(
-                                new VirtualServiceStatus(e.getMessage(), messageSource
-                                        .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
-                                HttpStatus.BAD_REQUEST);
+                            new VirtualServiceStatus(e.getMessage(), messageSource
+                                .getMessage("VS_REQUEST_BODY_MISMATCH", null, locale)),
+                            HttpStatus.BAD_REQUEST);
                     }
                 }
             }
         }
-           return null;
+        return null;
     }
 
-    
+
 
     private ResponseEntity validateExpectedInput(VirtualServiceRequest mockLoadRequest) {
         if (mockLoadRequest.getHttpStatusCode() == null || mockLoadRequest.getMethod() == null || mockLoadRequest.getType() == null
-                || mockLoadRequest.getUrl() == null) {
+            || mockLoadRequest.getUrl() == null) {
             return new ResponseEntity<VirtualServiceStatus>(
-                    new VirtualServiceStatus(
-                            messageSource.getMessage("VS_CREATE_MISSING_INFO", null, locale)),
-                    HttpStatus.BAD_REQUEST);
+                new VirtualServiceStatus(
+                    messageSource.getMessage("VS_CREATE_MISSING_INFO", null, locale)),
+                HttpStatus.BAD_REQUEST);
         }
         return null;
     }
 
     @RequestMapping(value = "/virtualservices/{id}", method = RequestMethod.PUT)
     public ResponseEntity<VirtualServiceRequest> updateMockRequest(@PathVariable("id") long id,
-            @RequestBody VirtualServiceRequest mockLoadRequest) {
+        @RequestBody VirtualServiceRequest mockLoadRequest) {
 
         final VirtualServiceRequest currentMockLoadRequest = virtualService.findById(id);
         if (currentMockLoadRequest == null) {
@@ -324,7 +333,7 @@ public class VirtualServiceController {
 
         // find the operationId for the given Request. It required for the Automation test cases
         virtualServiceUtil.findOperationIdForService(mockLoadRequest);
-        
+
         currentMockLoadRequest.setInput(mockLoadRequest.getInput());
         currentMockLoadRequest.setOutput(mockLoadRequest.getOutput());
         currentMockLoadRequest.setOperationId(mockLoadRequest.getOperationId());
@@ -390,7 +399,7 @@ public class VirtualServiceController {
     private Resource[] getCatalogs(String name) throws IOException {
         final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
         final PathMatchingResourcePatternResolver resolver =
-                new PathMatchingResourcePatternResolver(classLoader);
+            new PathMatchingResourcePatternResolver(classLoader);
         return resolver.getResources("classpath:META-INF/resources/yaml/" + name + "/*.*");
     }
 
@@ -399,7 +408,7 @@ public class VirtualServiceController {
         final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
 
         final PathMatchingResourcePatternResolver resolver =
-                new PathMatchingResourcePatternResolver(classLoader);
+            new PathMatchingResourcePatternResolver(classLoader);
 
         return resolver.getResources("classpath:META-INF/resources/yaml/*/");
     }

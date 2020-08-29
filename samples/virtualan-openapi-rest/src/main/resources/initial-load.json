@@ -28,6 +28,94 @@
   },
   {
     "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets",
+    "type": "Response",
+    "requestType": "REST",
+    "method": "POST",
+    "input": {
+      "category": {
+        "id": 10,
+        "name": "string"
+      },
+      "name": "doggie",
+      "photoUrls": [
+        "string"
+      ],
+      "status": "available",
+      "tags": [
+        {
+          "id": 0,
+          "name": "string"
+        }
+      ]
+    },
+    "output": {
+      "category": {
+        "id": 10,
+        "name": "string"
+      },
+      "name": "doggie",
+      "photoUrls": [
+        "string"
+      ],
+      "status": "available",
+      "tags": [
+        {
+          "id": 0,
+          "name": "string"
+        }
+      ]
+    },
+    "resource": "pets",
+    "contentType": "JSON"
+  },
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets",
+    "type": "Response",
+    "requestType": "REST",
+    "method": "POST",
+    "input": {
+      "category": {
+        "id": 100,
+        "name": "string"
+      },
+      "name": "doggie",
+      "photoUrls": [
+        "string"
+      ],
+      "status": "available",
+      "tags": [
+        {
+          "id": 0,
+          "name": "string"
+        }
+      ]
+    },
+    "output": {
+      "category": {
+        "id": 10,
+        "name": "string"
+      },
+      "name": "doggie",
+      "photoUrls": [
+        "string"
+      ],
+      "status": "available",
+      "tags": [
+        {
+          "id": 0,
+          "name": "string"
+        }
+      ]
+    },
+    "resource": "pets",
+    "contentType": "JSON"
+  },
+  {
+    "operationId": "addPet",
     "httpStatusCode": "400",
     "url": "/pets",
     "type": "Rule",

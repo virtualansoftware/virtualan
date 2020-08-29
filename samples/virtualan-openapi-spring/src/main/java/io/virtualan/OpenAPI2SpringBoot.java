@@ -85,10 +85,6 @@ public class OpenAPI2SpringBoot implements CommandLineRunner {
 @Configuration
 public static class Config {
 
-    @Autowired
-    private EmbeddedKafkaBroker broker;
-
-
     private int kafkaPort;
 
 

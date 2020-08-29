@@ -128,9 +128,9 @@ public class MessageUtil {
 			if (mockTransferObject.getInputObjectType() != null) {
 				if(ContentType.XML.equals(mockTransferObject.getContentType())){
 					mockServiceRequest.setInput(
-							XMLConverter.xmlToObject(mockTransferObject.getInputObjectType(),mockTransferObject.getInput()));
+							XMLConverter.xmlToObject(mockTransferObject.getInputObjectType(),mockTransferObject.getInput().toString()));
 				} else {
-					mockServiceRequest.setInput(objectMapper.readValue(mockTransferObject.getInput(), mockTransferObject.getInputObjectType()));
+					mockServiceRequest.setInput(objectMapper.readValue(mockTransferObject.getInput().toString(), mockTransferObject.getInputObjectType()));
 				}
 			} else {
 				mockServiceRequest.setInput(mockTransferObject.getInput());
