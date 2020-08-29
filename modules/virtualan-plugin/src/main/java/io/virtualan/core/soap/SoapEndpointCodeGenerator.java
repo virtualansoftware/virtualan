@@ -65,9 +65,12 @@ public class SoapEndpointCodeGenerator {
       addParameterAnnotation(cc, method);
       addMethodAnnotation(cc, soapService, method);
     }
-    //cc.getClassFile()
-    //    .write(new DataOutputStream(new FileOutputStream("VirtualanEndpoint.class")));
-    return cc.toClass();
+//    log.info("##########################");
+//    cc.getClassFile()
+//        .write(new DataOutputStream(System.out));
+//    log.info("##########################");
+//
+   return cc.toClass();
   }
 
   private static void addMethodAnnotation(CtClass cc, SoapService soapService, CtMethod method) {
@@ -157,22 +160,28 @@ public class SoapEndpointCodeGenerator {
     return provider;
   }
 
-  protected List<Class> findMyTypes(String basePackage) throws IOException, ClassNotFoundException {
-    ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-    MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
-        resourcePatternResolver);
+  protected List<Class> findMyTypes(String basePackage) {
     List<Class> candidates = new ArrayList<Class>();
-    String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-        resolveBasePackage(basePackage) + "/" + "**/*.class";
-    Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
-    for (Resource resource : resources) {
-      if (resource.isReadable()) {
-        MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
-        if (isCandidate(metadataReader)) {
-          candidates.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
+    try {
+      ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+      MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
+          resourcePatternResolver);
+      String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
+          resolveBasePackage(basePackage) + "/" + "**/*.class";
+      Resource[] resources = new Resource[0];
+      resources = resourcePatternResolver.getResources(packageSearchPath);
+      for (Resource resource : resources) {
+        if (resource.isReadable()) {
+          MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+          if (isCandidate(metadataReader)) {
+            candidates.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
+          }
         }
       }
+    } catch (IOException | ClassNotFoundException e) {
+      log.warn("Unable to load the package : " + basePackage);
     }
+
     return candidates;
   }
 

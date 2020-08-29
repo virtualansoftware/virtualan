@@ -2,7 +2,7 @@
 <jxb:bindings version="2.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     jxb:extensionBindingPrefixes="xjc">
-    <jxb:globalBindings generateElementProperty="false"> <!-- remove JAXBElement annotations -->
+    <jxb:globalBindings generateElementProperty="false" typesafeEnumMaxMembers="2000" > <!-- remove JAXBElement annotations -->
         <xjc:simple/> <!-- adds @XmlRootElement annotations -->
     </jxb:globalBindings>
 </jxb:bindings>

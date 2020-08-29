@@ -53,14 +53,16 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   public void loadSoapWSservice() throws Exception {
     DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
 
-    //TODO MUST
-    List<Class> portTypeList = soapEndpointCodeGenerator.findMyTypes(soapPackage);
-    for(Class clazz : portTypeList) {
-      Method[] methods = clazz.getDeclaredMethods();
-      Arrays.stream(methods).forEach( method  -> {
-        loadParameters(method);
-      });
+    Arrays.stream(soapPackage.split(";")).forEach( packageName -> {
+      List<Class> portTypeList = soapEndpointCodeGenerator.findMyTypes(packageName);
+      for(Class clazz : portTypeList) {
+        Method[] methods = clazz.getDeclaredMethods();
+        Arrays.stream(methods).forEach( method  -> {
+          loadParameters(method);
+        });
+      }
     }
+    );
 
     GenericBeanDefinition virtualanSOAPWS = new GenericBeanDefinition();
     virtualanSOAPWS.setBeanClass(soapEndpointCodeGenerator.buildEndpointClass(wsServiceMockList));
