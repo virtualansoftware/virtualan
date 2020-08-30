@@ -15,6 +15,22 @@
     ]
   },
   {
+    "httpStatusCode": "400",
+    "url": "/pets/{petId}",
+    "type": "Rule",
+    "requestType": "REST",
+    "method": "GET",
+    "rule": "parameters['petId'] == 0",
+    "output": { "code": "PET_1000",  "message": "Pet identifier is not valid"},
+    "availableParams": [
+      {
+        "key": "petId",
+        "value": "100"
+      }
+    ],
+    "contentType": "JSON"
+  },
+  {
     "operationId": "addPet",
     "httpStatusCode": "200",
     "url": "/pets",
