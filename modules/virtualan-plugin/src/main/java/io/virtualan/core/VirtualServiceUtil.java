@@ -436,7 +436,7 @@ public class VirtualServiceUtil {
 	            }
 	            if (responseEntity != null) {
 	            	virtualService.updateUsageTime(rMockResponse.getMockRequest());
-	                return returnResponse(method, responseEntity, responseEntity.getBody().toString());
+	                return returnResponse(method, responseEntity, responseEntity.getBody() != null ? responseEntity.getBody().toString() : null);
 	            }
         	}
         } else {
