@@ -5,9 +5,8 @@ info:
   description: A simple API to learn how to write OpenAPI Specification
 
 schemes:
-  - https
-host: simple.api
-basePath: /openapi101
+  - http
+basePath: /
 
 paths:
   /persons:
@@ -136,7 +135,6 @@ definitions:
       dateOfBirth:
         type: string
         format: date
-
       lastTimeOnline:
         type: string
         format: date-time
