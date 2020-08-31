@@ -174,16 +174,25 @@
     "type": "Script",
     "requestType": "REST",
     "method": "GET",
-    "rule": "def executeScript(mockServiceRequest, responseObject) { \n    String userName = mockServiceRequest.getParam(\"username\").get(); \n    responseObject.setHttpStatusCode('200'); \n    responseObject.setOutput( \"{   \\\"dateOfBirth\\\": \\\"1985-01-17\\\",   \\\"firstName\\\": \\\"Bill\\\",   \\\"lastName\\\": \\\"Gates\\\",   \\\"lastTimeOnline\\\": \\\"2020-08-30T20:28:36.267Z\\\",   \\\"spokenLanguages\\\": {     \\\"additionalProp1\\\": \\\"Tamil\\\",     \\\"additionalProp2\\\": \\\"English\\\",     \\\"additionalProp3\\\": \\\"Spanish\\\"   },   \\\"username\\\": \\\"bgates\\\" }\"); \n    return responseObject.builder(); \n }",
-    "output": "{\n  \"dateOfBirth\": \"1985-01-17\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
+    "rule": "def executeScript(mockServiceRequest, responseObject) { \n    String userName = mockServiceRequest.getParam(\"username\").get(); \n    responseObject.setHttpStatusCode('200'); \n    responseObject.setOutput( \"{   \\\"dateOfBirth\\\": \\\"1955-10-28\\\",   \\\"firstName\\\": \\\"Bill\\\",   \\\"lastName\\\": \\\"Gates\\\",   \\\"lastTimeOnline\\\": \\\"2020-08-30T20:28:36.267Z\\\",   \\\"spokenLanguages\\\": {     \\\"additionalProp1\\\": \\\"Tamil\\\",     \\\"additionalProp2\\\": \\\"English\\\",     \\\"additionalProp3\\\": \\\"Spanish\\\"   },   \\\"username\\\": \\\"bgates\\\" }\"); \n    return responseObject.builder(); \n }",
+    "output": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
     "availableParams": [
       {
         "key": "username",
-        "value": "bgates",
-        "type": null,
-        "serviceType": null,
-        "parameterType": null
+        "value": "bgates"
       }
     ]
+  },
+  {
+    "resource": "persons",
+    "url": "/persons",
+    "type": "Script",
+    "rule": "def executeScript(mockServiceRequest, responseObject) { \n    responseObject.setHttpStatusCode('204');\n  \n    return responseObject.builder(); \n }",
+    "operationId": "personsPost",
+    "input": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
+    "output": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
+    "httpStatusCode": "201",
+    "method": "POST"
   }
+
 ]

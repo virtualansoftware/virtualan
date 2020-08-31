@@ -175,3 +175,28 @@ Feature: Test Pet API
     When a user POST the risk with id
     Then verify the status code is 200
     And verify risk response with 35 includes in the response
+
+  Scenario: User check if default response returns
+    Given create a person with given input
+      | input | {   "dateOfBirth": "1955-10-28",   "firstName": "Bill",   "lastName": "Gates",   "lastTimeOnline": "2020-08-30T20:28:36.267Z",   "spokenLanguages": {     "additionalProp1": "Tamil",     "additionalProp2": "English",     "additionalProp3": "Spanish"   },   "username": "bgates" } |
+    When a user POST the person with id
+    Then verify the status code is 204
+
+  Scenario: User calls service to GET a person by its id
+    Given a person exists with an id of bgates
+    When a user GET the personId by id
+    Then verify the status code is 200
+    And verify response includes following in the response
+      | username	| bgates    |
+      | firstName   | Bill      |
+      | lastName    | Gates     |
+      | dateOfBirth  | 1955-10-28|
+  Scenario: User calls service to GET a person by its id
+    Given a person exists with an id of wagner
+    When a user GET the personId by id
+    Then verify the status code is 200
+    And verify response includes following in the response
+      | username	| bgates    |
+      | firstName   | Bill      |
+      | lastName    | Gates     |
+      | dateOfBirth  | 1955-10-28|
