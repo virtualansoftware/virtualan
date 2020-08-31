@@ -41,11 +41,13 @@ public class PetStepDefinition extends PetApiTest {
 			urlMapBuild.put("pet", "http://localhost:8080/api/pets");
 			urlMapBuild.put("risk", "http://localhost:8080/api/riskfactor/compute");
 			urlMapBuild.put("petId", "http://localhost:8080/api/pets/{id}");
+			urlMapBuild.put("person", "http://localhost:8080/api/persons");
+			urlMapBuild.put("personId", "http://localhost:8080/api/persons/{id}");
 			return urlMapBuild;
 		}
 
 		@Given("a (.*) exists with an id of (.*)")
-		public void petExistsById(String resource, int id) {
+		public void petExistsById(String resource, String id) {
 			request = given().port(80).pathParam("id", id);
 		}
 

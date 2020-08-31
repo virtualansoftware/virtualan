@@ -6,7 +6,7 @@ info:
 
 schemes:
   - http
-basePath: /
+basePath: /api
 
 paths:
   /persons:

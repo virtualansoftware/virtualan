@@ -494,7 +494,11 @@ public class VirtualServiceUtil {
 
          if (responseEntity != null) {
              if(WSResource.isExists(method)){
-                 SoapFaultException SoapFaultException = new SoapFaultException(responseEntity.getBody().toString());
+                 String faultMsg = "MOC SERVER ERROR";
+                 if(responseEntity.getBody() != null) {
+                     faultMsg = responseEntity.getBody().toString();
+                 }
+                 SoapFaultException SoapFaultException = new SoapFaultException(faultMsg);
                  throw SoapFaultException;
              }
             final ResponseException responseException = new ResponseException();
