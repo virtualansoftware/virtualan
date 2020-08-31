@@ -5,12 +5,12 @@
 	<artifactId>virtualan-openapi-spring</artifactId>
 	<packaging>jar</packaging>
 	<name>virtualan-openapi-spring</name>
-	<version>2.0.3-SNAPSHOT</version>
+	<version>2.0.4-SNAPSHOT</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<virtualan.version>2.0.3-SNAPSHOT</virtualan.version>
+		<virtualan.version>2.0.4-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 	</properties>
 	<build>
