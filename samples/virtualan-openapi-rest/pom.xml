@@ -158,7 +158,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -167,12 +166,30 @@
 
 
 
-		<!-- START Virtual Service API support -->
-		<dependency>
-			<groupId>io.virtualan</groupId>
-			<artifactId>virtualan-plugin</artifactId>
-			<version>${virtualan.version}</version>
-		</dependency>
+    <!-- START Virtual Service API support -->
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>virtualan-plugin</artifactId>
+      <version>${virtualan.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-activemq</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework.kafka</groupId>
+          <artifactId>spring-kafka</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework.integration</groupId>
+          <artifactId>spring-integration-kafka</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.kafka</groupId>
+          <artifactId>kafka-clients</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
 		<!-- HyperSQL DB -->
 		<dependency>

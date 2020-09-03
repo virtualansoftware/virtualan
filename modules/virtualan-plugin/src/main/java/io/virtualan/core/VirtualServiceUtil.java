@@ -17,6 +17,7 @@ package io.virtualan.core;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.virtualan.api.WSResource;
+import io.virtualan.core.soap.SoapFaultException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -58,7 +59,6 @@ import io.virtualan.custom.message.ResponseException;
 import io.virtualan.requestbody.RequestBody;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
-import org.springframework.ws.soap.SoapFaultException;
 
 /**
  * This class is base utility service class to perform all virtual service operations

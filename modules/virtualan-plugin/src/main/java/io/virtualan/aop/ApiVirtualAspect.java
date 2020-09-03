@@ -37,7 +37,6 @@ import javax.ws.rs.QueryParam;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -236,9 +235,9 @@ public class ApiVirtualAspect {
                     } else if (annotation instanceof CookieParam) {
                         CookieParam requestParam = (CookieParam) annotation;
                         requestParamName = requestParam.value();
-                    } else if (annotation instanceof Multipart) {
-                        Multipart requestParam = (Multipart) annotation;
-                        requestParamName = requestParam.value();
+//                    } else if (annotation instanceof Multipart) {
+//                        Multipart requestParam = (Multipart) annotation;
+//                        requestParamName = requestParam.value();
                     } else if (requestParamName == null && VirtualServiceType.CXF_JAX_RS
                             .equals(getVirtualServiceUtil().getVirtualServiceType())) {
                         try {

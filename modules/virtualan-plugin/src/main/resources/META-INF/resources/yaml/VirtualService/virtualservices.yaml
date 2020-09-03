@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Virtual Service API
-  version: 2.0.2
+  version: 2.0.4
   title: Virtual Service API
 basePath: /
 schemes:
@@ -204,7 +204,7 @@ definitions:
         type: string
       contentType:
         type: string
-        desc: Mandatory for XML.. valida values XML and JSON
+        desc: Mandatory for XML.. values are either XML or JSON or empty
       requestType:
         type: string
         desc: Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP

@@ -23,6 +23,7 @@ import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +46,7 @@ import java.util.*;
 import springfox.documentation.service.ResponseMessage;
 
 @Configuration
+@ConditionalOnClass(IntegrationFlows.class)
 @EnableIntegration
 @EnableKafka
 @ConditionalOnResource(resources = {"classpath:conf/kafka.json"})
