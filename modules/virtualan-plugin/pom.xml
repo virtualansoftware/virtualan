@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>io.virtualan</groupId>
 		<artifactId>virtualan-project</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<version>3.0.0</version>
 		<relativePath>../..</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -10,7 +10,7 @@
 	<artifactId>virtualan-plugin</artifactId>
 	<packaging>jar</packaging>
 	<name>virtualan-plugin</name>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.0.0</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -43,7 +43,6 @@
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
