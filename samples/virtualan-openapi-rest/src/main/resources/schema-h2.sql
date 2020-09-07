@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS  virtual_service (id INTEGER  PRIMARY KEY AUTO_INCREMENT,  operationid varchar(250),  type varchar(50),priority int,rule clob,
+                input clob, output clob, resources varchar(50),url varchar(250),requestType varchar(50),contentType varchar(50), method varchar(50), httpStatusCode varchar(50),excludeList varchar(250), availableParamsList varchar(4000) ,headerParamsList varchar(4000),
+                lastUsedDateTime TIMESTAMP, usageCount INT);
