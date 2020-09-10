@@ -38,7 +38,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.appName = "Virtualan!!";
     getAppName();
     loadAllMockRequest();
-    loadAllTopics();
+    //loadAllTopics();
 
     self.isNotEmpty = function() {
        return (Object.keys(self.mockLoadRequests).length > 0);
