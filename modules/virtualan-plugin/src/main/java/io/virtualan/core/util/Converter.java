@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.model.ContentType;
-import io.virtualan.core.model.RequestType;
-import io.virtualan.mapson.exception.BadInputDataException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.entity.VirtualServiceEntity;
-import org.springframework.xml.transform.StringSource;
 
 @Component("converter")
 public class Converter {

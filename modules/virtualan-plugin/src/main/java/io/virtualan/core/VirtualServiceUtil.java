@@ -16,7 +16,6 @@ package io.virtualan.core;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import io.virtualan.api.WSResource;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -58,7 +57,6 @@ import io.virtualan.custom.message.ResponseException;
 import io.virtualan.requestbody.RequestBody;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
-import org.springframework.ws.soap.SoapFaultException;
 
 /**
  * This class is base utility service class to perform all virtual service operations
@@ -425,9 +423,6 @@ public class VirtualServiceUtil {
                     .filter(x -> x.isExactMatch()).findAny().orElse(null);
             if(rMockResponse != null) {
 	            rMockResponse = returnMockResponseList.iterator().next();
-	            if(WSResource.isExists(method)){
-	                return returnSoapResponse(method, rMockResponse);
-              }
 	            if (rMockResponse.getHeaderResponse() != null) {
 	                responseEntity = buildResponseEntity(rMockResponse.getMockResponse(),
 	                        rMockResponse.getHeaderResponse());
@@ -444,29 +439,6 @@ public class VirtualServiceUtil {
                     " Unable to find matching for the given request >>> " + mockServiceRequest);
         }
         return mockResponseNotFoundorSet(method, mockDataSetupMap, mockServiceRequest);
-    }
-
-
-
-
-    private Object returnSoapResponse(Method method,  ReturnMockResponse rMockResponse)
-        throws JAXBException {
-            if (rMockResponse.getMockResponse().getOutput() != null) {
-                if(ContentType.XML.equals(rMockResponse.getMockRequest().getContentType())) {
-                    return XMLConverter.xmlToObject(method.getReturnType(), rMockResponse.getMockResponse().getOutput());
-                }
-                Type mySuperclass = null;
-
-                try {
-                    mySuperclass = method.getGenericReturnType();
-                    return this.objectMapper.readValue(rMockResponse.getMockResponse().getOutput(), this.objectMapper.constructType(mySuperclass));
-                } catch (Exception ex) {
-                    log.error(" GenericReturnType  >>> mySuperclass " + mySuperclass);
-                    throw new SoapFaultException("MOCK NOT FOUND ("+ex.getMessage()+")  GenericReturnType  >>> mySuperclass " + method.getReturnType());
-                }
-            } else {
-                throw new SoapFaultException("MOCK NOT FOUND");
-            }
     }
 
     private Object returnResponse(Method method, ResponseEntity responseEntity, String response)
@@ -493,14 +465,6 @@ public class VirtualServiceUtil {
         }
 
          if (responseEntity != null) {
-             if(WSResource.isExists(method)){
-                 String faultMsg = "MOC SERVER ERROR";
-                 if(responseEntity.getBody() != null) {
-                     faultMsg = responseEntity.getBody().toString();
-                 }
-                 SoapFaultException SoapFaultException = new SoapFaultException(faultMsg);
-                 throw SoapFaultException;
-             }
             final ResponseException responseException = new ResponseException();
             if (VirtualServiceType.CXF_JAX_RS.compareTo(getVirtualServiceType()) == 0) {
                 responseException

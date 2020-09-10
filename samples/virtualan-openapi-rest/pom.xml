@@ -10,13 +10,12 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<virtualan.version>2.0.4-SNAPSHOT</virtualan.version>
+		<virtualan.version>2.1.1-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 		<hsqldb.version>2.3.2</hsqldb.version>
 		<spring.boot.version>2.3.0.RELEASE</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
 		<groovy.version>2.4.7</groovy.version>
-		<testng-version>6.14.3</testng-version>
 	</properties>
 	<build>
 		<finalName>virtualan-rest-demo</finalName>
@@ -158,7 +157,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -166,12 +164,11 @@
 		</dependency>
 
 
-
-		<!-- START Virtual Service API support -->
-		<dependency>
-			<groupId>io.virtualan</groupId>
-			<artifactId>virtualan-plugin</artifactId>
-			<version>${virtualan.version}</version>
+    <!-- START Virtual Service API support -->
+    <dependency>
+      <groupId>io.virtualan</groupId>
+      <artifactId>virtualan-plugin</artifactId>
+      <version>${virtualan.version}</version>
 		</dependency>
 
 		<!-- HyperSQL DB -->
@@ -182,7 +179,6 @@
 		</dependency>
 		<!-- END Virtual Service API support -->
 
-		<!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>

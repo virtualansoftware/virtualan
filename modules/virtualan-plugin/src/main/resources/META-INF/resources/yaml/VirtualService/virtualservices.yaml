@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Virtual Service API
-  version: 2.0.2
+  version: 2.1.0
   title: Virtual Service API
 basePath: /
 schemes:
@@ -61,72 +61,6 @@ paths:
           description: Business Exception
         '500':
           description: Server Error
-      security:
-        - basicAuth: []
-  /virtualservices/message:
-    post:
-      tags:
-        - VirtualServices
-      summary: Create Message Mock service data for the Virtual services
-      description: Create Message Mock data
-      operationId: "createMsgMockRequest"
-      produces:
-        - application/json
-      consumes:
-        - application/json
-      parameters:
-        - in: body
-          name: VirtualServiceMessageRequest
-          description: Create message Mock service data
-          required: true
-          schema:
-            $ref: '#/definitions/VirtualServiceMessageRequest'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/VirtualServiceMessageRequest'
-        '400':
-          description: Business Exception
-          schema:
-            $ref: '#/definitions/VirtualServiceStatus'
-        '500':
-          description: Server Error
-          schema:
-            $ref: '#/definitions/VirtualServiceStatus'
-      security:
-        - basicAuth: []
-  /virtualservices/soap:
-    post:
-      tags:
-        - VirtualServices
-      summary: Create SOAP Mock service data for the Virtual services
-      description: Create SOAP Mock service data soap
-      operationId: "createSoapMockRequest"
-      produces:
-        - application/json
-      consumes:
-        - application/json
-      parameters:
-        - in: body
-          name: VirtualServiceRequest
-          description: Create Mock service data
-          required: true
-          schema:
-            $ref: '#/definitions/VirtualServiceRequest'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/VirtualServiceRequest'
-        '400':
-          description: Business Exception
-          schema:
-            $ref: '#/definitions/VirtualServiceStatus'
-        '500':
-          description: Server Error
-          schema:
-            $ref: '#/definitions/VirtualServiceStatus'
       security:
         - basicAuth: []
   /virtualservices/{id}:
@@ -204,7 +138,7 @@ definitions:
         type: string
       contentType:
         type: string
-        desc: Mandatory for XML.. valida values XML and JSON
+        desc: Mandatory for XML.. values are either XML or JSON or empty
       requestType:
         type: string
         desc: Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP

@@ -1,11 +1,13 @@
 package io.virtualan.core.util;
 
-import io.virtualan.api.ApiType;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
-import org.apache.cxf.helpers.IOUtils;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -55,10 +57,11 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 	@PostConstruct
 	public void loadRequestdata()  {
 		try {
-			String charset = "UTF-8";
 			InputStream stream = MockDataBatchProcess.class.getClassLoader().getResourceAsStream(dataLoadFileLocation);
 			if(stream != null) {
-				String respData = IOUtils.toString(stream, charset);
+				String respData = new BufferedReader(
+						new InputStreamReader(stream, StandardCharsets.UTF_8)).lines()
+						.collect(Collectors.joining("\n"));
 				JSONTokener parser = new JSONTokener(respData);
 				List<VirtualServiceRequest> requestList = new LinkedList<>();
 				JSONArray arrayList = (JSONArray) parser.nextValue();
