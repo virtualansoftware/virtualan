@@ -34,7 +34,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.soap.SOAPException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -93,7 +92,7 @@ public class ApiVirtualAspect {
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-        throws ResponseException, IOException, SOAPException, JAXBException {
+        throws ResponseException, IOException, JAXBException {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();
