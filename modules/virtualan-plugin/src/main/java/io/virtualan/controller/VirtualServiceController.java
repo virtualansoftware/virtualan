@@ -17,7 +17,6 @@ package io.virtualan.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.RequestType;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -67,7 +66,6 @@ import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
-import org.springframework.xml.transform.StringSource;
 
 
 /**

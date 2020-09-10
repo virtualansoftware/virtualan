@@ -18,7 +18,6 @@ package io.virtualan.api;
 import java.lang.reflect.Method;
 
 import javax.ws.rs.Path;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.virtualan.core.model.VirtualServiceKeyValue;

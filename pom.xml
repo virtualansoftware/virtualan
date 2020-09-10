@@ -343,9 +343,9 @@
 			<modules>
 <!--				<module>samples/virtualan-all-in-one</module>-->
 				<module>samples/virtualan-openapi-rest</module>
-				<module>samples/virtualan-wsdl-soap</module>
-				<module>samples/virtualan-kafka</module>
-				<module>samples/virtualan-amq</module>
+<!--				<module>samples/virtualan-wsdl-soap</module>-->
+<!--				<module>samples/virtualan-kafka</module>-->
+<!--				<module>samples/virtualan-amq</module>-->
 				<module>samples/virtualan-openapi-spring</module>
 				<module>samples/virtualan-openapi-mongo</module>
 			</modules>

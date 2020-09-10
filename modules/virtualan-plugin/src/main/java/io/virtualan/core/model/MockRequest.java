@@ -17,9 +17,6 @@ package io.virtualan.core.model;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
-import lombok.Setter;
-import org.springframework.messaging.converter.ContentTypeResolver;
-import org.springframework.util.MimeType;
 
 
 /**
