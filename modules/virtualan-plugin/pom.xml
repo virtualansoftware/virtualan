@@ -52,6 +52,19 @@
 				<version>1.2.1</version>
 				<executions>
 					<execution>
+						<id>swagger-editor</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/swagger-api/swagger-editor/archive/master.tar.gz</url>
+							<outputFileName>swagger-editor.tar.gz</outputFileName>
+							<unpack>true</unpack>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
 						<id>swagger-ui</id>
 						<phase>compile</phase>
 						<goals>
@@ -99,6 +112,25 @@
 									<directory>src/main/resources/META-INF/resources</directory>
 									<includes>
 										<include>swaggerex-ui.html</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>editor-resource</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/classes/META-INF/resources/swagger-editor/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/swagger-editor-master/</directory>
+									<includes>
+										<include>dist/**</include>
+										<include>index.html</include>
 									</includes>
 								</resource>
 							</resources>
