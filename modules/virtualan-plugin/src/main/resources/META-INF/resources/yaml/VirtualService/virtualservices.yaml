@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: Virtual Service API
-  version: 2.1.1
+  version: 2.1.2
   title: Virtual Service API
 basePath: /
 schemes:
@@ -31,7 +31,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/VirtualServiceRequest'
+            $ref: '#/definitions/VirtualServiceResponse'
         '400':
           description: Business Exception
           schema:
@@ -125,9 +125,6 @@ definitions:
       - method
       - type
     properties:
-      id:
-        type: integer
-        format: int64
       operationId:
         type: string
       httpStatusCode:
@@ -141,7 +138,7 @@ definitions:
         desc: Mandatory for XML.. values are either XML or JSON or empty
       requestType:
         type: string
-        desc: Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP
+        desc: Mandatory for other then REST.
       type:
         type: string
         desc: "possible values are Response, Rule and Script"
@@ -172,33 +169,31 @@ definitions:
         type: string
       resource:
         type: string
-      mockStatus:
-        $ref: "#/definitions/VirtualServiceStatus"
-  VirtualServiceMessageRequest:
+  VirtualServiceResponse:
     type: object
     required:
-      - brokerUrl
-      - requestTopicOrQueueName
+      - url
+      - httpStatusCode
+      - method
       - type
-      - requestType
     properties:
       id:
         type: integer
         format: int64
-      responseTopicOrQueueName:
+      operationId:
         type: string
-      requestTopicOrQueueName:
+      httpStatusCode:
         type: string
-      brokerUrl:
+      url:
         type: string
       method:
         type: string
-      requestType:
-        type: string
-        desc: "Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP"
       contentType:
         type: string
-        desc: Mandatory for XML.. valida values XML and JSON
+        desc: Mandatory for XML.. values are either XML or JSON or empty
+      requestType:
+        type: string
+        desc: Mandatory for other then REST. possible values are KAFKA, REST, MQ, AMQ, SOAP
       type:
         type: string
         desc: "possible values are Response, Rule and Script"

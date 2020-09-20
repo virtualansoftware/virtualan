@@ -9,7 +9,7 @@
   <version>1.0.0-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
   <properties>
-    <virtualan.version>2.1.1-SNAPSHOT</virtualan.version>
+    <virtualan.version>1.0.0-SNAPSHOT</virtualan.version>
     <cucumber.version>1.2.5</cucumber.version>
     <java.version>1.8</java.version>
     <maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
@@ -35,7 +35,7 @@
               <sourceRoot>${basedir}/src/main/java</sourceRoot>
               <wsdlOptions>
                 <wsdlOption>
-                  <wsdl>${basedir}/src/main/resources/wsdl/helloworld.wsdl</wsdl>
+                  <wsdl>${basedir}/src/main/resources/META-INF/resources/wsdl/Hello/helloworld.wsdl</wsdl>
                   <extraargs>
                     <extraarg>-xjc-Xequals</extraarg>
                     <extraarg>-xjc-XhashCode</extraarg>
@@ -47,7 +47,7 @@
                 </wsdlOption>
                 <wsdlOption>
                   <autoNameResolution>true</autoNameResolution>
-                  <wsdl>${basedir}/src/main/resources/wsdl/sforce-49/partner.wsdl</wsdl>
+                  <wsdl>${basedir}/src/main/resources/META-INF/resources/wsdl/Salesforce-49/partner.wsdl</wsdl>
                   <extraargs>
                     <extraarg>-xjc-Xequals</extraarg>
                     <extraarg>-xjc-XhashCode</extraarg>
@@ -61,11 +61,7 @@
                 </wsdlOption>
                 <wsdlOption>
                   <autoNameResolution>true</autoNameResolution>
-                  <wsdl>${basedir}/src/main/resources/wsdl/sforce-49/apex.wsdl</wsdl>
-                  </wsdlOption>
-                <wsdlOption>
-                  <autoNameResolution>true</autoNameResolution>
-                  <wsdl>${basedir}/src/main/resources/wsdl/sforce-49/apex.wsdl</wsdl>
+                  <wsdl>${basedir}/src/main/resources/META-INF/resources/wsdl/Salesforce-49/apex.wsdl</wsdl>
                   <extraargs>
                     <extraarg>-xjc-Xequals</extraarg>
                     <extraarg>-xjc-XhashCode</extraarg>
@@ -137,7 +133,7 @@
     </dependency>
 
     <dependency>
-      <artifactId>virtualan-plugin</artifactId>
+      <artifactId>virtualization</artifactId>
       <exclusions>
         <exclusion>
           <artifactId>activemq-all</artifactId>

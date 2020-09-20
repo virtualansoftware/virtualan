@@ -38,7 +38,6 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.appName = "Virtualan!!";
     getAppName();
     loadAllMockRequest();
-    //loadAllTopics();
 
     self.isNotEmpty = function() {
        return (Object.keys(self.mockLoadRequests).length > 0);
@@ -64,30 +63,38 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 
     self.input = "Enter the Json here to get formatted";
     self.output = "You will see the Formatted Output or Error";
-    self.jsonOutputObj = JSON.parse("{  \"errorCode\": \"____NOT_FOUND\",  \"errorMessage\": \" Missing?????\"}");
+    self.jsonOutputObj = JSON.parse("{  \"errorCode\": \"NOT_FOUND\" }");
 
     self.jsonFormatter = function() {
         try {
-            self.output = JSON.parse(self.input);
+            self.input = JSON.stringify(JSON.parse(self.input), undefined, 4);
             self.jsonOutputObj = JSON.parse(self.input);
+            self.showJSONDialog = false;
         } catch (throw_error) {
-            self.output = throw_error.message;
+            self.error = throw_error.message;
+            self.showJSONDialog = true;
         }
     }
 
-   self.jsonObj = JSON.parse("{  \"errorCode\": \"____NOT_FOUND\",  \"errorMessage\": \" Missing?????\"}");
+
+   self.jsonObj = JSON.parse("{  \"message\": \"____NOT_FOUND\" }");
    self.groovyObj = "NO Data ";
 
-    self.copyToClipboard = function(value) {
-      var $temp = $("<input type='hidden'>");
-      $("body").append($temp);
-      $temp.val(JSON.parse(value.toString())).select();
-      document.execCommand("copy");
-      $temp.remove();
-    };
+  self.copyToClipboard = function (data) {
+       angular.element('<textarea/>')
+           .css({ 'opacity' : '0', 'position' : 'fixed' })
+           .text(data)
+           .appendTo(angular.element(window.document.body))
+           .select()
+           .each(function() { document.execCommand('copy') })
+           .remove();
+   }
 
-    self.isEmpty = function (value) {
-      return value === null
+  self.isEmptyNotPresent = function (value) {
+      if(value === null || value === '' || value === undefined){
+         return  true ;
+      }
+      return false;
     };
 
     self.loadDefaultRule = function(type, value) {
@@ -229,6 +236,24 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
                 }
             );
         }
+
+self.showJSONDialog = false;
+	self.closeJSONAlertDialog = false;
+
+	self.typeJSONDialog = function() {
+		return "warning";
+	}
+
+	self.closeJSONAlert = function() {
+		self.typeJSONWarning = false;
+		self.showJSONDialog = false;
+	}
+
+	self.showJSONMessage = function() {
+			return self.error;
+	}
+
+
 
 	self.showDialog = false;
 	
