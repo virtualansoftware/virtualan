@@ -1,12 +1,10 @@
 package io.virtualan.core.soap;
 
 import io.virtualan.core.model.SoapService;
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -104,8 +102,6 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         Document xmlDocument = builder.parse(file.getURI().toString());
-        //Document xmlDocument = builder.parse(new File("d:\\Elan\\virtualan-working-dir\\service-vir\\virtualan\\samples\\virtualan-wsdl-soap\\src\\main\\resources\\META-INF\\resources\\wsdl\\Salesforce-49\\apex.wsdl"));
-
         NodeList nl = eval(xmlDocument);
         nodeList.add(nl);
       }
