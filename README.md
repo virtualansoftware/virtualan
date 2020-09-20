@@ -9,7 +9,6 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=virtualansoftware_virtualan&metric=alert_status)](https://sonarcloud.io/dashboard?id=virtualansoftware_virtualan)
 </div>
 
-
 # What is Virtualan : 
 Virtualan would be built with spring boot  framework that would convert API service as Virtualized service in matter of adding couple of annotations. **_Simply as Virtualized service_** which currently supports spring-boot based Rest service(API) with **Spring-RestController** or **CXF-Jaxrs** as Virtualized service with **@VirtualService** and **@ApiVirtual** annotations.
 
