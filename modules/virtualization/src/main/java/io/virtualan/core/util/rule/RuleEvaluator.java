@@ -23,6 +23,12 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 
+/**
+ * This is Rule Evaluator Service .
+ *
+ * @author  Elan Thangamani
+ *
+ **/
 @Service("ruleEvaluator")
 public class RuleEvaluator {
 	
