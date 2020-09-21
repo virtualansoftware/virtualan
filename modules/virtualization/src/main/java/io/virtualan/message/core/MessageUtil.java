@@ -29,7 +29,6 @@ public class MessageUtil {
 
 	private static final Logger log = LoggerFactory.getLogger(MessageUtil.class);
 
-
 	@Autowired
 	private ObjectMapper objectMapper;
 

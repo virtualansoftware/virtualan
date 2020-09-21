@@ -35,8 +35,10 @@ public class VirtualSoapController {
 
   @Autowired
   private MessageSource messageSource;
+
   @Autowired
   private VirtualService virtualService;
+
   @Autowired(required = false)
   private WSEndpointConfiguration wsEndpointConfiguration;
 

@@ -23,6 +23,7 @@
 		<spring.boot.version>2.2.4.RELEASE</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
 		<spring.version>5.0.3.RELEASE</spring.version>
+		<spring.boot.mq.version>2.2.4</spring.boot.mq.version>
 		<groovy.version>3.0.5</groovy.version>
 		<junit.version>4.13</junit.version>
 		<slf4j.version>1.7.12</slf4j.version>
@@ -197,6 +198,12 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 			<version>${spring-kafka.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ibm.mq</groupId>
+			<artifactId>mq-jms-spring-boot-starter</artifactId>
+			<version>${spring.boot.mq.version}</version>
 		</dependency>
 
 		<dependency>

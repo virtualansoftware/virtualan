@@ -10,7 +10,7 @@
   "IBMMQ" : [
     {
       "systemName": "Virtualan-IBMMQ-1",
-      "host" : "localhost",
+      "host" : "127.0.0.1",
       "port" : 1414,
       "channel": "virtualan.channel",
       "queue-mgr" :  "virtualanmgr",

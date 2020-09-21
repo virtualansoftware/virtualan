@@ -1,61 +1,26 @@
 package io.virtualan.message.core.jms;
 
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class JMSConfigurationDomain {
   String system;
   String brokerUrl;
   String userName;
   String password;
-  String receiverQueueName;
+  List<String> receiverQueueName;
   String senderQueueName;
+  String host;
+  String channel;
+  int port;
+  String queueMgr;
+  String jmsType;
 
-  public String getSystem() {
-    return system;
-  }
-
-  public void setSystem(String system) {
-    this.system = system;
-  }
-
-  public String getBrokerUrl() {
-    return brokerUrl;
-  }
-
-  public void setBrokerUrl(String brokerUrl) {
-    this.brokerUrl = brokerUrl;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public String getReceiverQueueName() {
-    return receiverQueueName;
-  }
-
-  public void setReceiverQueueName(String receiverQueueName) {
-    this.receiverQueueName = receiverQueueName;
-  }
-
-  public String getSenderQueueName() {
-    return senderQueueName;
-  }
-
-  public void setSenderQueueName(String senderQueueName) {
-    this.senderQueueName = senderQueueName;
-  }
-  
   @Override
   public String toString() {
     return "JMSConfigurationDomain{" +
@@ -63,8 +28,13 @@ public class JMSConfigurationDomain {
         ", brokerUrl='" + brokerUrl + '\'' +
         ", userName='" + userName + '\'' +
         ", password='" + password + '\'' +
-        ", receiverQueueName='" + receiverQueueName + '\'' +
+        ", receiverQueueName=" + receiverQueueName +
         ", senderQueueName='" + senderQueueName + '\'' +
+        ", host='" + host + '\'' +
+        ", channel='" + channel + '\'' +
+        ", port=" + port +
+        ", queueMgr='" + queueMgr + '\'' +
+        ", jmsType='" + jmsType + '\'' +
         '}';
   }
 }
