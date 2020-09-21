@@ -16,7 +16,6 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
 	<build>
-		<finalName>virtualan-sv-all</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>

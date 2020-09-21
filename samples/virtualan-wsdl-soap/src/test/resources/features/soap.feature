@@ -18,7 +18,7 @@ Feature: Test Soap API
   Scenario: Setup a mock service for Soap for POST
     Given set Soap Mock data for the following given input
       | url					| http://virtualan.io/types/helloworld	|
-      | input               | <hel:person xmlns:hel="http://virtualan.io/types/helloworld"> <hel:firstName>Suki</hel:firstName> <hel:lastName>Elan</hel:lastName> </hel:person>       |
+      | input               | <hel:person xmlns:hel="http://virtualan.io/types/helloworld"> <hel:firstName>Mani</hel:firstName> <hel:lastName>Elan</hel:lastName> </hel:person>       |
       | output              | <ns2:greeting xmlns:ns2="http://virtualan.io/types/helloworld">             <ns2:greeting>Welcome SOAP World!!!</ns2:greeting></ns2:greeting> |
       | operationId	        |   person                              |
       | method              |   person                              |

@@ -356,6 +356,7 @@ public class VirtualServiceController {
     public ResponseEntity<List<String>> readCatalog() {
         final Set<String> fileList = new HashSet<>();
         try {
+            fileList.add("VirtualService");
             final Resource[] resources = getCatalogs();
             for (final Resource file : resources) {
                 final String[] names = file.toString().split("/");
