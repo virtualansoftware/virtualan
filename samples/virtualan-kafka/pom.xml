@@ -1,17 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.virtualan</groupId>
 	<artifactId>virtualan-kafka-demo</artifactId>
 	<packaging>jar</packaging>
 	<name>virtualan-kafka-demo</name>
 	<description>Virtualan Messaging(Kafka, AMQ and IBMMQ) virtualization Demo</description>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<virtualan.version>1.0.0-SNAPSHOT</virtualan.version>
+		<virtualan.version>1.0.0</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 	</properties>
 	<build>
@@ -103,18 +102,18 @@
 			<version>${virtualan.version}</version>
 		</dependency>
 
-	<!-- HyperSQL DB -->
+		<!-- HyperSQL DB -->
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 			<version>2.5.0</version>
 		</dependency>
-	<!-- END Virtual Service API support -->
+		<!-- END Virtual Service API support -->
 
-    <!-- Start embedded kafka -->
-    <dependency>
-      <groupId>org.springframework.kafka</groupId>
-      <artifactId>spring-kafka-test</artifactId>
+		<!-- Start embedded kafka -->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
 			<version>2.2.2.RELEASE</version>
 		</dependency>
 
@@ -149,7 +148,7 @@
 			<version>${cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
