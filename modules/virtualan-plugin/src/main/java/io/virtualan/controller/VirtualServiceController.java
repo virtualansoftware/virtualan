@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.virtualan.core.model.RequestType;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -356,11 +357,15 @@ public class VirtualServiceController {
     public ResponseEntity<List<String>> readCatalog() {
         final Set<String> fileList = new HashSet<>();
         try {
-            final Resource[] resources = getCatalogs();
-            for (final Resource file : resources) {
-                final String[] names = file.toString().split("/");
-                if (names.length > 1) {
-                    fileList.add(names[names.length - 2]);
+            List<String> lists  = Arrays.asList("classpath:META-INF/resources/yaml/*/");
+            fileList.add("VirtualService");
+            for(String pathName  :  lists){
+                final Resource[] resources = getCatalogList(pathName);
+                for (final Resource file : resources) {
+                    final String[] names = file.toString().split("/");
+                    if (names.length > 1) {
+                        fileList.add(names[names.length - 2]);
+                    }
                 }
             }
         } catch (final IOException e) {
@@ -371,7 +376,8 @@ public class VirtualServiceController {
             VirtualServiceController.log.error("Api-catalogs List was not available : ");
             return new ResponseEntity<List<String>>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<List<String>>(new LinkedList<>(fileList), HttpStatus.OK);
+            return new ResponseEntity<List<String>>(new LinkedList<>(fileList.stream().sorted().collect(
+                Collectors.toList())), HttpStatus.OK);
         }
     }
 
@@ -380,9 +386,14 @@ public class VirtualServiceController {
     public ResponseEntity<List<String>> readCatalog(@PathVariable("name") String name) {
         final List<String> fileList = new LinkedList<>();
         try {
+            if("VirtualService".equalsIgnoreCase(name)){
+                fileList.add("virtualservices.yaml");
+            }
+
             for (final Resource file : getCatalogs(name)) {
                 fileList.add(file.getFilename());
             }
+
         } catch (final IOException e) {
             return new ResponseEntity<List<String>>(HttpStatus.NOT_FOUND);
         }
@@ -398,17 +409,15 @@ public class VirtualServiceController {
         final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
         final PathMatchingResourcePatternResolver resolver =
             new PathMatchingResourcePatternResolver(classLoader);
-        return resolver.getResources("classpath:META-INF/resources/yaml/" + name + "/*.*");
+        return resolver.getResources("classpath:META-INF/resources/**/" + name + "/*.*");
     }
 
-
-    private Resource[] getCatalogs() throws IOException {
+    private Resource[] getCatalogList(String path) throws IOException {
         final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
 
         final PathMatchingResourcePatternResolver resolver =
             new PathMatchingResourcePatternResolver(classLoader);
-
-        return resolver.getResources("classpath:META-INF/resources/yaml/*/");
+        return resolver.getResources(path);
     }
 
 

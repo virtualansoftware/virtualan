@@ -2,10 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.virtualan</groupId>
-	<artifactId>virtualan-openapi-spring</artifactId>
+	<artifactId>virtualan-openapi-spring-demo</artifactId>
 	<packaging>jar</packaging>
-	<name>virtualan-openapi-spring</name>
-	<version>2.1.1-SNAPSHOT</version>
+	<name>virtualan-openapi-spring-demo</name>
+	<version>1.0.0-SNAPSHOT</version>
+	<description>Virtualan Rest virtualization spring rest service with annotations - Demo</description>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>

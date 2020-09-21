@@ -59,7 +59,6 @@ public class VirtualSoapController {
   @RequestMapping(value = "/virtualservices/soap/services", method = RequestMethod.GET)
   public ResponseEntity<Map<String, List<SoapService>>> listAvailableSoapService() {
     if (wsEndpointConfiguration == null) {
-      log.warn("virtualan.soap.package is not configured");
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     Map<String, SoapService> soapServiceMap = wsEndpointConfiguration.getWsServiceMockList();

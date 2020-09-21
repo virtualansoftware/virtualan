@@ -3,7 +3,7 @@
   "url": "http://virtualan.io/types/helloworld",
   "method": "person",
   "type": "Response",
-  "input": "<hel:person xmlns:hel=\"http://virtualan.io/types/helloworld\"> \t<hel:firstName>Suki</hel:firstName> \t<hel:lastName>Elan</hel:lastName> </hel:person>",
+  "input": "<hel:person xmlns:hel=\"http://virtualan.io/types/helloworld\"> \t<hel:firstName>Mani</hel:firstName> \t<hel:lastName>Elan</hel:lastName> </hel:person>",
   "output": "<ns2:greeting xmlns:ns2=\"http://virtualan.io/types/helloworld\">             <ns2:greeting>Welcome SOAP World!!!</ns2:greeting></ns2:greeting>",
   "resource": "http://virtualan.io/types/helloworld",
    "contentType": "XML",

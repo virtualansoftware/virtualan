@@ -27,7 +27,7 @@ public class KafkaStepDefinition extends KafkaTest {
 		private RequestSpecification request;
 		VirtualServiceRequest virtualServiceRequest = null;
 
-		private String VIRTUAL_SERVICE = "http://localhost:8080/virtualservices/message";
+		private String VIRTUAL_SERVICE = "http://localhost:8800/virtualservices/message";
 
 		@LocalServerPort
 		int randomServerPort;
