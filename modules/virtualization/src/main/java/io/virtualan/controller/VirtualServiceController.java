@@ -361,7 +361,7 @@ public class VirtualServiceController {
         final Set<String> fileList = new HashSet<>();
         try {
           List<String> lists  = Arrays.asList("classpath:META-INF/resources/yaml/*/", "classpath:META-INF/resources/wsdl/*/");
-          lists.add("VirtualService");
+          fileList.add("VirtualService");
           for(String pathName  :  lists){
             final Resource[] resources = getCatalogList(pathName);
             for (final Resource file : resources) {
