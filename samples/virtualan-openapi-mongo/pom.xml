@@ -2,10 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.virtualan</groupId>
-	<artifactId>virtualan-openapi-mongo</artifactId>
+	<artifactId>virtualan-openapi-mongo-demo</artifactId>
 	<packaging>jar</packaging>
-	<name>virtualan-openapi-mongo</name>
-	<version>1.1.0</version>
+	<name>virtualan-openapi-mongo-demo</name>
+	<description>Virtualan Openapi Rest virtualization Mock to Real service - Demo</description>
+	<version>1.0.0-SNAPSHOT</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>

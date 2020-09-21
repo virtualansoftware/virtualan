@@ -2,10 +2,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <name>virtualan-wsdl-sv-demo</name>
+  <name>virtualan-sv-wsdl-demo</name>
   <groupId>io.virtualan</groupId>
-  <artifactId>virtualan-wsdl-sv-demo</artifactId>
-  <description>Virtualan Auto WSDL Service virtualization</description>
+  <artifactId>virtualan-sv-wsdl-demo</artifactId>
+  <description>Virtualan SOAP Service virtualization  demo </description>
   <version>1.0.0-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
   <properties>

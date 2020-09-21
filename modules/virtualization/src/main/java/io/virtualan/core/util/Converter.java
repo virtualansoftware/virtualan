@@ -4,33 +4,32 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.model.ContentType;
-import io.virtualan.core.model.RequestType;
-import io.virtualan.mapson.exception.BadInputDataException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.entity.VirtualServiceEntity;
-import org.springframework.xml.transform.StringSource;
 
 @Component("converter")
 public class Converter {
 
     private static final String PARAM_DELIMITER = ":_:";
 
+    @Autowired
+    private  ObjectMapper objectMapper;
+
     private String getString(Object jsonObject) throws JsonProcessingException {
         if(jsonObject != null && jsonObject instanceof LinkedHashMap) {
-            String json = new ObjectMapper().writeValueAsString(jsonObject);
+            String json = objectMapper.writeValueAsString(jsonObject);
             return json;
         }
         return null;
@@ -40,8 +39,10 @@ public class Converter {
     private Object getJson(String jsonStr)  {
         if(jsonStr != null && !jsonStr.isEmpty()) {
             try {
-                return new ObjectMapper().readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
+                return objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
             } catch (JsonProcessingException e) {
+                throw new BadDataException(e.getMessage());
+            } catch (IOException e) {
                 throw new BadDataException(e.getMessage());
             }
         }

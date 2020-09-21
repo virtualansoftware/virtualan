@@ -259,7 +259,6 @@
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
 			<version>${validation-api.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

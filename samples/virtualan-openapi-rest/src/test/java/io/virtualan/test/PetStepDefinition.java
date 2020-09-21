@@ -27,9 +27,9 @@ public class PetStepDefinition extends PetApiTest {
 		private RequestSpecification request;
 		VirtualServiceRequest virtualServiceRequest = null;
 
-		private String PET_BY_ID = "http://localhost:8080/api/pets/{id}";
-		private String PET_URL = "http://localhost:8080/api/pets";
-		private String VIRTUAL_SERVICE = "http://localhost:8080/virtualservices";
+		private String PET_BY_ID = "http://localhost:8800/api/pets/{id}";
+		private String PET_URL = "http://localhost:8800/api/pets";
+		private String VIRTUAL_SERVICE = "http://localhost:8800/virtualservices";
 
 		@LocalServerPort
 		int randomServerPort;
@@ -38,11 +38,11 @@ public class PetStepDefinition extends PetApiTest {
 
 		public Map loadUrl() {
 			Map<String, String>  urlMapBuild = new HashMap();
-			urlMapBuild.put("pet", "http://localhost:8080/api/pets");
-			urlMapBuild.put("risk", "http://localhost:8080/api/riskfactor/compute");
-			urlMapBuild.put("petId", "http://localhost:8080/api/pets/{id}");
-			urlMapBuild.put("person", "http://localhost:8080/api/persons");
-			urlMapBuild.put("personId", "http://localhost:8080/api/persons/{id}");
+			urlMapBuild.put("pet", "http://localhost:8800/api/pets");
+			urlMapBuild.put("risk", "http://localhost:8800/api/riskfactor/compute");
+			urlMapBuild.put("petId", "http://localhost:8800/api/pets/{id}");
+			urlMapBuild.put("person", "http://localhost:8800/api/persons");
+			urlMapBuild.put("personId", "http://localhost:8800/api/persons/{id}");
 			return urlMapBuild;
 		}
 
