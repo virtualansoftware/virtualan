@@ -58,7 +58,6 @@ import io.virtualan.core.model.VirtualServiceRequest;
  *
  *
  * @author  Elan Thangamani
- * @see     io.virtualan.core.CxfVirtualServiceInfo
  * @see     io.virtualan.core.OpenApiVirtualServiceInfo
  * @see     io.virtualan.core.SpringVirtualServiceInfo
  */
