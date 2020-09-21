@@ -26,7 +26,6 @@ public class JMSListener implements MessageListener {
   @Autowired
   private MessageUtil messageUtil;
 
-
   @Override
   public void onMessage(Message message) {
     String queueName = null;
@@ -55,7 +54,6 @@ public class JMSListener implements MessageListener {
           }
         } else {
           log.info("No response configured for the given input");
-          //JMSMessageSender.sendMessage(queueName, text);
         }
 
       } catch (JSONException e) {

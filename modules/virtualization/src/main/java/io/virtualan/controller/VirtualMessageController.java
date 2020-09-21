@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -36,10 +37,13 @@ public class VirtualMessageController {
 
   private static final Logger log = LoggerFactory.getLogger(VirtualMessageController.class);
   Locale locale = LocaleContextHolder.getLocale();
+
   @Autowired
   private MessageUtil messageUtil;
+
   @Autowired
   private MessageSource messageSource;
+
   @Autowired
   private VirtualService virtualService;
 
@@ -49,7 +53,7 @@ public class VirtualMessageController {
   @RequestMapping(value = "/virtualservices/load-topics", method = RequestMethod.GET)
   public ResponseEntity<String> listAllTopics()
       throws Exception {
-    JSONArray array = getJsonObject();
+    JSONArray array = getAvailableQueues();
     return ResponseEntity.status(HttpStatus.OK).body(array.toString());
   }
 
@@ -67,9 +71,7 @@ public class VirtualMessageController {
       virtualServiceMessageRequest.setResponseTopicOrQueueName(virtualServiceRequest.getMethod());
       virtualServiceMessageRequest.setRequestTopicOrQueueName(virtualServiceRequest.getOperationId());
       virtualServiceStatus.setVirtualServiceMessageRequest(virtualServiceMessageRequest);
-
-      return new ResponseEntity<VirtualServiceStatus>(virtualServiceStatus,
-          HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<VirtualServiceStatus>(virtualServiceStatus, HttpStatus.BAD_REQUEST);
     }
     return null;
   }
@@ -149,15 +151,38 @@ public class VirtualMessageController {
   }
 
 
-  private JSONArray getJsonObject() throws Exception {
+  private JSONArray getAvailableQueues() throws Exception {
+    //KAFKA CONFIGS
     InputStream stream = VirtualMessageController.class.getClassLoader()
         .getResourceAsStream("conf/kafka.json");
+    JSONArray messageServiceInfos  = new JSONArray();
+
     if (stream != null) {
       String jmsConfigJson = readString(stream);
       JSONObject jsonObject = new JSONObject(jmsConfigJson);
-      return jsonObject.optJSONArray("Kafka");
+      messageServiceInfos = jsonObject.optJSONArray("Kafka");
     }
-    return new JSONArray();
+
+    //JMS CONFIGS
+    stream = VirtualMessageController.class.getClassLoader()
+        .getResourceAsStream("conf/jms-config.json");
+    if (stream != null) {
+      String jmsConfigJson = readString(stream);
+      JSONObject jsonObject = new JSONObject(jmsConfigJson);
+      Iterator<String> keys = jsonObject.keys();
+      while(keys.hasNext()) {
+        String key = keys.next();
+        JSONArray jmsArray = jsonObject.getJSONArray(key);
+        if(jmsArray != null && jmsArray.length() > 0) {
+          JSONObject expected = jmsArray.optJSONObject(0);
+          JSONObject jmsObject = new JSONObject();
+          jmsObject.put("broker", expected.getString("broker-url"));
+          jmsObject.put("topics", expected.getJSONArray("receiver-queue"));
+          messageServiceInfos.put(jmsObject);
+        }
+      }
+    }
+    return messageServiceInfos;
   }
 
   public String readString(InputStream inputStream) throws IOException {

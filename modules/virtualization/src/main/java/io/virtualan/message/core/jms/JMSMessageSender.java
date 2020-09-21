@@ -4,15 +4,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.runner.Runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -32,6 +35,8 @@ public class JMSMessageSender {
 
   private static final Logger log = LoggerFactory.getLogger(JMSMessageSender.class);
 
+  List<VirtualanJMSConnectionFactory> virtualanJMSConnectionFactory;
+
   @Autowired
   private BeanFactory beanFactory;
 
@@ -47,15 +52,21 @@ public class JMSMessageSender {
     });
   }
 
-  public ConnectionFactory connectionFactory(JMSConfigurationDomain conf) {
-    ConnectionFactory connectionFactory = null;
-    if (conf.getUserName() != null && conf.getPassword() != null) {
-      connectionFactory = new ActiveMQConnectionFactory(conf.getUserName(), conf.getPassword(),
-          conf.getBrokerUrl());
-    } else {
-      connectionFactory = new ActiveMQConnectionFactory(conf.getBrokerUrl());
-    }
-    return connectionFactory;
+  @Autowired
+  public void  allVirtualanJMSConnectionFactory(List<VirtualanJMSConnectionFactory> virtualanJMSConnectionFactory) {
+    this.virtualanJMSConnectionFactory = virtualanJMSConnectionFactory;
+  }
+
+
+  public ConnectionFactory connectionFactory(JMSConfigurationDomain conf) throws JMSException {
+    VirtualanJMSConnectionFactory virtualanJMSConnectionFactory = null;
+      for(VirtualanJMSConnectionFactory virtualanJMSConnection : this.virtualanJMSConnectionFactory){
+        if(conf.getJmsType().equalsIgnoreCase(virtualanJMSConnection.getJMSType())) {
+          return virtualanJMSConnection.connectionFactory(conf);
+        }
+      }
+      log.warn("JMS Conf JMSType" + conf.getJmsType() + " :: " + conf );
+      throw new JMSException("JMS Conf JMSType is not found" + conf.getJmsType());
   }
 
 
@@ -68,64 +79,110 @@ public class JMSMessageSender {
   @PostConstruct
   public void init() throws IOException {
     try {
-      JSONArray array = getJMSConfiguration();
-      for (int i = 0; i < array.length(); i++) {
-        JSONObject object = array.optJSONObject(i);
-        JMSConfigurationDomain conf = getJmsConfigurationDomain(object);
-        if (conf.getReceiverQueueName() == conf.getSenderQueueName()) {
-          log.info("JMS conf is not valid to be loaded :  " + conf);
-          continue;
+      JSONObject jmsConfigurations = getJMSConfiguration();
+      Iterator<String> keys = jmsConfigurations.keys();
+      while(keys.hasNext()) {
+        String key = keys.next();
+        JSONArray array = jmsConfigurations.getJSONArray(key);
+        if(array != null && array.length() > 0) {
+          buildJMSListener(array, key);
         }
-        if (conf.getReceiverQueueName() != null) {
-          registerListenerBeans(conf);
-        }
-
-        if (conf.getSenderQueueName() != null) {
-          JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory(conf));
-          JMSTemplateLookup.loadTemplate(conf.getReceiverQueueName(), jmsTemplate);
-          log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
-        }
-        log.info("JMS conf loaded : " + conf);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("JMS conf is not loaded "  + e.getMessage());
     }
   }
 
-  private JSONArray getJMSConfiguration() throws IOException {
+  private void buildJMSListener(JSONArray array, String jmsType) {
+    for (int i = 0; i < array.length(); i++) {
+      JSONObject object = array.optJSONObject(i);
+      JMSConfigurationDomain conf = getJmsConfigurationDomain(object, jmsType);
+      if (conf.getReceiverQueueName().contains(conf.getSenderQueueName())) {
+        log.info("JMS conf is not valid to be loaded :  " + conf);
+        continue;
+      }
+      if (conf.getReceiverQueueName() != null) {
+        registerListenerBeans(conf);
+      }
+      if (conf.getSenderQueueName() != null) {
+        try {
+          JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory(conf));
+          for (String queue : conf.getReceiverQueueName()) {
+            JMSTemplateLookup.loadTemplate(queue, jmsTemplate);
+          }
+          log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
+        }catch (JMSException e){
+          log.warn("JMS Exception error : " + e.getMessage() + " : conf : " + conf);
+        }
+      }
+      log.info("JMS conf loaded : " + conf);
+    }
+  }
+
+  private JSONObject getJMSConfiguration() throws IOException {
     InputStream stream = JMSMessageSender.class.getClassLoader()
         .getResourceAsStream("conf/jms-config.json");
     String jmsConfigJson = readString(stream);
     JSONObject jsonObject = new JSONObject(jmsConfigJson);
-    return jsonObject.optJSONArray("AMQ");
+    return jsonObject;
   }
 
-  private JMSConfigurationDomain getJmsConfigurationDomain(JSONObject object) {
+  private List<String> getReceiverQueues(JSONObject object) {
+    List<String> receiverQueue = new ArrayList<>();
+    for(int i=0; i < object.getJSONArray("receiver-queue").length(); i++) {
+      receiverQueue.add((String) object.getJSONArray("receiver-queue").get(i));
+    }
+    return receiverQueue;
+  }
+
+  private JMSConfigurationDomain getJmsConfigurationDomain(JSONObject object, String jmsType) {
     JMSConfigurationDomain conf = new JMSConfigurationDomain();
-    conf.setSystem(object.getString("systemName"));
-    conf.setBrokerUrl(object.getString("broker-url"));
-    conf.setUserName(object.optString("user"));
-    conf.setPassword(object.optString("password"));
-    conf.setReceiverQueueName(object.getString("request-queue"));
-    conf.setSenderQueueName(object.optString("response-queue"));
+    conf.setJmsType(jmsType);
+    if("IBMMQ".equalsIgnoreCase(jmsType)) {
+     conf.setSystem(object.getString("systemName"));
+     conf.setHost(object.getString("host"));
+     conf.setPort(object.getInt("port"));
+     conf.setQueueMgr(object.getString("queue-mgr"));
+     conf.setChannel(object.getString("channel"));
+     conf.setUserName(object.optString("username"));
+     conf.setPassword(object.optString("password"));
+     conf.setReceiverQueueName(getReceiverQueues(object));
+     conf.setSenderQueueName(object.optString("response-queue"));
+   } else {
+     conf.setSystem(object.getString("systemName"));
+     conf.setBrokerUrl(object.getString("broker-url"));
+     conf.setUserName(object.optString("user"));
+     conf.setPassword(object.optString("password"));
+     conf.setReceiverQueueName(getReceiverQueues(object));
+     conf.setSenderQueueName(object.optString("response-queue"));
+    }
     return conf;
   }
 
   public void registerListenerBeans(JMSConfigurationDomain conf) {
-    GenericBeanDefinition jmsBean = new GenericBeanDefinition();
-    jmsBean.setBeanClass(JMSListener.class);
-    BeanDefinitionBuilder bean = BeanDefinitionBuilder
-        .rootBeanDefinition(DefaultMessageListenerContainer.class)
-        .addPropertyValue("connectionFactory", connectionFactory(conf))
-          .addPropertyValue("destinationName", conf.getReceiverQueueName())
-        .addPropertyValue("messageListener", jmsBean);
-    DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
-    beanRegistry.registerBeanDefinition(conf.getSystem(), bean.getBeanDefinition());
+    for(String queue : conf.getReceiverQueueName()) {
+      try {
+        GenericBeanDefinition jmsBean = new GenericBeanDefinition();
+        jmsBean.setBeanClass(JMSListener.class);
+        BeanDefinitionBuilder bean = BeanDefinitionBuilder
+            .rootBeanDefinition(DefaultMessageListenerContainer.class)
+            .addPropertyValue("connectionFactory", connectionFactory(conf))
+            .addPropertyValue("destinationName", queue)
+            .addPropertyValue("messageListener", jmsBean);
+        DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
+        beanRegistry.registerBeanDefinition(conf.getSystem().concat(queue), bean.getBeanDefinition());
 
-    DefaultMessageListenerContainer messageListenerContainer = beanFactory.getBean(conf.getSystem(), DefaultMessageListenerContainer.class);
-    if (!messageListenerContainer.isRunning()) {
-      log.info(conf.getSystem() + " bean registered successfully.. and Started JmsListenerContainer");
-      messageListenerContainer.start();
+        DefaultMessageListenerContainer messageListenerContainer = beanFactory
+            .getBean(conf.getSystem().concat(queue), DefaultMessageListenerContainer.class);
+        if (!messageListenerContainer.isRunning()) {
+          log.info(
+              conf.getSystem()
+                  + " bean registered successfully.. and Started JmsListenerContainer");
+          messageListenerContainer.start();
+        }
+      }catch (JMSException e){
+        log.warn("JMS  Listener register Exception error : " + e.getMessage() + " : conf : " + conf);
+      }
     }
   }
 
