@@ -176,7 +176,20 @@ public class VirtualMessageController {
         if(jmsArray != null && jmsArray.length() > 0) {
           JSONObject expected = jmsArray.optJSONObject(0);
           JSONObject jmsObject = new JSONObject();
-          jmsObject.put("broker", expected.getString("broker-url"));
+          if("IBMMQ".equalsIgnoreCase(key)) {
+
+            StringBuffer messageIndentifier = new StringBuffer();
+            messageIndentifier.append(expected.getString("host"));
+            messageIndentifier.append("(");
+            messageIndentifier.append(expected.getInt("port"));
+            messageIndentifier.append(")- ");
+            messageIndentifier.append(expected.getString("channel"));
+            messageIndentifier.append(" - ");
+            messageIndentifier.append(expected.getString("queue-mgr"));
+            jmsObject.put("broker", key +" : " + messageIndentifier.toString());
+          } else {
+            jmsObject.put("broker", key +" : " +expected.getString("broker-url"));
+          }
           jmsObject.put("topics", expected.getJSONArray("receiver-queue"));
           messageServiceInfos.put(jmsObject);
         }
@@ -190,7 +203,6 @@ public class VirtualMessageController {
       return br.lines().collect(Collectors.joining(System.lineSeparator()));
     }
   }
-
 
   public JSONArray getArray(String[] stringArray) {
     JSONArray array = new JSONArray();

@@ -6,6 +6,15 @@
       "user": "admin",
       "password" :"admin",
       "receiver-queue": ["virtualan.input"]
+    } ],
+  "IBMMQ" : [
+    {
+      "systemName": "Virtualan-IBMMQ-1",
+      "host" : "localhost",
+      "port" : 1414,
+      "channel": "virtualan.channel",
+      "queue-mgr" :  "virtualanmgr",
+      "receiver-queue": ["virtualan1","virtualan.input.1"]
     }
   ]
 }
