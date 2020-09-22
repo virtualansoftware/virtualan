@@ -14,6 +14,7 @@
   </properties>
   <url>http://virtualan.io</url>
   <build>
+    <finalName>virtualan-sv-wsdl-demo</finalName>
     <plugins>
       <plugin>
         <artifactId>spring-boot-maven-plugin</artifactId>

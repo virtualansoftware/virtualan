@@ -1,0 +1,24 @@
+steps:
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['clean','install', '-Dmaven.test.skip=true']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/virtualan-wsdl-mock:1.0.$BUILD_ID', '.']
+    timeout: 180s
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/virtualan-wsdl-mock:1.0.$BUILD_ID']
+    # Deploy an image from Container Registry to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['run', 'deploy', 'virtualan-wsdl-demo', '--image', 'gcr.io/$PROJECT_ID/virtualan-wsdl-mock:1.0.$BUILD_ID', '--region', 'us-central1', "--max-instances", "5", "--memory", "1Gi" ,"--port", "8080", '--platform', 'managed', '--allow-unauthenticated']
+    # Deploy on-demand-domain
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['beta', 'run', 'domain-mappings', 'create', '--service', 'virtualan-wsdl-demo', '--domain', 'sforce.virtualandemo.com', '--region', 'us-central1', '--platform', 'managed']
+  #- name: 'gcr.io/cloud-builders/kubectl'
+  #  args:
+  #  - set
+  #  - image
+  #  - deployment
+  #  - virtualan-mock
+  #  - web=gcr.io/$PROJECT_ID/virtualan-mock:1.0.$BUILD_ID
+  #  env:
+  #  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-b'
+  #  - 'CLOUDSDK_CONTAINER_CLUSTER=cloud-build-virtualan-mock'
