@@ -5,12 +5,12 @@
 	<packaging>jar</packaging>
 	<name>virtualan-kafka-demo</name>
 	<description>Virtualan Messaging(Kafka, AMQ and IBMMQ) virtualization Demo</description>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<virtualan.version>1.0.0</virtualan.version>
+		<virtualan.version>1.0.1-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 	</properties>
 	<build>
