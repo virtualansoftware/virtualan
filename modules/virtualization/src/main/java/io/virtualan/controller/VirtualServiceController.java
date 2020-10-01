@@ -359,22 +359,21 @@ public class VirtualServiceController {
     @RequestMapping(value = "/api-catalogs", method = RequestMethod.GET)
     public ResponseEntity<List<String>> readCatalog() {
         final Set<String> fileList = new HashSet<>();
-        try {
           List<String> lists  = Arrays.asList("classpath:META-INF/resources/yaml/*/", "classpath:META-INF/resources/wsdl/*/");
           fileList.add("VirtualService");
           for(String pathName  :  lists){
-            final Resource[] resources = getCatalogList(pathName);
-            for (final Resource file : resources) {
-                final String[] names = file.toString().split("/");
-                if (names.length > 1) {
-                    fileList.add(names[names.length - 2]);
-                }
-            }
+              try {
+                  final Resource[] resources = getCatalogList(pathName);
+                  for (final Resource file : resources) {
+                      final String[] names = file.toString().split("/");
+                      if (names.length > 1) {
+                          fileList.add(names[names.length - 2]);
+                      }
+                  }
+              }catch (Exception e){
+                  VirtualServiceController.log.error("api-catalogs : " + e.getMessage());
+              }
           }
-        } catch (final IOException e) {
-            VirtualServiceController.log.error("api-catalogs : " + e.getMessage());
-            return new ResponseEntity<List<String>>(HttpStatus.NOT_FOUND);
-        }
         if (fileList.isEmpty()) {
             VirtualServiceController.log.error("Api-catalogs List was not available : ");
             return new ResponseEntity<List<String>>(HttpStatus.NOT_FOUND);
