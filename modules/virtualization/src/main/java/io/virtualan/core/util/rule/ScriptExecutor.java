@@ -44,7 +44,7 @@ public class ScriptExecutor {
 
     public MockResponse executeScript(MockServiceRequest mockServiceRequest, MockResponse mockResponse, String scriptText) throws IOException {
         Script script = shell.parse(scriptText);
-        LOG.info("Executing {}", mockServiceRequest);
+        LOG.debug("Executing {}", mockServiceRequest);
         MockResponse result = (MockResponse) script.invokeMethod("executeScript", new Object[] { mockServiceRequest, mockResponse });
         return result;
     }
@@ -53,10 +53,10 @@ public class ScriptExecutor {
     public static void main(String[] args) throws InstantiationException, IllegalAccessException,
       ResourceException, ScriptException, IOException, javax.script.ScriptException {
         ScriptExecutor scriptExecutor = new ScriptExecutor();
-        LOG.info("Example mock Groovy scripts integration with Java.: ");
+        LOG.debug("Example mock Groovy scripts integration with Java.: ");
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
         mockServiceRequest.setInput("Elan");
         MockResponse mockResponse = new MockResponse();
-        System.out.println(scriptExecutor.executeScript( mockServiceRequest, mockResponse,"def executeScript(mockServiceRequest) {mockServiceRequest.getInput()}"));
+        LOG.debug(String.valueOf(scriptExecutor.executeScript( mockServiceRequest, mockResponse,"def executeScript(mockServiceRequest) {mockServiceRequest.getInput()}")));
     }
 }

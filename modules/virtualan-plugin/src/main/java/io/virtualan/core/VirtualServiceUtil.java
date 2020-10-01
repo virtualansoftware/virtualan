@@ -16,6 +16,7 @@ package io.virtualan.core;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import io.virtualan.core.util.rule.ScriptExecutor;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -70,6 +71,9 @@ public class VirtualServiceUtil {
 
 
     private static final Logger log = LoggerFactory.getLogger(VirtualServiceUtil.class);
+
+    @Autowired
+    private ScriptExecutor scriptExecutor;
 
     @Autowired
     private VirtualServiceValidRequest virtualServiceValidRequest;
@@ -208,7 +212,7 @@ public class VirtualServiceUtil {
     }
     
     public ResponseEntity checkIfServiceDataAlreadyExists(
-            VirtualServiceRequest virtualServiceRequest) {
+            VirtualServiceRequest virtualServiceRequest) throws IOException, JAXBException {
         final Long id = isMockAlreadyExists(virtualServiceRequest);
         if (id != null && id != 0) {
             final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
@@ -223,7 +227,8 @@ public class VirtualServiceUtil {
     }
     
 
-    public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject) {
+    public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject)
+        throws IOException, JAXBException {
 
         try {
             final Map<MockRequest, MockResponse> mockDataSetupMap = readDynamicResponse(
@@ -239,7 +244,13 @@ public class VirtualServiceUtil {
             mockServiceRequest
                     .setParams(Converter.converter(mockTransferObject.getAvailableParams()));
             mockServiceRequest.setResource(mockTransferObject.getResource());
-    
+
+            //validate if it is a valid script
+            if(mockServiceRequest.getRule() != null) {
+                scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
+                    mockServiceRequest.getRule().toString());
+            }
+
             if (inputObjectType != null && mockTransferObject.getInput() != null) {
                 mockServiceRequest.setInput(getObjectMapper()
                         .readValue(mockTransferObject.getInput().toString(), inputObjectType));
@@ -258,7 +269,7 @@ public class VirtualServiceUtil {
 
         } catch (final Exception e) {
             VirtualServiceUtil.log.error("isMockAlreadyExists :: " + e.getMessage());
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }

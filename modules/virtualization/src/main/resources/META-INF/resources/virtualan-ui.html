@@ -1170,24 +1170,24 @@ json-tree .branch-preview::after {
 																		</div>
 																	</div>
 
-																	<div ng-show="mockRequest.type.toUpperCase() === 'RULE'"
+																	<div ng-show="mockSoapRequest.type.toUpperCase() === 'RULE'"
 																			 class="row">
 																		<div class="form-group col-md-12">
 																			<label class="head-text-black col-md-2 control-lable"
 																						 for="file">Rule: </label>
 																			<div class="col-md-7">
-																	<textarea type="text" ng-model="mockRequest.rule" name="rule"
+																	<textarea type="text" ng-model="mockSoapRequest.rule" name="rule"
 																						class="form-control input-sm bk-textarea"> </textarea>
 																			</div>
 																		</div>
 																	</div>
-																	<div ng-show="mockRequest.type.toUpperCase() === 'SCRIPT' "
+																	<div ng-show="mockSoapRequest.type.toUpperCase() === 'SCRIPT' "
 																			 class="row">
 																		<div class="form-group col-md-12">
 																			<label class="head-text-black col-md-2 control-lable"
 																						 for="file">Groovy Script: </label>
 																				<div class="col-md-7">
-																		<textarea type="text" ng-model="mockRequest.rule" name="rule"
+																		<textarea type="text" ng-model="mockSoapRequest.rule" name="rule"
 																				class="form-control input-sm bk-textarea"></textarea>
 																			</div>
 																		</div>

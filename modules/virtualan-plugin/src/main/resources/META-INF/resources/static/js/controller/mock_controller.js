@@ -107,7 +107,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             "    responseObject.setHttpStatusCode('200'); \n" +
             "    responseObject.setOutput(String.valueOf(riskFactor)); \n" +
             "    return responseObject.builder(); \n" +
-            " }} \n";
+            " } \n";
           }
         } else if(type.toUpperCase() === 'RULE') {
            if (value == null ) {

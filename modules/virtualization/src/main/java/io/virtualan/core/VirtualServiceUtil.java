@@ -18,6 +18,8 @@ package io.virtualan.core;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.virtualan.api.WSResource;
 import io.virtualan.core.soap.SoapFaultException;
+import io.virtualan.core.util.ScriptErrorException;
+import io.virtualan.core.util.rule.ScriptExecutor;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -78,6 +80,9 @@ public class VirtualServiceUtil {
 
     @Autowired
     private VirtualService virtualService;
+
+    @Autowired
+    private ScriptExecutor scriptExecutor;
 
     @Autowired
     private Converter converter;
@@ -210,7 +215,7 @@ public class VirtualServiceUtil {
     }
     
     public ResponseEntity checkIfServiceDataAlreadyExists(
-            VirtualServiceRequest virtualServiceRequest) {
+            VirtualServiceRequest virtualServiceRequest) throws IOException, JAXBException {
         final Long id = isMockAlreadyExists(virtualServiceRequest);
         if (id != null && id != 0) {
             final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
@@ -225,7 +230,8 @@ public class VirtualServiceUtil {
     }
     
 
-    public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject) {
+    public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject)
+        throws IOException, JAXBException {
 
         try {
             final Map<MockRequest, MockResponse> mockDataSetupMap = readDynamicResponse(
@@ -241,7 +247,13 @@ public class VirtualServiceUtil {
             mockServiceRequest
                     .setParams(Converter.converter(mockTransferObject.getAvailableParams()));
             mockServiceRequest.setResource(mockTransferObject.getResource());
-    
+
+            //validate if it is a valid script
+            if(mockServiceRequest.getRule() != null) {
+                scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
+                    mockServiceRequest.getRule().toString());
+            }
+
             if (inputObjectType != null && mockTransferObject.getInput() != null) {
                 mockServiceRequest.setInput(getObjectMapper()
                         .readValue(mockTransferObject.getInput().toString(), inputObjectType));
@@ -260,7 +272,7 @@ public class VirtualServiceUtil {
 
         } catch (final Exception e) {
             VirtualServiceUtil.log.error("isMockAlreadyExists :: " + e.getMessage());
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }
@@ -272,7 +284,7 @@ public class VirtualServiceUtil {
         final List<ReturnMockResponse> returnMockResponseList =
                 new ArrayList<>(returnMockResponseMap.values());
         Collections.sort(returnMockResponseList, new BestMatchComparator());
-        VirtualServiceUtil.log.info("Sorted list : " + returnMockResponseList);
+        VirtualServiceUtil.log.debug("Sorted list : " + returnMockResponseList);
         final ReturnMockResponse rMockResponse = returnMockResponseList.iterator().next();
         if (rMockResponse != null && rMockResponse.getHeaderResponse() != null) {
 
@@ -403,7 +415,11 @@ public class VirtualServiceUtil {
         
         //No Rule conditions exists/met then run the script
         if(returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
-           returnMockResponseMap = virtualServiceValidRequest.checkScriptResponse(mockDataSetupMap, mockServiceRequest);
+            try {
+                returnMockResponseMap = virtualServiceValidRequest.checkScriptResponse(mockDataSetupMap, mockServiceRequest);
+            } catch (ScriptErrorException e) {
+                log.error("Error  in Script configuration :" + e.getMessage());
+            }
         }
     
         //No script conditions exists/met then run the mock response
@@ -413,14 +429,14 @@ public class VirtualServiceUtil {
         }
     
        
-        VirtualServiceUtil.log.info("number of matches : " + returnMockResponseMap.size());
+        VirtualServiceUtil.log.debug("number of matches : " + returnMockResponseMap.size());
         ResponseEntity responseEntity = null;
         ReturnMockResponse rMockResponse = null;
         if (returnMockResponseMap.size() > 0) {
             final List<ReturnMockResponse> returnMockResponseList =
                     new ArrayList<>(returnMockResponseMap.values());
             Collections.sort(returnMockResponseList, new BestMatchComparator());
-            VirtualServiceUtil.log.info("Sorted list : " + returnMockResponseList);
+            VirtualServiceUtil.log.debug("Sorted list : " + returnMockResponseList);
             rMockResponse = returnMockResponseList.stream()
                     .filter(x -> x.isExactMatch()).findAny().orElse(null);
             if(rMockResponse != null) {
@@ -471,7 +487,7 @@ public class VirtualServiceUtil {
 
     private Object returnResponse(Method method, ResponseEntity responseEntity, String response)
             throws ResponseException {
-        VirtualServiceUtil.log.info(" responseEntity.getHeaders() :" + responseEntity.getHeaders());
+        VirtualServiceUtil.log.debug(" responseEntity.getHeaders() :" + responseEntity.getHeaders());
         if (response != null) {
             final String responseOut = xmlConverter.returnAsXml(method, responseEntity, response);
             if (method.getReturnType().equals(Response.class)) {
