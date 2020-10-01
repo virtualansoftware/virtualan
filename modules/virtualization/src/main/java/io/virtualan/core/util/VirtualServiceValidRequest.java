@@ -120,9 +120,9 @@ public class VirtualServiceValidRequest {
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
             if("RULE".equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
-                log.info("Rule key : " + mockRequestResponse.getKey().getRule());
-                log.info("Rule Input : " + mockServiceRequest);
-                log.info("Rule evaluated flag :" +ruleEvaluator.expressionEvaluator(mockServiceRequest, mockRequestResponse.getKey().getRule()));
+                log.debug("Rule key : " + mockRequestResponse.getKey().getRule());
+                log.debug("Rule Input : " + mockServiceRequest);
+                log.debug("Rule evaluated flag :" +ruleEvaluator.expressionEvaluator(mockServiceRequest, mockRequestResponse.getKey().getRule()));
                 if(ruleEvaluator.expressionEvaluator(mockServiceRequest,mockRequestResponse.getKey().getRule())) {
                     final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                             mockRequestResponse, 1);
@@ -138,18 +138,18 @@ public class VirtualServiceValidRequest {
     
     public Map<Integer, ReturnMockResponse> checkScriptResponse(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest) throws IOException, ScriptErrorException {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
             if("SCRIPT".equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
-                log.info("Script : " + mockRequestResponse.getKey().getRule());
-                log.info("Script Input : " + mockServiceRequest);
+                log.debug("Script : " + mockRequestResponse.getKey().getRule());
+                log.debug("Script Input : " + mockServiceRequest);
                 try {
                     MockResponse mockResponse = new MockResponse();
                     mockResponse = scriptExecutor.executeScript(mockServiceRequest, mockResponse, mockRequestResponse.getKey().getRule());
-                    log.info("Script output expected : " + mockResponse);
+                    log.debug("Script output expected : " + mockResponse);
                     if (mockResponse != null) {
                         
                         final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
@@ -161,6 +161,7 @@ public class VirtualServiceValidRequest {
                     }
                 }catch (Exception e){
                     log.warn("Oh!!! check the groovy script... Script was not working as expected configuration? " + e.getMessage());
+                    throw new ScriptErrorException("Oh!!! check the groovy script... Script was not working as expected configuration? " + e.getMessage());
                 }
                 return  matchMap;
             }

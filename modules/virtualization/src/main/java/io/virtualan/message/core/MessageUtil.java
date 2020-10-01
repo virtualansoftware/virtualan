@@ -10,7 +10,7 @@ import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.VirtualServiceValidRequest;
 import io.virtualan.core.util.XMLConverter;
-import io.virtualan.message.core.jms.JMSListener;
+import io.virtualan.core.util.rule.ScriptExecutor;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
@@ -31,6 +31,9 @@ public class MessageUtil {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private ScriptExecutor scriptExecutor;
 
 	@Autowired
 	private VirtualServiceValidRequest virtualServiceValidRequest;
@@ -124,7 +127,15 @@ public class MessageUtil {
 					.setParams(Converter.converter(mockTransferObject.getAvailableParams()));
 			mockServiceRequest.setResource(mockTransferObject.getResource());
 			mockServiceRequest.setContentType(mockTransferObject.getContentType());
+			mockServiceRequest.setRule(mockTransferObject.getRule());
+
 			if (mockTransferObject.getInputObjectType() != null) {
+
+				//validate if it is a valid script
+				if(mockServiceRequest.getRule() != null) {
+					scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
+							mockServiceRequest.getRule().toString());
+				}
 				if(ContentType.XML.equals(mockTransferObject.getContentType())){
 					mockServiceRequest.setInput(
 							XMLConverter.xmlToObject(mockTransferObject.getInputObjectType(),mockTransferObject.getInput().toString()));
@@ -148,7 +159,7 @@ public class MessageUtil {
 			
 		} catch (final Exception e) {
 			e.printStackTrace();
-			System.out.println("isMockAlreadyExists :: " + e.getMessage());
+			log.error("isMockAlreadyExists :: " + e.getMessage());
 			throw  e;
 		}
 		return null;
@@ -159,7 +170,7 @@ public class MessageUtil {
 		final List<ReturnMockResponse> returnMockResponseList =
 				new ArrayList<>(returnMockResponseMap.values());
 		Collections.sort(returnMockResponseList, new BestMatchComparator());
-		System.out.println("Sorted list : " + returnMockResponseList);
+		log.debug("Sorted list : " + returnMockResponseList);
 		final ReturnMockResponse rMockResponse = returnMockResponseList.iterator().next();
 		if (rMockResponse != null && rMockResponse.getHeaderResponse() != null && rMockResponse.isExactMatch()) {
 			return rMockResponse.getMockRequest().getVirtualServiceId();
