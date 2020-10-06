@@ -38,6 +38,6 @@ public class ScriptExecutor {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
         mockServiceRequest.setInput("Elan");
         MockResponse mockResponse = new MockResponse();
-        System.out.println(scriptExecutor.executeScript( mockServiceRequest, mockResponse,"def executeScript(mockServiceRequest) {mockServiceRequest.getInput()}"));
+        scriptExecutor.executeScript( mockServiceRequest, mockResponse,"def executeScript(mockServiceRequest) {mockServiceRequest.getInput()}");
     }
 }

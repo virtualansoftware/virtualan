@@ -1,10 +1,11 @@
 swagger: '2.0'
 info:
   description: Virtual Service API
-  version: 2.1.2
+  version: 2.1.4
   title: Virtual Service API
 basePath: /
 schemes:
+  - https
   - http
 produces:
   - application/json

@@ -103,7 +103,7 @@ public class VirtualServiceValidRequest {
             	
                 final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                         mockRequestResponse, numberAttrMatch);
-                System.out.println(numberAttrMatch +" : "+ mockRequestResponse.getKey().getAvailableParams().size());
+                log.debug(numberAttrMatch +" : "+ mockRequestResponse.getKey().getAvailableParams().size());
                 returnMockResponse.setExactMatch(numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size());
                 	
                 matchMap.put(count, returnMockResponse);
@@ -126,13 +126,13 @@ public class VirtualServiceValidRequest {
                 if(ruleEvaluator.expressionEvaluator(mockServiceRequest,mockRequestResponse.getKey().getRule())) {
                     final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                             mockRequestResponse, 1);
-                    System.out.println("Successful expression Rule evaluated : ");
+                    log.debug("Successful expression Rule evaluated : ");
                     returnMockResponse.setExactMatch(true);
                     matchMap.put(count, returnMockResponse);
                 }
             }
         }
-        System.out.println("Rule evaluated Ended : " + matchMap);
+        log.debug("Rule evaluated Ended : " + matchMap);
         return matchMap;
     }
     
@@ -155,7 +155,7 @@ public class VirtualServiceValidRequest {
                         final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                                 mockRequestResponse, 1);
                         returnMockResponse.setMockResponse(mockResponse);
-                        System.out.println("Successful expression Rule evaluated : ");
+                        log.debug("Successful expression Rule evaluated : ");
                         returnMockResponse.setExactMatch(true);
                         matchMap.put(count, returnMockResponse);
                     }
@@ -165,7 +165,7 @@ public class VirtualServiceValidRequest {
                 return  matchMap;
             }
         }
-        System.out.println("Rule evaluated Ended : " + matchMap);
+        log.debug("Rule evaluated Ended : " + matchMap);
         return matchMap;
     }
     
