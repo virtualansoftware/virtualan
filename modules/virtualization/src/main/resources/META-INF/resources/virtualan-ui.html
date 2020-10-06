@@ -601,6 +601,9 @@ json-tree .branch-preview::after {
 																	<div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm.httpStatus.$error.required">This
 																			is a required field</span>
+																		<span ng-show="myForm.mockRequest.type.$error.required">This
+																			is a required field</span>
+
 																	</div>
 																</div>
 															</div>
@@ -1126,21 +1129,24 @@ json-tree .branch-preview::after {
 																			<label class="head-text-black col-md-2 control-lable"
 																						 for="file">Type/Storage ContentType:</label>
 																			<div class="col-md-7">
-																				<select ng-model="mockSoapRequest.type" ng-click="mockSoapRequest.rule = ctrl3.loadDefaultRule(mockSoapRequest.type, mockSoapRequest.rule)"
+																				<select name="type" ng-model="mockSoapRequest.type" ng-click="mockSoapRequest.rule = ctrl3.loadDefaultRule(mockSoapRequest.type, mockSoapRequest.rule)"
 																								required>
 																					<option id="RESPONSE" selected>Response</option>
 																					<option id="RULE">Rule</option>
 																					<option id="SCRIPT">Script</option>
 																				</select> &nbsp; &nbsp; &nbsp; &nbsp;
-																				<select ng-model="mockSoapRequest.contentType"
+																				<select name="contentType" ng-model="mockSoapRequest.contentType"
 																								required>
 																					<option id="JSON" selected>JSON</option>
 																					<option id="XML">XML</option>
 																				</select>
 
-																				<div class="has-error" ng-show="myForm.$dirty">
-																					<span ng-show="myForm.httpStatus.$error.required">This
+																				<div class="has-error" ng-show="myForm-soap.$dirty">
+																					<span ng-show="myForm-soap.contentType.$error.required">This
 																				is a required field</span>
+																					<span ng-show="myForm.type.$error.required">This
+																			is a required field</span>
+
 																				</div>
 																				<input type="hidden"  ng-model="mockSoapRequest.method"
 																							 class="input form-control input-sm" required
@@ -1162,8 +1168,8 @@ json-tree .branch-preview::after {
 																				> <input
 																					type="hidden"  ng-model="mockSoapRequest.id"
 																					value="" />
-																				<div class="has-error" ng-show="myForm-message.$dirty">
-																			<span ng-show="myForm-message.api.$error.required">This
+																				<div class="has-error" ng-show="myForm-soap.$dirty">
+																			<span ng-show="myForm-soap.api.$error.required">This
 																				is a required field</span>
 																				</div>
 																			</div>
@@ -1215,8 +1221,8 @@ json-tree .branch-preview::after {
 																		<textarea ng-model="mockSoapRequest.output" name="output"
 																							class="response form-control input-sm bk-textarea"
 																							rows="3"> {{mockSoapRequest.output}}</textarea>
-																				<div class="has-error" ng-show="myForm.$dirty">
-																			<span ng-show="myForm-message.output.$error.required">This
+																				<div class="has-error" ng-show="myForm-soap.$dirty">
+																			<span ng-show="myForm-soap.output.$error.required">This
 																				is a required field</span>
 																				</div>
 																			</div>
@@ -1239,11 +1245,11 @@ json-tree .branch-preview::after {
 																			<input type="submit"
 																						 value="{{!mockSoapRequest.id ? 'Add' : 'Update'}}"
 																						 class="btn btn-primary btn-sm"
-																						 ng-disabled="myForm-message.$invalid">
+																						 ng-disabled="myForm-soap.$invalid">
 																			<button type="button"
 																							ng-click="ctrl3.reset(myForm-message, mockSoapRequest)"
 																							class="btn btn-primary btn-sm"
-																							ng-disabled="myForm-message.$pristine">Reset Form</button>
+																							ng-disabled="myForm-soap.$pristine">Reset Form</button>
 																			<button type="button" class="btn btn-primary btn-sm"
 																							ng-click="showme=!showme">Close</button>
 																		</div>
