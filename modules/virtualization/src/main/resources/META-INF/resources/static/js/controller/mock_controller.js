@@ -51,7 +51,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     loadAllMockRequest();
     loadAllTopics();
     loadAllSoapRequest();
-
+    self.tmp= null;
     self.isNotEmpty = function() {
        return (Object.keys(self.mockLoadRequests).length > 0);
     }
@@ -120,8 +120,10 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     };
 
     self.loadDefaultRule = function(type, value) {
-     if(type && type.toUpperCase() === 'SCRIPT') {
-       if (value == null ) {
+     if(value != null) {
+        self.tmp = value
+     }if(type && type.toUpperCase() === 'SCRIPT') {
+       if (self.tmp == null && value == null ) {
         return  " def executeScript(mockServiceRequest, responseObject) { \n" +
             "     int age = getAge(mockServiceRequest.getInput().getBirthday()); \n" +
             "    String postalCode = mockServiceRequest.getInput().getPostalCode(); \n" +
@@ -130,11 +132,15 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             "    responseObject.setOutput(String.valueOf(riskFactor)); \n" +
             "    return responseObject.builder(); \n" +
             " } \n";
+          } else {
+            return self.tmp;
           }
         } else if( type && type.toUpperCase() === 'RULE') {
-           if (value == null ) {
+           if (self.tmp == null && value == null ) {
               return " T(java.time.Period).between(input.dateOfBirth, T(java.time.LocalDate).now()).getYears() < 22 ";
-           }
+            } else {
+               return self.tmp;
+            }
         }
     }
 
@@ -395,7 +401,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     	self.selectedOperationId = mockRequest.operationId;
 		MockService.createMockRequest(mockRequest)
             .then(
-            		fetchAllMockRequest,
+            		self.loadData = fetchAllMockRequest,
             function(errResponse){
                 self.showDialog = true;
             	self.typeWarning = true;
@@ -413,7 +419,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       self.selectedOperationId = mockRequest.operationId;
       MockService.createMockSoapRequest(mockRequest)
         .then(
-            fetchAllSoapMockRequest,
+            self.loadSoapData = fetchAllSoapMockRequest,
         function(errResponse){
             self.showDialog = true;
           self.typeWarning = true;
@@ -431,7 +437,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     	self.selectedOperationId = mockRequest.requestTopicOrQueueName;
 		MockService.createMockMsgRequest(mockRequest)
             .then(
-            		fetchAllMsgMockRequest,
+            		self.loadMsgData = fetchAllMsgMockRequest,
             function(errResponse){
                 self.showDialog = true;
             	self.typeWarning = true;
@@ -447,7 +453,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     function updateMockRequest(mockRequest, id){
         MockService.updateMockRequest(mockRequest, id)
             .then(
-            		fetchAllMockRequest,
+            		self.loadData = fetchAllMockRequest,
             function(errResponse){
                 console.error('Error while updating MockRequest');
             }
@@ -458,7 +464,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     function deleteSoapMockRequest(id){
         MockService.deleteMockRequest(id)
             .then(
-            		fetchAllSoapMockRequest,
+            		self.loadSoapData = fetchAllSoapMockRequest,
             function(errResponse){
                 console.error('Error while deleting Msg MockRequest');
             }
@@ -468,7 +474,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     function deleteMsgMockRequest(id){
         MockService.deleteMockRequest(id)
             .then(
-            		fetchAllMsgMockRequest,
+            		self.loadMsgData = fetchAllMsgMockRequest,
             function(errResponse){
                 console.error('Error while deleting Msg MockRequest');
             }
