@@ -385,7 +385,7 @@ json-tree .branch-preview::after {
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li ><a href="#" class="impact"><h4><font color="#004080">
-						{{ctrl.appName}} Virtualization - v1.0.0
+						{{ctrl.appName}} Virtualization - v1.0.2
 						</font>
 					</h4></a></li>
 				</ul>
@@ -1104,7 +1104,7 @@ json-tree .branch-preview::after {
 
 														<div ng-show="showme ">
 															<div class="opblock-section nomargin">
-																<form ng-submit="ctrl3.submitSoap(mockSoapRequest)" name="myForm-soap"
+																<form ng-submit="ctrl3.submitSoap(mockSoapRequest)" name="myFormSoap"
 																			class="form-horizontal">
 																	<div class="row"
 																			 ng-show="ctrl3.showAlert(mockSoapRequest.method)">
@@ -1141,10 +1141,10 @@ json-tree .branch-preview::after {
 																					<option id="XML">XML</option>
 																				</select>
 
-																				<div class="has-error" ng-show="myForm-soap.$dirty">
-																					<span ng-show="myForm-soap.contentType.$error.required">This
+																				<div class="has-error" ng-show="myFormSoap.$dirty">
+																					<span ng-show="myFormSoap.mockSoapRequest.contentType.$error.required">This
 																				is a required field</span>
-																					<span ng-show="myForm.type.$error.required">This
+																					<span ng-show="myFormSoap.mockSoapRequest.type.$error.required">This
 																			is a required field</span>
 
 																				</div>
@@ -1168,8 +1168,8 @@ json-tree .branch-preview::after {
 																				> <input
 																					type="hidden"  ng-model="mockSoapRequest.id"
 																					value="" />
-																				<div class="has-error" ng-show="myForm-soap.$dirty">
-																			<span ng-show="myForm-soap.api.$error.required">This
+																				<div class="has-error" ng-show="myFormSoap.$dirty">
+																			<span ng-show="myFormSoap.api.$error.required">This
 																				is a required field</span>
 																				</div>
 																			</div>
@@ -1221,8 +1221,8 @@ json-tree .branch-preview::after {
 																		<textarea ng-model="mockSoapRequest.output" name="output"
 																							class="response form-control input-sm bk-textarea"
 																							rows="3"> {{mockSoapRequest.output}}</textarea>
-																				<div class="has-error" ng-show="myForm-soap.$dirty">
-																			<span ng-show="myForm-soap.output.$error.required">This
+																				<div class="has-error" ng-show="myFormSoap.$dirty">
+																			<span ng-show="myFormSoap.output.$error.required">This
 																				is a required field</span>
 																				</div>
 																			</div>
@@ -1245,11 +1245,11 @@ json-tree .branch-preview::after {
 																			<input type="submit"
 																						 value="{{!mockSoapRequest.id ? 'Add' : 'Update'}}"
 																						 class="btn btn-primary btn-sm"
-																						 ng-disabled="myForm-soap.$invalid">
+																						 ng-disabled="myFormSoap.$invalid">
 																			<button type="button"
 																							ng-click="ctrl3.reset(myForm-message, mockSoapRequest)"
 																							class="btn btn-primary btn-sm"
-																							ng-disabled="myForm-soap.$pristine">Reset Form</button>
+																							ng-disabled="myFormSoap.$pristine">Reset Form</button>
 																			<button type="button" class="btn btn-primary btn-sm"
 																							ng-click="showme=!showme">Close</button>
 																		</div>
@@ -1316,7 +1316,7 @@ json-tree .branch-preview::after {
 									</thead>
 									<tbody>
 									<tr
-											ng-repeat="mockSoapRequest in ctrl.soapFiltered = (ctrl.filterSoapList | filter: ctrl.searchSoapText ) | start: (ctrl.currentSoapPage - 1) * ctrl.perPage | limitTo : ctrl.perPage">
+											ng-repeat="mockSoapRequest in ctrl.soapFiltered = (ctrl.filterSoapList | filter: ctrl.searchSoapText ) | start: (ctrl.currentSoapPage - 1) * ctrl.perSoapPage | limitTo : ctrl.perSoapPage">
 										<td><span ng-bind="mockSoapRequest.id"></span></td>
 										<td><span ng-bind="mockSoapRequest.url"></span></td>
 										<td><span ng-bind="mockSoapRequest.method"></span></td>
