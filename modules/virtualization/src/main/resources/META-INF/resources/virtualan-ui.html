@@ -863,7 +863,7 @@ json-tree .branch-preview::after {
 
 													<div ng-show="showme ">
 														<div class="opblock-section nomargin">
-															<form ng-submit="ctrl2.submitMessage(mockMsgRequest)" name="myForm-message"
+															<form ng-submit="ctrl2.submitMessage(mockMsgRequest)" name="myFormMessage"
 																  class="form-horizontal">
 																<div class="row"
 																	 ng-show="ctrl2.showAlert(mockMsgRequest.operationId)">
@@ -905,8 +905,8 @@ json-tree .branch-preview::after {
 																				> <input
 																				type="hidden"  ng-model="mockMsgRequest.id"
 																				value="" />
-																			<div class="has-error" ng-show="myForm-message.$dirty">
-																		<span ng-show="myForm-message.api.$error.required">This
+																			<div class="has-error" ng-show="myFormMessage.$dirty">
+																		<span ng-show="myFormMessage.api.$error.required">This
 																			is a required field</span>
 																			</div>
 																		</div>
@@ -975,7 +975,7 @@ json-tree .branch-preview::after {
 																			  class="response form-control input-sm bk-textarea"
 																			  rows="3"> {{mockMsgRequest.output}}</textarea>
 																			<div class="has-error" ng-show="myForm.$dirty">
-																		<span ng-show="myForm-message.output.$error.required">This
+																		<span ng-show="myFormMessage.output.$error.required">This
 																			is a required field</span>
 																			</div>
 																		</div>
@@ -1035,11 +1035,11 @@ json-tree .branch-preview::after {
 																		<input type="submit"
 																			   value="{{!mockMsgRequest.id ? 'Add' : 'Update'}}"
 																			   class="btn btn-primary btn-sm"
-																			   ng-disabled="myForm-message.$invalid">
+																			   ng-disabled="myFormMessage.$invalid">
 																		<button type="button"
-																				ng-click="ctrl2.reset(myForm-message, mockMsgRequest)"
+																				ng-click="ctrl2.reset(myFormMessage, mockMsgRequest)"
 																				class="btn btn-primary btn-sm"
-																				ng-disabled="myForm-message.$pristine">Reset Form</button>
+																				ng-disabled="myFormMessage.$pristine">Reset Form</button>
 																		<button type="button" class="btn btn-primary btn-sm"
 																				ng-click="showme=!showme">Close</button>
 																	</div>
@@ -1247,7 +1247,7 @@ json-tree .branch-preview::after {
 																						 class="btn btn-primary btn-sm"
 																						 ng-disabled="myFormSoap.$invalid">
 																			<button type="button"
-																							ng-click="ctrl3.reset(myForm-message, mockSoapRequest)"
+																							ng-click="ctrl3.reset(myFormMessage, mockSoapRequest)"
 																							class="btn btn-primary btn-sm"
 																							ng-disabled="myFormSoap.$pristine">Reset Form</button>
 																			<button type="button" class="btn btn-primary btn-sm"

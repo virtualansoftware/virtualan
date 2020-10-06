@@ -169,13 +169,6 @@ public class SoapEndpointCodeGenerator {
   }
 
 
-  public static void findAnnotatedClasses(String scanPackage) {
-    ClassPathScanningCandidateComponentProvider provider = createComponentScanner();
-    for (BeanDefinition beanDef : provider.findCandidateComponents(scanPackage)) {
-      System.out.println(beanDef);
-    }
-  }
-
   private static ClassPathScanningCandidateComponentProvider createComponentScanner() {
     ClassPathScanningCandidateComponentProvider provider
         = new ClassPathScanningCandidateComponentProvider(false);

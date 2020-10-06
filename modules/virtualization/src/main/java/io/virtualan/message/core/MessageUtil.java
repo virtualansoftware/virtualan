@@ -49,7 +49,7 @@ public class MessageUtil {
 		final List<ReturnMockResponse> returnMockResponseList =
 				new ArrayList<>(returnMockResponseMap.values());
 		Collections.sort(returnMockResponseList, new BestMatchComparator());
-		System.out.println("Sorted list : " + returnMockResponseList);
+		log.debug("Sorted list : " + returnMockResponseList);
 		final ReturnMockResponse rMockResponse = returnMockResponseList.iterator().next();
 		if (rMockResponse != null && rMockResponse.getHeaderResponse() != null && rMockResponse.isExactMatch()) {
 			return rMockResponse;
@@ -101,7 +101,7 @@ public class MessageUtil {
 			
 		} catch (final Exception e) {
 			e.printStackTrace();
-			System.out.println("getMatchingRecord :: " + e.getMessage());
+			log.error("getMatchingRecord :: " + e.getMessage());
 		}
 		return null;
 	}
