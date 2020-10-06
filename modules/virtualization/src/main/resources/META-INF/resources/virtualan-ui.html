@@ -1361,7 +1361,7 @@ json-tree .branch-preview::after {
 							<option>40</option>
 							<option>50</option></select> records at a time.
 
-							<pagination total-items="ctrl.SoapFiltered.length"
+							<pagination total-items="ctrl.soapFiltered.length"
 													boundary-links="true" max-size="ctrl.maxSoapSize"
 													ng-model="ctrl.currentSoapPage" class="pagination-sm"
 													items-per-page="ctrl.perSoapPage"></pagination>
@@ -1476,7 +1476,7 @@ json-tree .branch-preview::after {
 						</div>
 						<div class="modal-footer">
 							View <select ng-model="ctrl.viewMsgby"
-													 ng-change="ctrl.setItemsMsgPerPage(ctrl.viewMsgpby)"><option>3</option>
+													 ng-change="ctrl.setItemsMsgPerPage(ctrl.viewMsgby)"><option>3</option>
 							<option>5</option>
 							<option>10</option>
 							<option>20</option>

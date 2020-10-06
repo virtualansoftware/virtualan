@@ -59,7 +59,17 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.setPage = function (pageNo) {
     	self.currentPage = pageNo;
     };
-    
+
+
+    self.setMsgPage = function (pageNo) {
+    	self.currentMsgPage = pageNo;
+    };
+
+
+    self.setSoapPage = function (pageNo) {
+    	self.currentSoapPage = pageNo;
+    };
+
      function getAppName(){	
     	MockService.readApplicationName()
             .then(
