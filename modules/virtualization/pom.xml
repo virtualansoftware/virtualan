@@ -25,7 +25,7 @@
 		<spring.version>5.0.3.RELEASE</spring.version>
 		<spring.boot.mq.version>2.2.4</spring.boot.mq.version>
 		<groovy.version>3.0.5</groovy.version>
-		<junit.version>4.13</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<slf4j.version>1.7.12</slf4j.version>
 		<validation-api.version>1.1.0.Final</validation-api.version>
 		<lombok.version>1.18.10</lombok.version>
