@@ -29,7 +29,7 @@
 		<lombok.version>1.18.10</lombok.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
-		<mapson.version>1.0.0</mapson.version>
+		<mapson.version>1.0.1</mapson.version>
 		<org.json.version>20190722</org.json.version>
 		<swagger-annotations.version>1.5.18</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
