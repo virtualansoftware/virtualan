@@ -92,7 +92,7 @@ public class ApiVirtualAspect {
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-        throws ResponseException, IOException, JAXBException {
+        throws ResponseException, IOException, JAXBException, JSONException {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();
