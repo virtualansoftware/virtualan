@@ -14,6 +14,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.runner.Runner;
 import org.slf4j.Logger;
@@ -93,7 +94,7 @@ public class JMSMessageSender {
     }
   }
 
-  private void buildJMSListener(JSONArray array, String jmsType) {
+  private void buildJMSListener(JSONArray array, String jmsType) throws JSONException {
     for (int i = 0; i < array.length(); i++) {
       JSONObject object = array.optJSONObject(i);
       JMSConfigurationDomain conf = getJmsConfigurationDomain(object, jmsType);
@@ -119,7 +120,7 @@ public class JMSMessageSender {
     }
   }
 
-  private JSONObject getJMSConfiguration() throws IOException {
+  private JSONObject getJMSConfiguration() throws IOException, JSONException {
     InputStream stream = JMSMessageSender.class.getClassLoader()
         .getResourceAsStream("conf/jms-config.json");
     String jmsConfigJson = readString(stream);
@@ -127,7 +128,7 @@ public class JMSMessageSender {
     return jsonObject;
   }
 
-  private List<String> getReceiverQueues(JSONObject object) {
+  private List<String> getReceiverQueues(JSONObject object) throws JSONException {
     List<String> receiverQueue = new ArrayList<>();
     for(int i=0; i < object.getJSONArray("receiver-queue").length(); i++) {
       receiverQueue.add((String) object.getJSONArray("receiver-queue").get(i));
@@ -135,7 +136,8 @@ public class JMSMessageSender {
     return receiverQueue;
   }
 
-  private JMSConfigurationDomain getJmsConfigurationDomain(JSONObject object, String jmsType) {
+  private JMSConfigurationDomain getJmsConfigurationDomain(JSONObject object, String jmsType)
+      throws JSONException {
     JMSConfigurationDomain conf = new JMSConfigurationDomain();
     conf.setJmsType(jmsType);
     if("IBMMQ".equalsIgnoreCase(jmsType)) {

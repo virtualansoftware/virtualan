@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
@@ -134,12 +135,16 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 		List<VirtualServiceKeyValue> virtualServiceKeyValueList = new LinkedList<>();
 		if(params != null  && params.length() > 0) {
 			for (int i = 0; i < params.length(); i++) {
-				JSONObject object = params.getJSONObject(i);
-				VirtualServiceKeyValue virtualServiceKeyValue = new VirtualServiceKeyValue();
-				virtualServiceKeyValue.setKey(object.optString("key"));
-				virtualServiceKeyValue.setValue(object.optString("value"));
-				virtualServiceKeyValue.setParameterType(object.optString("parameterType"));
-				virtualServiceKeyValueList.add(virtualServiceKeyValue);
+				try {
+					JSONObject object = params.getJSONObject(i);
+					VirtualServiceKeyValue virtualServiceKeyValue = new VirtualServiceKeyValue();
+					virtualServiceKeyValue.setKey(object.optString("key"));
+					virtualServiceKeyValue.setValue(object.optString("value"));
+					virtualServiceKeyValue.setParameterType(object.optString("parameterType"));
+					virtualServiceKeyValueList.add(virtualServiceKeyValue);
+				}catch (JSONException e){
+					log.warn("Loader: " + e.getMessage());
+				}
 			}
 		}
 		return virtualServiceKeyValueList;
