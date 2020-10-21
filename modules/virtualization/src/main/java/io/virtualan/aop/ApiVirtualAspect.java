@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Virtualan Contributors (https://virtualan.io)
+ * Copyright 2020 Virtualan Contributors (https://virtualan.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -26,6 +26,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
