@@ -23,10 +23,28 @@ import org.springframework.http.ResponseEntity;
  * @author  Elan Thangamani
  * 
  **/
+
 @Data
 public class ResponseException extends RuntimeException  {
 
-    private final Response response ;
-    private final ResponseEntity responseEntity;
+    public Response getResponse() {
+        return response;
+    }
+
+    public ResponseEntity getResponseEntity() {
+        return responseEntity;
+    }
+
+    private  Response response ;
+    private  ResponseEntity responseEntity;
+
+    public void setResponse(Response response) {
+        this.response = response;
+    }
+
+    public void setResponseEntity(ResponseEntity responseEntity) {
+        this.responseEntity =responseEntity;
+    }
+
 
 }
