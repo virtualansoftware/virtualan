@@ -264,7 +264,7 @@ public interface VirtualServiceInfo {
                 mockTransferInput.setResource(mockTransferInput.getUrl().substring(1, index));
             }
         }
-        if (mockTransferInput.getOperationId() != null) {
+        if (mockTransferInput != null && mockTransferInput.getOperationId() != null) {
             return getMockLoadChoice().get(mockTransferInput.getResource())
                     .get(mockTransferInput.getOperationId());
         }

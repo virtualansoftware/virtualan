@@ -1,7 +1,6 @@
 package io.virtualan.message.core.jms;
 
 import com.ibm.mq.jms.MQQueueConnectionFactory;
-import com.ibm.msg.client.wmq.WMQConstants;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -19,7 +18,7 @@ public class IBMMQConnectionFactory implements  VirtualanJMSConnectionFactory{
     if (conf.getUserName() != null && conf.getPassword() != null) {
       //userCredentialsConnectionFactoryAdapter
     }
-    connectionFactory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
+    connectionFactory.setTransportType(1);
     connectionFactory.setCCSID(1208);
     connectionFactory.setHostName(conf.getHost());
     connectionFactory.setQueueManager(conf.getQueueMgr());

@@ -14,16 +14,12 @@
 
 package io.virtualan.core.soap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.virtualan.core.model.SoapService;
-import io.virtualan.core.model.VirtualServiceRequest;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,13 +36,10 @@ import javassist.bytecode.MethodInfo;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
-import javax.jws.WebMethod;
 import javax.jws.WebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -54,7 +47,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SystemPropertyUtils;
@@ -75,7 +67,7 @@ public class SoapEndpointCodeGenerator {
 
 
   public static Class buildEndpointClass(Map<String, SoapService> soapWsServices)
-      throws Exception {
+      throws CannotCompileException, IOException {
     ClassPool pool = ClassPool.getDefault();
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     pool.insertClassPath(new LoaderClassPath(cl));
@@ -110,12 +102,10 @@ public class SoapEndpointCodeGenerator {
     attr.addAnnotation(annot1);
     Annotation annot2 = new Annotation(
         "org.springframework.ws.server.endpoint.annotation.PayloadRoot", cpool);
-    if (keyValue != null) {
-      keyValue.entrySet().stream().forEach(x -> annot2.addMemberValue(
-          x.getKey(),
-          new StringMemberValue(x.getValue(), cpool))
-      );
-    }
+    keyValue.entrySet().stream().forEach(x -> annot2.addMemberValue(
+        x.getKey(),
+        new StringMemberValue(x.getValue(), cpool))
+    );
     attr.addAnnotation(annot2);
     method.getMethodInfo().addAttribute(attr);
   }
@@ -137,13 +127,11 @@ public class SoapEndpointCodeGenerator {
 
 
   private static Annotation constructAnnotation(ConstPool cp, String annotationName) {
-    Annotation ann = new Annotation(annotationName, cp);
-    return ann;
+    return new Annotation(annotationName, cp);
   }
 
-  private static String generateMethod(SoapService soapService)
-      throws CannotCompileException {
-    StringBuffer sb = new StringBuffer();
+  private static String generateMethod(SoapService soapService) {
+    StringBuilder sb = new StringBuilder();
     sb.append("public  ")
         .append(soapService.getResponseClassName())
         .append(" ")
@@ -153,7 +141,7 @@ public class SoapEndpointCodeGenerator {
     return sb.toString();
   }
 
-  public static void addClassAnnotation(CtClass clazz) throws Exception {
+  public static void addClassAnnotation(CtClass clazz)  {
     ClassFile cfile = clazz.getClassFile();
     ConstPool cpool = cfile.getConstPool();
     AnnotationsAttribute attr = new AnnotationsAttribute(cpool, AnnotationsAttribute.visibleTag);
@@ -169,23 +157,15 @@ public class SoapEndpointCodeGenerator {
   }
 
 
-  private static ClassPathScanningCandidateComponentProvider createComponentScanner() {
-    ClassPathScanningCandidateComponentProvider provider
-        = new ClassPathScanningCandidateComponentProvider(false);
-    provider.addIncludeFilter(new AnnotationTypeFilter(WebService.class));
-    return provider;
-  }
-
   protected List<Class> findMyTypes(String basePackage) {
-    List<Class> candidates = new ArrayList<Class>();
+    List<Class> candidates = new ArrayList<>();
     try {
       ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
       MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
           resourcePatternResolver);
       String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-          resolveBasePackage(basePackage) + "/" + "**/*.class";
-      Resource[] resources = new Resource[0];
-      resources = resourcePatternResolver.getResources(packageSearchPath);
+          resolveBasePackage(basePackage) + "/**/*.class";
+      Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
       for (Resource resource : resources) {
         if (resource.isReadable()) {
           MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
@@ -195,7 +175,7 @@ public class SoapEndpointCodeGenerator {
         }
       }
     } catch (IOException | ClassNotFoundException e) {
-      log.warn("Unable to load the package : " + basePackage);
+      log.warn("Unable to load the package : {}"  , basePackage);
     }
 
     return candidates;
@@ -212,26 +192,10 @@ public class SoapEndpointCodeGenerator {
       if (c.getAnnotation(WebService.class) != null) {
         return true;
       }
-    } catch (Throwable e) {
+    } catch (Exception e) {
+      log.warn(" isCandidate unexpected error {}", e.getMessage());
     }
     return false;
-  }
-
-  private Map<String, VirtualServiceRequest> buildVirtualServiceInfo(
-      Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
-      InstantiationException, IllegalAccessException, ClassNotFoundException {
-    Map<String, VirtualServiceRequest> mockAPILoadChoice =
-        new LinkedHashMap<String, VirtualServiceRequest>();
-    for (Method method : virtualServiceEntry.getValue().getDeclaredMethods()) {
-      WebMethod[] annotInstance = method.getAnnotationsByType(WebMethod.class);
-      if (annotInstance != null && annotInstance.length > 0) {
-//        VirtualServiceRequest mockReturn = buildServiceDetails(virtualServiceEntry, method);
-//        if (mockReturn != null) {
-//          mockAPILoadChoice.put(method.getName(), mockReturn);
-//        }
-      }
-    }
-    return mockAPILoadChoice;
   }
 
 }

@@ -21,8 +21,7 @@ import io.virtualan.core.model.VirtualServiceRequest;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Predicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +34,8 @@ import org.springframework.stereotype.Service;
  */
 
 @Service("nonRestVirtualServiceInfo")
+@Slf4j
 public class NonRestVirtualServiceInfo implements VirtualServiceInfo {
-
-    private static final Logger log = LoggerFactory.getLogger(NonRestVirtualServiceInfo.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -89,15 +87,10 @@ public class NonRestVirtualServiceInfo implements VirtualServiceInfo {
     }
 
     @Override
-    public void buildInput(Method method, VirtualServiceRequest mockLoadRequest) {
+    public void buildInput(Method method, VirtualServiceRequest mockLoadRequest){
+        log.info("not used");
     }
 
-    private VirtualServiceKeyValue readParam(Class parameterType, String requestParamValue) {
-        VirtualServiceKeyValue virtualServiceKeyValue = new VirtualServiceKeyValue();
-        virtualServiceKeyValue.setKey(requestParamValue);
-        virtualServiceKeyValue.setType(parameterType);
-        return virtualServiceKeyValue;
-    }
 
     public static Predicate<VirtualServiceKeyValue> isParam(String key) {
         return value -> value.getKey().equalsIgnoreCase(key);

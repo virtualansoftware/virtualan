@@ -15,7 +15,7 @@
 package io.virtualan.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * This is entry point to the virtualan User interface. to set up the Mock data for the selected APIs.
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class IndexController {
 
-    @RequestMapping("/virtualan-ui")
+    @GetMapping("/virtualan-ui")
     public String getVirtualServicePage() {
         return "redirect:virtualan-ui.html";
     }

@@ -127,7 +127,11 @@ public class ResourceMapper {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ResourceMapper other = (ResourceMapper) obj;
+        return compareTo((ResourceMapper) obj);
+    }
+
+    public boolean compareTo(ResourceMapper obj) {
+        ResourceMapper other = obj;
         if (actualResource == null) {
             if (other.actualResource != null)
                 return false;

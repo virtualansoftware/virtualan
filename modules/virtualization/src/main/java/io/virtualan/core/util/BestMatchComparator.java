@@ -31,27 +31,34 @@ public class BestMatchComparator implements Comparator<ReturnMockResponse> {
     private boolean isSame(ReturnMockResponse returnMockResponse1,
             ReturnMockResponse returnMockResponse2) {
         boolean isSame = false;
-        if (isBestMatch(returnMockResponse1) && isBestMatch(returnMockResponse2)) {
-            if (returnMockResponse1.getMockRequest().getAvailableParams()
+        if (isBestMatch(returnMockResponse1) && isBestMatch(returnMockResponse2) &&
+            returnMockResponse1.getMockRequest().getAvailableParams()
                     .size() == returnMockResponse2.getMockRequest().getAvailableParams().size()
                     && returnMockResponse1.getNumberAttrMatch() == returnMockResponse2
                             .getNumberAttrMatch()) {
                 isSame = true;
-                for (final VirtualServiceKeyValue virtualServiceKeyValue1 : returnMockResponse1
-                        .getMockRequest().getAvailableParams()) {
-                    for (final VirtualServiceKeyValue virtualServiceKeyValue2 : returnMockResponse2
-                            .getMockRequest().getAvailableParams()) {
-                        if (!(virtualServiceKeyValue1.getKey()
-                                .equals(virtualServiceKeyValue2.getKey())
-                                && virtualServiceKeyValue1.getValue()
-                                        .equals(virtualServiceKeyValue2.getValue()))) {
-                            return false;
-                        }
-                    }
-                }
+            if (getMatch(returnMockResponse1, returnMockResponse2)) {
+                return false;
             }
         }
         return isSame;
+    }
+
+    private boolean getMatch(ReturnMockResponse returnMockResponse1,
+        ReturnMockResponse returnMockResponse2) {
+        for (final VirtualServiceKeyValue virtualServiceKeyValue1 : returnMockResponse1
+                .getMockRequest().getAvailableParams()) {
+            for (final VirtualServiceKeyValue virtualServiceKeyValue2 : returnMockResponse2
+                    .getMockRequest().getAvailableParams()) {
+                if (!(virtualServiceKeyValue1.getKey()
+                        .equals(virtualServiceKeyValue2.getKey())
+                        && virtualServiceKeyValue1.getValue()
+                                .equals(virtualServiceKeyValue2.getValue()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

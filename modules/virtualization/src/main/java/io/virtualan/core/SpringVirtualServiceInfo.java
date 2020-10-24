@@ -21,15 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.virtualan.api.ApiType;
@@ -44,10 +42,9 @@ import io.virtualan.requestbody.RequestBodyTypes;
  * @author  Elan Thangamani
  * 
  */
+@Slf4j
 @Service("springVirtualServiceInfo")
 public class SpringVirtualServiceInfo implements VirtualServiceInfo {
-
-    private static final Logger log = LoggerFactory.getLogger(SpringVirtualServiceInfo.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -113,32 +110,7 @@ public class SpringVirtualServiceInfo implements VirtualServiceInfo {
                 if (paramAnnotation.annotationType().equals(RequestParam.class)) {
                     RequestParam requestParam = (RequestParam) paramAnnotation;
                     availableParams.add(new VirtualServiceKeyValue(requestParam.value(), null, "QUERY_PARAM"));
-                } /*if(paramAnnotation.annotationType().equals(GetMapping.class)) {
-                  GetMapping requestParam = (GetMapping) paramAnnotation;
-                  if(requestParam.value() != null && requestParam.value().length > 0) {
-                  	availableParams.add(new VirtualServiceKeyValue(requestParam.value()[0], null));
-                  }
-                  } if(paramAnnotation.annotationType().equals(PostMapping.class)) {
-                  PostMapping requestParam = (PostMapping) paramAnnotation;
-                  if(requestParam.value() != null && requestParam.value().length > 0) {
-                  	availableParams.add(new VirtualServiceKeyValue(requestParam.value()[0], null));
-                  }
-                  } if(paramAnnotation.annotationType().equals(DeleteMapping.class)) {
-                  DeleteMapping requestParam = (DeleteMapping) paramAnnotation;
-                  if(requestParam.value() != null && requestParam.value().length > 0) {
-                  	availableParams.add(new VirtualServiceKeyValue(requestParam.value()[0], null));
-                  }
-                  } if(paramAnnotation.annotationType().equals(PutMapping.class)) {
-                  PutMapping requestParam = (PutMapping) paramAnnotation;
-                  if(requestParam.value() != null && requestParam.value().length > 0) {
-                  	availableParams.add(new VirtualServiceKeyValue(requestParam.value()[0], null));
-                  }
-                  } if(paramAnnotation.annotationType().equals(PatchMapping.class)) {
-                  PatchMapping requestParam = (PatchMapping) paramAnnotation;
-                  if(requestParam.value() != null && requestParam.value().length > 0) {
-                  	availableParams.add(new VirtualServiceKeyValue(requestParam.value()[0], null));
-                  }
-                  }*/ else if (paramAnnotation.annotationType().equals(PathVariable.class)) {
+                }else if (paramAnnotation.annotationType().equals(PathVariable.class)) {
                     PathVariable pathVariable = (PathVariable) paramAnnotation;
                     availableParams.add(new VirtualServiceKeyValue(pathVariable.value(), null, "PATH_PARAM"));
                 } else if (paramAnnotation.annotationType().equals(RequestBody.class)) {

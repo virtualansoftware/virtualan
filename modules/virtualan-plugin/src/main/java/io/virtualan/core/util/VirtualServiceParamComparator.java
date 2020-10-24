@@ -55,10 +55,7 @@ public class VirtualServiceParamComparator {
                 }
             }
         }
-        if (mockServiceRequest.getParams().size() == 0) {
-            return true;
-        }
-        return false;
+      return mockServiceRequest.getParams().size() == 0;
     }
 
 

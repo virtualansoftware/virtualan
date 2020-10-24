@@ -36,11 +36,8 @@ import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import java.util.stream.Collectors;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -224,7 +221,7 @@ public class VirtualServiceController {
 
 
 
-    private ResponseEntity validateRequestBody(VirtualServiceRequest virtualServiceRequest) throws IllegalAccessException, InstantiationException {
+    private ResponseEntity validateRequestBody(VirtualServiceRequest virtualServiceRequest) {
         if (virtualServiceUtil.getVirtualServiceInfo() != null) {
             final Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo().getInputType(virtualServiceRequest);
             if (inputObjectType == null && (virtualServiceRequest.getInput() == null
@@ -263,9 +260,7 @@ public class VirtualServiceController {
                             object = null;
                         }
                         mockServiceRequest.setInput(object);
-                        mockServiceRequest.setParams(converter.converter(virtualServiceRequest.getAvailableParams()));
-                        //TODO FIX
-                        // mockServiceRequest.setParam(converter.converter(virtualServiceRequest.getAvailableParams()));
+                        mockServiceRequest.setParams(Converter.converter(virtualServiceRequest.getAvailableParams()));
                         ruleEvaluator.expressionEvaluatorForMockCreation(mockServiceRequest, virtualServiceRequest.getRule());
                     } catch (Exception e) {
                         return new ResponseEntity<VirtualServiceStatus>(
@@ -285,7 +280,7 @@ public class VirtualServiceController {
                             object = null;
                         }
                         mockServiceRequest.setInput(object);
-                        mockServiceRequest.setParams(converter.converter(virtualServiceRequest.getAvailableParams()));
+                        mockServiceRequest.setParams(Converter.converter(virtualServiceRequest.getAvailableParams()));
                         MockResponse mockResponse = new MockResponse();
                         mockResponse = scriptExecutor.executeScript (mockServiceRequest, mockResponse, virtualServiceRequest.getRule());
                         if(mockResponse == null){

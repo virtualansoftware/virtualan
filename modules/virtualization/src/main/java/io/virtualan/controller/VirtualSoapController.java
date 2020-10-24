@@ -7,11 +7,13 @@ import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.soap.WSEndpointConfiguration;
 import io.virtualan.message.core.MessageUtil;
 import io.virtualan.service.VirtualService;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("virtualSoapController")
@@ -43,7 +46,7 @@ public class VirtualSoapController {
   private WSEndpointConfiguration wsEndpointConfiguration;
 
   public ResponseEntity checkIfServiceDataAlreadyExists(
-      VirtualServiceRequest virtualServiceRequest) throws Exception {
+      VirtualServiceRequest virtualServiceRequest) throws JAXBException, IOException {
     final Long id = messageUtil.isMockAlreadyExists(virtualServiceRequest);
     if (id != null && id != 0) {
       final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
@@ -56,7 +59,7 @@ public class VirtualSoapController {
     return null;
   }
 
-  @RequestMapping(value = "/virtualservices/soap/services", method = RequestMethod.GET)
+  @GetMapping(value = "/virtualservices/soap/services")
   public ResponseEntity<Map<String, List<SoapService>>> listAvailableSoapService() {
     if (wsEndpointConfiguration == null) {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -66,36 +69,36 @@ public class VirtualSoapController {
 
       Map<String, List<SoapService>> soapServicesByNs =
           soapServiceMap.values().stream()
-              .sorted(Comparator.comparing(s -> s.getMethod()))
+              .sorted(Comparator.comparing(SoapService::getMethod))
               .collect(Collectors.groupingBy(SoapService::getNs));
-      return new ResponseEntity<Map<String, List<SoapService>>>(soapServicesByNs, HttpStatus.OK);
+      return new ResponseEntity<>(soapServicesByNs, HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 
-  @RequestMapping(value = "/virtualservices/soap/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/virtualservices/soap/{id}")
   public ResponseEntity<VirtualServiceRequest> deleteMockRequest(@PathVariable("id") long id) {
-    final VirtualServiceRequest MockLoadRequest = virtualService.findById(id);
-    if (MockLoadRequest == null) {
-      return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NOT_FOUND);
+    final VirtualServiceRequest mockLoadRequest = virtualService.findById(id);
+    if (mockLoadRequest == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     virtualService.deleteMockRequestById(id);
-    return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @RequestMapping(value = "/virtualservices/soap", method = RequestMethod.GET)
+  @GetMapping(value = "/virtualservices/soap")
   public ResponseEntity<List<VirtualServiceRequest>> listAllMockMessageLoadRequests() {
     final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
     final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.SOAP.toString().equalsIgnoreCase(x.getRequestType()) || x.getRequestType() == null).collect(
         Collectors.toList());
     if (mockRestLoadRequests.isEmpty()) {
-      return new ResponseEntity<List<VirtualServiceRequest>>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    return new ResponseEntity<List<VirtualServiceRequest>>(mockRestLoadRequests, HttpStatus.OK);
+    return new ResponseEntity<>(mockRestLoadRequests, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/virtualservices/soap", method = RequestMethod.POST)
+  @PostMapping(value = "/virtualservices/soap")
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
     try {
@@ -109,7 +112,7 @@ public class VirtualSoapController {
               Class reqClazzz = Class.forName(y.getValue().getRequestClassName());
               virtualServiceRequest.setInputObjectType(reqClazzz);
              } catch (ClassNotFoundException e) {
-              log.warn("return Class not found : " + e.getMessage());
+              log.warn("return Class not found : {}" , e.getMessage());
             }
           });
       if(virtualServiceRequest.getResource() == null) {

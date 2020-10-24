@@ -15,6 +15,7 @@
 package io.virtualan.core.util;
 
 import io.virtualan.core.model.ContentType;
+import io.virtualan.core.model.ResponseProcessType;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +23,9 @@ import java.util.Map;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.mapson.Mapson;
+import java.util.Map.Entry;
 import javax.xml.bind.JAXBException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,10 +50,9 @@ import io.virtualan.requestbody.RequestBodyTypes;
  **/
 
 @Service("virtualServiceValidRequest")
+@Slf4j
 public class VirtualServiceValidRequest {
 
-    private static final Logger log = LoggerFactory.getLogger(VirtualServiceUtil.class);
-    
     @Autowired
     private RuleEvaluator ruleEvaluator;
 
@@ -103,7 +103,7 @@ public class VirtualServiceValidRequest {
             	
                 final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                         mockRequestResponse, numberAttrMatch);
-                log.debug(numberAttrMatch +" : "+ mockRequestResponse.getKey().getAvailableParams().size());
+                log.debug("{} : {}",numberAttrMatch , mockRequestResponse.getKey().getAvailableParams().size());
                 returnMockResponse.setExactMatch(numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size());
                 	
                 matchMap.put(count, returnMockResponse);
@@ -114,15 +114,15 @@ public class VirtualServiceValidRequest {
     
     public Map<Integer, ReturnMockResponse> validBusinessRuleForInputObject(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest)  {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
             if("RULE".equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
-                log.debug("Rule key : " + mockRequestResponse.getKey().getRule());
-                log.debug("Rule Input : " + mockServiceRequest);
-                log.debug("Rule evaluated flag :" +ruleEvaluator.expressionEvaluator(mockServiceRequest, mockRequestResponse.getKey().getRule()));
+                log.debug("Rule key : {}" , mockRequestResponse.getKey().getRule());
+                log.debug("Rule Input : {}" , mockServiceRequest);
+                log.debug("Rule evaluated flag : {}" , ruleEvaluator.expressionEvaluator(mockServiceRequest, mockRequestResponse.getKey().getRule()));
                 if(ruleEvaluator.expressionEvaluator(mockServiceRequest,mockRequestResponse.getKey().getRule())) {
                     final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                             mockRequestResponse, 1);
@@ -132,7 +132,7 @@ public class VirtualServiceValidRequest {
                 }
             }
         }
-        log.debug("Rule evaluated Ended : " + matchMap);
+        log.debug("Rule evaluated Ended : {}" , matchMap);
         return matchMap;
     }
     
@@ -143,13 +143,13 @@ public class VirtualServiceValidRequest {
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
-            if("SCRIPT".equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
-                log.debug("Script : " + mockRequestResponse.getKey().getRule());
-                log.debug("Script Input : " + mockServiceRequest);
+            if(ResponseProcessType.SCRIPT.name().equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
+                log.debug("Script : {}" , mockRequestResponse.getKey().getRule());
+                log.debug("Script Input {}: " , mockServiceRequest);
                 try {
                     MockResponse mockResponse = new MockResponse();
                     mockResponse = scriptExecutor.executeScript(mockServiceRequest, mockResponse, mockRequestResponse.getKey().getRule());
-                    log.debug("Script output expected : " + mockResponse);
+                    log.debug("Script output expected : {}" , mockResponse);
                     if (mockResponse != null) {
                         
                         final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
@@ -187,8 +187,7 @@ public class VirtualServiceValidRequest {
                 .buildMAPsonFromJson(jsonString);
             for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
-                final RequestBody requestBody =
-                    buildRequestBody(mockServiceRequest, mockRequestResponse);
+                buildRequestBody(mockServiceRequest, mockRequestResponse);
                 final int numberAttrMatch = virtualServiceParamComparator
                     .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
 
@@ -232,48 +231,62 @@ public class VirtualServiceValidRequest {
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
                 .entrySet()) {
-    
             final int numberAttrMatch = virtualServiceParamComparator
                     .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
-            if( ("RULE".equalsIgnoreCase(mockServiceRequest.getType()) || "RULE".equalsIgnoreCase(mockRequestResponse.getKey().getType()))) {
-                if(mockServiceRequest.getRule() != null && mockServiceRequest.getRule().equals(mockRequestResponse.getKey().getRule())) {
+            if( (ResponseProcessType.RULE.name().equalsIgnoreCase(mockServiceRequest.getType()) || ResponseProcessType.SCRIPT.name().equalsIgnoreCase(mockServiceRequest.getType())
+                || ResponseProcessType.SCRIPT.name().equalsIgnoreCase(mockRequestResponse.getKey().getType()) || ResponseProcessType.RULE.name().equalsIgnoreCase(mockRequestResponse.getKey().getType())) && mockServiceRequest.getRule() != null && mockServiceRequest.getRule().equals(mockRequestResponse.getKey().getRule())) {
                     count++;
-                    final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
-                            mockRequestResponse, numberAttrMatch);
-                    returnMockResponse.setExactMatch(true);
-                    matchMap.put(count, returnMockResponse);
-                    return matchMap;
-                }
-            } else if( ("SCRIPT".equalsIgnoreCase(mockServiceRequest.getType()) || "SCRIPT".equalsIgnoreCase(mockRequestResponse.getKey().getType()))) {
-                if(mockServiceRequest.getRule() != null && mockServiceRequest.getRule().equals(mockRequestResponse.getKey().getRule())
-                        ||"SCRIPT".equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
-                    count++;
-                    final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
-                            mockRequestResponse, numberAttrMatch);
-                    returnMockResponse.setExactMatch(true);
-                    matchMap.put(count, returnMockResponse);
-                    return matchMap;
-                }
-            }else if("RESPONSE".equalsIgnoreCase(mockRequestResponse.getKey().getType())){
-                RequestBody requestBody =
-                        buildRequestBody(mockServiceRequest, mockRequestResponse);
-                if (numberAttrMatch != 0 && RequestBodyTypes
-                        .fromString(mockServiceRequest.getInputObjectType().getTypeName())
-                        .compareRequestBody(requestBody)) {
-                    count++;
-                    final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
-                            mockRequestResponse, numberAttrMatch);
-                    returnMockResponse.setExactMatch(
-                            mockRequestResponse.getKey().getAvailableParams().size() == 0 ? true : numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size()
-                                    && RequestBodyTypes
-                                    .fromString(mockServiceRequest.getInputObjectType().getTypeName())
-                                    .compareRequestBody(requestBody));
-                    matchMap.put(count, returnMockResponse);
-                }
+                    return getScriptResponseCount(mockServiceRequest, matchMap, count,
+                        mockRequestResponse, numberAttrMatch);
+            }else if(ResponseProcessType.RESPONSE.name().equalsIgnoreCase(mockRequestResponse.getKey().getType())){
+                count = getResponseCount(mockServiceRequest, matchMap, count, mockRequestResponse,
+                    numberAttrMatch);
             }
 
         }
         return matchMap;
+    }
+
+    public int getResponseCount(MockServiceRequest mockServiceRequest,
+        Map<Integer, ReturnMockResponse> matchMap, int count,
+        Entry<MockRequest, MockResponse> mockRequestResponse, int numberAttrMatch)
+        throws IOException, JAXBException {
+        RequestBody requestBody =
+                buildRequestBody(mockServiceRequest, mockRequestResponse);
+        if (numberAttrMatch != 0 && RequestBodyTypes
+                .fromString(mockServiceRequest.getInputObjectType().getTypeName())
+                .compareRequestBody(requestBody)) {
+            count++;
+            getResponseCount(mockServiceRequest, matchMap, count, mockRequestResponse,
+                numberAttrMatch,
+                requestBody);
+        }
+        return count;
+    }
+
+    public Map<Integer, ReturnMockResponse> getScriptResponseCount(
+        MockServiceRequest mockServiceRequest, Map<Integer, ReturnMockResponse> matchMap, int count,
+        Entry<MockRequest, MockResponse> mockRequestResponse, int numberAttrMatch) {
+        final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
+            mockRequestResponse, numberAttrMatch);
+        returnMockResponse.setExactMatch(true);
+        matchMap.put(count, returnMockResponse);
+        return matchMap;
+    }
+
+    public void getResponseCount(MockServiceRequest mockServiceRequest,
+        Map<Integer, ReturnMockResponse> matchMap, int count,
+        Entry<MockRequest, MockResponse> mockRequestResponse, int numberAttrMatch,
+        RequestBody requestBody) throws IOException, JAXBException {
+        final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
+                mockRequestResponse, numberAttrMatch);
+        returnMockResponse.setExactMatch(
+                mockRequestResponse.getKey().getAvailableParams().isEmpty()  ? mockRequestResponse.getKey().getAvailableParams().isEmpty() :
+                    numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size()
+                        && RequestBodyTypes
+                        .fromString(mockServiceRequest.getInputObjectType().getTypeName())
+                        .compareRequestBody(requestBody));
+        matchMap.put(count, returnMockResponse);
     }
 
     public Map<Integer, ReturnMockResponse> validForNoParam(

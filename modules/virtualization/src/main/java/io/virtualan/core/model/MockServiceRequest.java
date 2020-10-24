@@ -38,6 +38,7 @@ public class MockServiceRequest {
     Map<String, String> headerParams = null;
     Class inputObjectType = null;
     Object input = null;
+    Object output = null;
     Object rule = null;
     private ContentType contentType;
 
@@ -48,13 +49,13 @@ public class MockServiceRequest {
 
     public Object getParam(String param) {
         Optional<Object> obj = Optional.ofNullable(getAvailableParam(param));
-        if( obj == null) {
+        if( !obj.isPresent()) {
             obj=  getParameters().entrySet().stream().filter(e -> param.equals(e.getKey())).map(Map.Entry::getValue).findFirst();
         }
         return obj.isPresent() ? obj.get() : null;
     }
 
-    public Optional<String> getAvailableParam(String param) {
+    private Optional<String> getAvailableParam(String param) {
         return getParams().entrySet().stream()
             .filter(e -> param.equals(e.getKey())).map(Map.Entry::getValue).findFirst();
     }

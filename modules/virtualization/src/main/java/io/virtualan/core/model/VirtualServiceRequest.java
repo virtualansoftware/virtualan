@@ -19,7 +19,6 @@ package io.virtualan.core.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -61,11 +60,13 @@ public class VirtualServiceRequest {
 
 
     public Object getHeaderParam(String param) {
-        return headerParams.stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+        return headerParams.stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(
+            VirtualServiceKeyValue::getValue);
     }
 
     public Object getAvailableParam(String param) {
-        return availableParams.stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+        return availableParams.stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(
+            VirtualServiceKeyValue::getValue);
     }
 
     public String groovyTemplateObj() {

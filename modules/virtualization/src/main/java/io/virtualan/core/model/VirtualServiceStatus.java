@@ -15,6 +15,7 @@
 package io.virtualan.core.model;
 
 
+import java.util.Map;
 import lombok.Data;
 
 /**
@@ -27,7 +28,9 @@ import lombok.Data;
 public class VirtualServiceStatus {
 
     private String code;
+
     private String message;
+    private Map<Integer, ResponseParam> responseParam;
 
     private VirtualServiceRequest virtualServiceRequest;
     private VirtualServiceMessageRequest virtualServiceMessageRequest;

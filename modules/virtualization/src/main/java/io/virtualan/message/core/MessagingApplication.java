@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
@@ -45,7 +45,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import java.util.*;
 import springfox.documentation.service.ResponseMessage;
 
-@Configuration
 @ConditionalOnClass(IntegrationFlows.class)
 @EnableIntegration
 @EnableKafka
@@ -53,47 +52,57 @@ import springfox.documentation.service.ResponseMessage;
 public class MessagingApplication {
 	
 	private static final Logger log = LoggerFactory.getLogger(MessagingApplication.class);
-	public static List<NewTopic> topicList = new ArrayList<NewTopic>();
-	
+	private static List<NewTopic> topicList = new ArrayList<>();
+
+	private String bootstrapServers;
+	private List<String> topics = new ArrayList<>();
+	private Map<String, Object> producerConfig = new HashMap<>();
+	private Map<String, Object> consumerConfigs = new HashMap<>();
+
 	@Autowired
 	private MessageUtil messageUtil;
-	
-	private static String bootstrapServers;
-	private static List<String> topics = new ArrayList<>();
-	Map<String, Object> producerConfig = new HashMap<>();
-	Map<String, Object> consumerConfigs = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
 		try {
-			JSONObject obj =  getJsonObject().optJSONObject(0);
-			if(obj != null ) {
-				bootstrapServers = obj.getString("broker");
-				JSONArray array = obj.getJSONArray("topics");
-				for(int i =0 ; i < array.length(); i++) {
-					topics.add(array.get(i).toString());
-				}
-				Set<String> names = getTopics();
-				for (String topic : topics) {
-					boolean contains = names.contains(topic);
-					if (!contains) {
-						topicList.add(addNewTopic(topic));
+			JSONArray jsonArray = getJsonObject();
+			if(jsonArray != null) {
+				JSONObject obj = jsonArray.optJSONObject(0);
+				if (obj != null) {
+					bootstrapServers = obj.getString("broker");
+					JSONArray array = obj.getJSONArray("topics");
+					for (int i = 0; i < array.length(); i++) {
+						topics.add(array.get(i).toString());
 					}
+					addTopics();
+					bootstrapServers = obj.getString("broker");
+					 getConfigMap(obj, "consumer", consumerConfigs);
+					 getConfigMap(obj, "producer", producerConfig);
+					if (topicList != null)
+						addTopic(topicList);
 				}
-				bootstrapServers = obj.getString("broker");
-				Map configProps = loadProperties(obj.optString("consumer"));
-				if (configProps != null) {
-					consumerConfigs.putAll(configProps);
-				}
-				Map configProducerProps = loadProperties(obj.optString("producer"));
-				if (configProps != null) {
-					producerConfig.putAll(configProducerProps);
-				}
-				if (topicList != null)
-					addTopic(topicList);
 			}
 		} catch (Exception e) {
 			log.error("Unable to load the kafka configuration");
+		}
+	}
+
+	public Map getConfigMap(JSONObject obj, String consumer,
+			Map<String, Object> consumerConfigs) {
+		Map configProps = loadProperties(obj.optString(consumer));
+		if (configProps != null) {
+			consumerConfigs.putAll(configProps);
+		}
+		return configProps;
+	}
+
+	public void addTopics() throws ExecutionException, InterruptedException {
+		Set<String> names = getTopics();
+		for (String topic : topics) {
+			boolean contains = names.contains(topic);
+			if (!contains) {
+				topicList.add(addNewTopic(topic));
+			}
 		}
 	}
 
@@ -104,24 +113,22 @@ public class MessagingApplication {
 		if (inputStream != null) {
 			try {
 				properties.load(inputStream);
-				if(properties != null) {
-					properties.forEach((k, v) -> {
-						String sk = k.toString();
-						String sv = v.toString();
-						mapList.put(sk, sv);
-					});
-					return mapList;
-				}
+				properties.forEach((k, v) -> {
+					String sk = k.toString();
+					String sv = v.toString();
+					mapList.put(sk, sv);
+				});
+				return mapList;
 			} catch (IOException e) {
-				log.warn("property file '" + propFileName + "' not found in the classpath.. loading default setting " + e.getMessage());
+				log.warn("property file '{}' not found in the classpath.. loading default setting {}" ,propFileName, e.getMessage());
 			}
 		} else {
-			log.warn("property file '" + propFileName + "' not found in the classpath.. loading default setting");
+			log.warn("property file '{}' not found in the classpath.. loading default setting", propFileName);
 		}
 		return null;
 	}
 
-	private static JSONArray getJsonObject() throws Exception {
+	private static JSONArray getJsonObject() throws IOException {
 		InputStream stream = MessagingApplication.class.getClassLoader()
 				.getResourceAsStream("conf/kafka.json");
 		if (stream != null) {
@@ -139,43 +146,43 @@ public class MessagingApplication {
 	}
 
 
-	private static AdminClient getAdminClient() {
+	private AdminClient getAdminClient() {
 		Properties config = new Properties();
 		config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		return AdminClient.create(config);
 	}
 	
-	public static void addTopic(List<NewTopic> topicList) {
+	public  void addTopic(List<NewTopic> topicList) {
 		AdminClient admin = getAdminClient();
 		admin.createTopics(topicList);
 	}
 	
 	
-	public static boolean isTopicExists(String topic) throws Exception {
+	public  boolean isTopicExists(String topic) throws ExecutionException, InterruptedException {
 		return getTopics().contains(topic);
 	}
 	
 	private static NewTopic addNewTopic(String topic) {
-		Map<String, String> configs = new HashMap<String, String>();
+		Map<String, String> configs = new HashMap<>();
 		int partitions = 5;
 		Short replication = 1;
 		return new NewTopic(topic, partitions, replication).configs(configs);
 	}
 
-	private static Set<String> getTopics() throws Exception {
+	private  Set<String> getTopics() throws ExecutionException, InterruptedException {
 		AdminClient admin = getAdminClient();
 		ListTopicsResult listTopics = admin.listTopics();
 		return listTopics.names().get();
 	}
 	
 	@Bean
-	public ProducerFactory<String, Object> producerFactory() {
-		return new DefaultKafkaProducerFactory<String, Object>(producerConfigs());
+	private ProducerFactory<String, Object> producerFactory() {
+		return new DefaultKafkaProducerFactory<>(producerConfigs());
 	}
 
 
 	@Bean
-	public Map<String, Object> producerConfigs() {
+	private Map<String, Object> producerConfigs() {
 		producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		if( producerConfig.size() == 1) {
 			producerConfig.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -204,12 +211,12 @@ public class MessagingApplication {
 	}
 	
 	@Bean
-	public ConsumerFactory<?, ?> consumerFactory() {
+	private ConsumerFactory<?,?> consumerFactory() {
 		return new DefaultKafkaConsumerFactory<>(consumerConfigs());
 	}
 	
 	@Bean
-	public DirectChannel sentToTransformer() {
+	private DirectChannel sentToTransformer() {
 		return new DirectChannel();
 	}
 	
@@ -221,7 +228,7 @@ public class MessagingApplication {
 	
 	@Bean
 	public IntegrationFlow listenerFromKafkaFlow() {
-		
+
 		return IntegrationFlows
 				.from(Kafka.messageDrivenChannelAdapter(consumerFactory(),
 						KafkaMessageDrivenChannelAdapter.ListenerMode.record,  topics.toArray(new String[topics.size()]))
@@ -230,40 +237,33 @@ public class MessagingApplication {
 										.ackOnError(true)
 										.idleEventInterval(100L)
 										.id("messageListenerContainer"))
-						).<Message<?>>channel(sentToTransformer())
-				. <Message<?>, MessageObject>transform(transformer())
+						).channel(sentToTransformer())
+				.transform(transformer())
 				.channel(listeningFromTransformer())
 				.get();
 	}
 	
 	@Bean
-	public GenericTransformer<Message<?>, MessageObject> transformer() {
-		return new GenericTransformer<Message<?>, MessageObject>() {
-			@Override
-			public MessageObject transform(Message<?> message) {
-				return parse( message);
-			}
-			
-		};
+	private GenericTransformer<Message, MessageObject> transformer() {
+		return this::parse;
 	}
 	
 	@Transformer
 	public MessageObject parse(Message<?> message) {
 		MessageObject messageObject = new MessageObject();
 		try {
-			messageObject.jsonObject = (JSONObject) new JSONTokener((message.getPayload().toString())).nextValue();
-			//messageObject.outboundTopic = "virtualan-dummy-outbound";
-			messageObject.inboundTopic = message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString();
+			messageObject.setJsonObject((JSONObject) new JSONTokener((message.getPayload().toString())).nextValue());
+			messageObject.setInboundTopic(message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString());
 			return messageObject;
 		} catch (JSONException e) {
-			e.printStackTrace();
+			log.warn("parse {}",e.getCause());
 		}
 		return messageObject;
 	}
 	
 	@Bean
-	public KafkaTemplate<String, Object> kafkaTemplate() {
-		return new KafkaTemplate<String, Object>(producerFactory());
+	private KafkaTemplate<String, Object> kafkaTemplate() {
+		return new KafkaTemplate<>(producerFactory());
 	}
 	
 	@Bean
@@ -274,61 +274,55 @@ public class MessagingApplication {
 	}
 	
 	@Bean
-	public ResponseMessage getResponseMessage() {
-		return new ResponseMessage() {
-			@Override
-			public MessageObject readResponseMessage(MessageObject messageObject) {
-					VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
-					virtualServiceRequest.setInput(messageObject.jsonObject.toString());
-					virtualServiceRequest.setOperationId(messageObject.inboundTopic);
-					virtualServiceRequest.setResource(messageObject.inboundTopic);
-					ReturnMockResponse response  = messageUtil.getMatchingRecord(virtualServiceRequest);
-					if(response != null && response.getMockResponse() != null) {
-						messageObject.outputMessage = response.getMockResponse().getOutput();
-						messageObject.outboundTopic = response.getMockRequest().getMethod();
-						if (messageObject.outputMessage == null || messageObject.outboundTopic == null) {
-							log.info("No outputMessage response configured..");
-							return null;
-						} else {
-							log.info("Response configured.. with (" + messageObject.outboundTopic + ") :"
-									+ messageObject.outputMessage);
-							return messageObject;
-						}
-					} else {
-						log.info("No response configured for the given input");
+	private ResponseMessage getResponseMessage() {
+		return messageObject -> {
+				VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
+				virtualServiceRequest.setInput(messageObject.getJsonObject().toString());
+				virtualServiceRequest.setOperationId(messageObject.getInboundTopic());
+				virtualServiceRequest.setResource(messageObject.getInboundTopic());
+				ReturnMockResponse response  = messageUtil.getMatchingRecord(virtualServiceRequest);
+				if(response != null && response.getMockResponse() != null) {
+					messageObject.setOutputMessage(response.getMockResponse().getOutput());
+					messageObject.setOutboundTopic(response.getMockRequest().getMethod());
+					if (messageObject.getOutputMessage() == null || messageObject.getOutboundTopic() == null) {
+						log.info("No outputMessage response configured..");
 						return null;
+					} else {
+						log.info("Response configured.. with ({}) : {}", messageObject.getOutboundTopic(),
+								 messageObject.getOutputMessage());
+						return messageObject;
 					}
-			}
+				} else {
+					log.info("No response configured for the given input");
+					return null;
+				}
 		};
 	}
 	
 	@Bean
-	public SendMessage postMessage() {
-		return new SendMessage() {
-			@Override
-			public String send(MessageObject messageObject) {
-				if (messageObject.outboundTopic != null) {
-					Message<String> message = MessageBuilder
-							.withPayload(messageObject.jsonObject.toString())
-							.setHeader(KafkaHeaders.TOPIC, messageObject.outboundTopic)
-							.setHeader(KafkaHeaders.MESSAGE_KEY, messageObject.messageKey)
-							.setHeader(KafkaHeaders.PARTITION_ID, 0)
-							.setHeader("X-Virtualan-Header", "Mock-Service-Response")
-							.build();
-					kafkaTemplate().send(message);
-				}
-				return null;
+	private SendMessage postMessage() {
+		return messageObject -> {
+			if (messageObject.getOutboundTopic() != null) {
+				Message<String> message = MessageBuilder
+						.withPayload(messageObject.getJsonObject().toString())
+						.setHeader(KafkaHeaders.TOPIC, messageObject.getOutboundTopic())
+						.setHeader(KafkaHeaders.MESSAGE_KEY, messageObject.getMessageKey())
+						.setHeader(KafkaHeaders.PARTITION_ID, 0)
+						.setHeader("X-Virtualan-Header", "Mock-Service-Response")
+						.build();
+				kafkaTemplate().send(message);
 			}
+			return null;
 		};
 	}
 	
 	interface ResponseMessage {
 		MessageObject readResponseMessage(MessageObject messageObject);
-	};
+	}
 	
 	interface SendMessage {
 		String send(MessageObject messageObject);
-	};
+	}
 	
 }
 

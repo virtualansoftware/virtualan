@@ -7,11 +7,12 @@
 	<version>1.0.3-SNAPSHOT</version>
 	<description>Virtualan Rest virtualization Script based and all - Demo</description>
 	<properties>
+		<cucumblan.version>1.0.0</cucumblan.version>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<virtualan.version>2.1.4-SNAPSHOT</virtualan.version>
-		<cucumber.version>1.2.5</cucumber.version>
+		<virtualan.version>2.1.5-SNAPSHOT</virtualan.version>
+		<cucumber.version>6.7.0</cucumber.version>
 		<hsqldb.version>2.3.2</hsqldb.version>
 		<spring.boot.version>2.3.0.RELEASE</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
@@ -108,40 +109,38 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.20.0</version>
-				<extensions>true</extensions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<registry>registry.hub.docker.com/virtualan</registry>
-					<verbose>true</verbose>
-					<follow>true</follow>
-					<images>
-						<image>
-							<alias>openapi-virtualan</alias>
-							<name>openapi-virtualan:${project.version}</name>
-							<build>
-								<dockerFileDir>${project.basedir}/src/main/docker/virtualan</dockerFileDir>
-								<tags>
-									<tag>${project.version}</tag>
-								</tags>
-								<assembly>
-									<inline>
-										<files>
-											<file>
-												<source>${project.build.directory}/${project.build.finalName}.jar</source>
-												<outputDirectory>.</outputDirectory>
-											</file>
-										</files>
-									</inline>
-								</assembly>
-							</build>
-						</image>
-					</images>
+					<testFailureIgnore>true</testFailureIgnore>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>net.masterthought</groupId>
+				<artifactId>maven-cucumber-reporting</artifactId>
+				<version>5.3.0</version>
+				<executions>
+					<execution>
+						<id>execution</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<projectName>Virtualan-OpenApi-Rest</projectName>
+							<skip>false</skip>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<inputDirectory>${project.build.directory}/jsonReports</inputDirectory>
+							<jsonFiles>
+								<param>**/*.json</param>
+							</jsonFiles>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
+
 
 	<dependencies>
 		<dependency>
@@ -184,36 +183,25 @@
 			<artifactId>validation-api</artifactId>
 			<version>2.0.1.Final</version>
 		</dependency>
-
-
-		<!-- Setup BDD Test cases -->
-
 		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured</artifactId>
-			<version>3.0.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-java8</artifactId>
-			<version>${cucumber.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-junit</artifactId>
-			<version>${cucumber.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>info.cukes</groupId>
+			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-spring</artifactId>
 			<version>${cucumber.version}</version>
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>io.virtualan</groupId>
+			<artifactId>cucumblan-api</artifactId>
+			<version>${cucumblan.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.masterthought</groupId>
+			<artifactId>cucumber-reporting</artifactId>
+			<version>5.3.0</version>
+		</dependency>
+
 	</dependencies>
+
 </project>

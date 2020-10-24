@@ -23,6 +23,7 @@ import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.mapson.Mapson;
 import javax.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +50,9 @@ import io.virtualan.requestbody.RequestBodyTypes;
  **/
 
 @Service("virtualServiceValidRequest")
+@Slf4j
 public class VirtualServiceValidRequest {
 
-    private static final Logger log = LoggerFactory.getLogger(VirtualServiceUtil.class);
-    
     @Autowired
     private RuleEvaluator ruleEvaluator;
 
@@ -114,7 +114,7 @@ public class VirtualServiceValidRequest {
     
     public Map<Integer, ReturnMockResponse> validBusinessRuleForInputObject(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
-            MockServiceRequest mockServiceRequest) throws IOException {
+            MockServiceRequest mockServiceRequest)  {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
@@ -250,10 +250,12 @@ public class VirtualServiceValidRequest {
                     final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
                             mockRequestResponse, numberAttrMatch);
                     returnMockResponse.setExactMatch(
-                            mockRequestResponse.getKey().getAvailableParams().size() == 0 ? true : numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size()
-                                    && RequestBodyTypes
-                                    .fromString(mockServiceRequest.getInputObjectType().getTypeName())
-                                    .compareRequestBody(requestBody));
+                        mockRequestResponse.getKey().getAvailableParams().isEmpty() ||
+                            numberAttrMatch == mockRequestResponse.getKey().getAvailableParams()
+                                .size()
+                                && RequestBodyTypes
+                                .fromString(mockServiceRequest.getInputObjectType().getTypeName())
+                                .compareRequestBody(requestBody));
                     matchMap.put(count, returnMockResponse);
                 }
             }
