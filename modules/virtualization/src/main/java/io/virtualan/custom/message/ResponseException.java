@@ -13,11 +13,8 @@
  */
 
 package io.virtualan.custom.message;
-
-import java.io.Serializable;
-
 import javax.ws.rs.core.Response;
-
+import lombok.Data;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -26,32 +23,10 @@ import org.springframework.http.ResponseEntity;
  * @author  Elan Thangamani
  * 
  **/
-public class ResponseException extends RuntimeException implements Serializable {
+@Data
+public class ResponseException extends RuntimeException  {
 
-    public ResponseException() {
-        super();
-    }
-
-    Response response;
-
-    ResponseEntity responseEntity;
-
-    private static final long serialVersionUID = 1169426381288170661L;
-
-    public Response getResponse() {
-        return response;
-    }
-
-    public void setResponse(Response response) {
-        this.response = response;
-    }
-
-    public ResponseEntity getResponseEntity() {
-        return responseEntity;
-    }
-
-    public void setResponseEntity(ResponseEntity responseEntity) {
-        this.responseEntity = responseEntity;
-    }
+    private final Response response ;
+    private final ResponseEntity responseEntity;
 
 }

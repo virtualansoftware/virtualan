@@ -57,13 +57,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-	
-	
-    @ExceptionHandler(ResponseException.class)
+
+	public static final String VS_VALIDATION_FAILURE1 = "VS_VALIDATION_FAILURE";
+	public static final String VS_VALIDATION_FAILURE = VS_VALIDATION_FAILURE1;
+
+	@ExceptionHandler(ResponseException.class)
     protected ResponseEntity handleExceptionInternal(HttpServletRequest req, Exception ex) {
     	logger.info("No Details: " + ex.getClass().getName());
 		//
-		final List<String> errors = new ArrayList<String>();
+		final List<String> errors = new ArrayList<>();
 		errors.add(ex.getMessage());
 		return ((ResponseException) ex).getResponseEntity();
     }
@@ -78,11 +80,11 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		logger.info(ex.getClass().getName());
-		final List<String> errors = new ArrayList<String>();
+		final List<String> errors = new ArrayList<>();
 		errors.add(ex.getMessage());
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), 
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), errors);
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale),
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), errors);
 		return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
 	}
 
@@ -94,7 +96,7 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		
 		
 		//
-		final List<String> errors = new ArrayList<String>();
+		final List<String> errors = new ArrayList<>();
 		for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
 			errors.add(error.getField() + ": " + error.getDefaultMessage());
 		}
@@ -102,8 +104,8 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 			errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
 		}
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), 
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), errors);
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale),
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), errors);
 		return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
 	}
 
@@ -112,7 +114,7 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 			final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());
 		//
-		final List<String> errors = new ArrayList<String>();
+		final List<String> errors = new ArrayList<>();
 		for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
 			errors.add(error.getField() + ": " + error.getDefaultMessage());
 		}
@@ -120,7 +122,7 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 			errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
 		}
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), errors);
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), errors);
 		return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
 	}
 
@@ -133,8 +135,8 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 				+ ex.getRequiredType();
 
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), error);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), error);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	@Override
@@ -144,8 +146,8 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		//
 		final String error = ex.getRequestPartName() + " part is missing";
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), error);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), error);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	@Override
@@ -157,8 +159,8 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		final String error = ex.getParameterName() + " parameter is missing";
 
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), error);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), error);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	@ExceptionHandler({ MethodArgumentTypeMismatchException.class })
@@ -169,8 +171,8 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		final String error = ex.getName() + " should be of type " + ex.getRequiredType().getName();
 
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), error);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), error);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	@ExceptionHandler({ ConstraintViolationException.class })
@@ -178,15 +180,15 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 			final WebRequest request) {
 		logger.info(ex.getClass().getName());
 		//
-		final List<String> errors = new ArrayList<String>();
+		final List<String> errors = new ArrayList<>();
 		for (final ConstraintViolation<?> violation : ex.getConstraintViolations()) {
 			errors.add(violation.getRootBeanClass().getName() + " " + violation.getPropertyPath() + ": "
 					+ violation.getMessage());
 		}
 
 		final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), errors);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), errors);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	// 404
@@ -199,8 +201,8 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		final String error = "No handler found for " + ex.getHttpMethod() + " " + ex.getRequestURL();
 
 		final ApiError apiError = new ApiError(HttpStatus.NOT_FOUND,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(), error);
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(), error);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	// 405
@@ -217,9 +219,9 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		ex.getSupportedHttpMethods().forEach(t -> builder.append(t + " "));
 
 		final ApiError apiError = new ApiError(HttpStatus.METHOD_NOT_ALLOWED,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(),
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(),
 				builder.toString());
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	// 415
@@ -235,9 +237,9 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		ex.getSupportedMediaTypes().forEach(t -> builder.append(t + " "));
 
 		final ApiError apiError = new ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(),
+				messageSource.getMessage(VS_VALIDATION_FAILURE1, null, locale), ex.getLocalizedMessage(),
 				builder.substring(0, builder.length() - 2));
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 	
@@ -249,9 +251,9 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		logger.error("error", ex);
 		//
 		final ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR,
-				messageSource.getMessage("VS_VALIDATION_FAILURE", null, locale), ex.getLocalizedMessage(),
+				messageSource.getMessage(VS_VALIDATION_FAILURE, null, locale), ex.getLocalizedMessage(),
 				"error occurred");
-		return new ResponseEntity<Object>(apiError, new HttpHeaders(), apiError.getStatus());
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
 

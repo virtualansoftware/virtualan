@@ -130,8 +130,8 @@ public class VirtualServiceImpl implements VirtualService {
     public void updateUsageTime(MockRequest request) {
         final VirtualServiceEntity vsEntity =
                 virtualServiceRepository.findById(request.getVirtualServiceId()).get();
-        vsEntity.setLastUsedDateTime(Calendar.getInstance());;
-        final long usageCount = request.getUsageCount() + 1;
+        vsEntity.setLastUsedDateTime(Calendar.getInstance());
+      final long usageCount = request.getUsageCount() + 1;
         vsEntity.setUsageCount(usageCount);
     }
 

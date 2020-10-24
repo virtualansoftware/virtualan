@@ -6,10 +6,10 @@ import org.json.JSONObject;
 @Data
 public class MessageObject {
 
-	public JSONObject jsonObject;
-	public String outboundTopic;
-	public String inboundTopic;
+	private JSONObject jsonObject;
+	private String outboundTopic;
+	private String inboundTopic;
 
-	public String messageKey;
-	public String outputMessage;
+	private String messageKey;
+	private String outputMessage;
 }

@@ -17,7 +17,6 @@ package io.virtualan.aop;
 
 import io.virtualan.api.WSResource;
 import io.virtualan.core.model.RequestType;
-import io.virtualan.core.VirtualServiceInfo;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -27,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
@@ -38,14 +37,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.soap.SOAPException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,10 +52,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.virtualan.annotation.VirtualService;
 import io.virtualan.api.ApiResource;
-import io.virtualan.api.VirtualServiceType;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.MockServiceRequest;
-import io.virtualan.custom.message.ResponseException;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 
 
@@ -74,9 +68,9 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
  */
 @Aspect
 @Component
+@Slf4j
 public class ApiVirtualAspect {
 
-    private static Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
     @Autowired
     HttpServletRequest request;
     @Autowired
@@ -94,11 +88,12 @@ public class ApiVirtualAspect {
 
     @Pointcut("@annotation(io.virtualan.annotation.ApiVirtual)")
     public void apiVirtualServicePointcut() {
+        log.info("apiVirtualServicePointcut");
     }
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-        throws ResponseException, IOException, SOAPException, JAXBException, JSONException{
+        throws IOException,  JAXBException{
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();
@@ -109,7 +104,7 @@ public class ApiVirtualAspect {
         Class targetClass = thisJoinPoint.getTarget().getClass();
 
         SimpleEntry<Boolean, Class> isVirtualan = isVirtualService(targetClass);
-        if (isVirtualan.getKey()) {
+        if (isVirtualan.getKey().booleanValue()) {
             String parentPath = null;
             if (WSResource.isExists(method)){
                 SimpleEntry<String, String> path =  WSResource.getResourceParent(method);
@@ -149,7 +144,7 @@ public class ApiVirtualAspect {
 
 
     private Map<String, String> getHeadersInfo() {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         Enumeration headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String key = (String) headerNames.nextElement();
@@ -168,26 +163,22 @@ public class ApiVirtualAspect {
         for (int argIndex = 0; argIndex < args.length; argIndex++) {
             if (parameterAnnotations[argIndex] != null
                 && parameterAnnotations[argIndex].length > 0) {
-                String requestParamName = null;
-                for (Annotation annotation : parameterAnnotations[argIndex]) {
-                    if (annotation instanceof RequestPayload) {
-                        try {
-                            mockServiceRequest.setInputObjectType(Class.forName(
-                                (methodSignature.getParameterTypes()[argIndex]).getName()));
-                            mockServiceRequest.setInput(args[argIndex]);
-                        } catch (ClassNotFoundException e) {
-                            log.error(e.getMessage());
-                        }
-                        mockServiceRequest.setInput(args[argIndex]);
-                    }
-                }
+                getReadWSInputParam(args[argIndex], methodSignature, mockServiceRequest,
+                    parameterAnnotations[argIndex], argIndex);
             }
         }
 
     }
 
+    private void getReadWSInputParam(Object arg, MethodSignature methodSignature,
+        MockServiceRequest mockServiceRequest, Annotation[] parameterAnnotation, int argIndex) {
+        for (Annotation annotation : parameterAnnotation) {
+            if (annotation instanceof RequestPayload) {
+                getBody(methodSignature, mockServiceRequest, argIndex, arg);
+            }
+        }
+    }
 
-    // TODO - Code Array List
     private void readInputParam(Object[] args, MethodSignature methodSignature,
             MockServiceRequest mockServiceRequest) {
         Map<String, String> paramMap = new HashMap<>();
@@ -203,69 +194,21 @@ public class ApiVirtualAspect {
                     && parameterAnnotations[argIndex].length > 0) {
                 String requestParamName = null;
                 for (Annotation annotation : parameterAnnotations[argIndex]) {
-                    if (annotation instanceof RequestParam) {
-                        RequestParam requestParam = (RequestParam) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof PathVariable) {
-                        PathVariable requestParam = (PathVariable) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof RequestBody) {
-                         try {
-                            mockServiceRequest.setInputObjectType(Class.forName(
-                                    (methodSignature.getParameterTypes()[argIndex]).getName()));
-                            mockServiceRequest.setInput(args[argIndex]);
-                        } catch (ClassNotFoundException e) {
-                             log.error(e.getMessage());
-                        }
-                        mockServiceRequest.setInput(args[argIndex]);
-
-                    } else if (annotation instanceof QueryParam) {
-                        QueryParam requestParam = (QueryParam) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof PathParam) {
-                        PathParam requestParam = (PathParam) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof FormParam) {
-                        FormParam requestParam = (FormParam) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof HeaderParam) {
-                        HeaderParam requestParam = (HeaderParam) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof MatrixParam) {
-                        MatrixParam requestParam = (MatrixParam) annotation;
-                        requestParamName = requestParam.value();
-                    } else if (annotation instanceof CookieParam) {
-                        CookieParam requestParam = (CookieParam) annotation;
-                        requestParamName = requestParam.value();
-//                    } else if (annotation instanceof Multipart) {
-//                        Multipart requestParam = (Multipart) annotation;
-//                        requestParamName = requestParam.value();
-                    } else if (requestParamName == null && VirtualServiceType.CXF_JAX_RS
-                            .equals(getVirtualServiceUtil().getVirtualServiceType())) {
-                        try {
-                            if (mockServiceRequest.getInputObjectType() == null) {
-                                mockServiceRequest.setInputObjectType(Class.forName(
-                                        (methodSignature.getParameterTypes()[argIndex]).getName()));
-                                mockServiceRequest.setInput(args[argIndex]);
-                            }
-                        } catch (ClassNotFoundException e) {
-                            log.error(e.getMessage());
-                        }
+                    ServiceParamObject serviceParamObject = new ServiceParamObject();
+                    serviceParamObject.setAnnotation(annotation);
+                    serviceParamObject.setArgIndex(argIndex);
+                    serviceParamObject.setArgs(args);
+                    serviceParamObject.setMethodSignature(methodSignature);
+                    serviceParamObject.setMockServiceRequest( mockServiceRequest);
+                    serviceParamObject.setParamMap(paramMap);
+                    serviceParamObject.setParameters(parameters);
+                    serviceParamObject.setParamMapType(paramMapType);
+                    serviceParamObject.setRequestParamName(requestParamName);
+                    GetParams getParams = new GetParams(serviceParamObject).invoke();
+                    if (getParams.is()) {
                         break;
                     }
-                    if (requestParamName != null) {
-                        if ((args[argIndex]) instanceof List) {
-                            paramMap.put(requestParamName, addQueryParamValue(args[argIndex]));
-                            parameters.put(requestParamName,addQueryParamValue(args[argIndex]));
-                        } else {
-                            paramMap.put(requestParamName, String.valueOf(args[argIndex]));
-                            parameters.put(requestParamName, args[argIndex]);
-                        }
-                        if (args[argIndex] != null) {
-                            paramMapType.put(requestParamName, (args[argIndex]).getClass());
-                        }
-                        break;
-                    }
+                    requestParamName = getParams.getRequestParamName();
                 }
             }
         }
@@ -275,4 +218,104 @@ public class ApiVirtualAspect {
         mockServiceRequest.setParamsType(paramMapType);
     }
 
+
+    private void getBody(MethodSignature methodSignature, MockServiceRequest mockServiceRequest,
+        int argIndex, Object arg) {
+        try {
+            mockServiceRequest.setInputObjectType(Class.forName(
+                (methodSignature.getParameterTypes()[argIndex]).getName()));
+            mockServiceRequest.setInput(arg);
+        } catch (ClassNotFoundException e) {
+            log.error(e.getMessage());
+        }
+        mockServiceRequest.setInput(arg);
+    }
+
+    private class GetParams {
+
+        private boolean myResult;
+        private Object[] args;
+        private MethodSignature methodSignature;
+        private MockServiceRequest mockServiceRequest;
+        private Map<String, String> paramMap;
+        private Map<String, Object> parameters;
+        private Map<String, Class> paramMapType;
+        private int argIndex;
+        private String requestParamName;
+        private Annotation annotation;
+
+        public GetParams(ServiceParamObject serviceParamObject) {
+            this.args = serviceParamObject.getArgs();
+            this.methodSignature = serviceParamObject.getMethodSignature();
+            this.mockServiceRequest = serviceParamObject.getMockServiceRequest();
+            this.paramMap = serviceParamObject.getParamMap();
+            this.parameters = serviceParamObject.getParameters();
+            this.paramMapType = serviceParamObject.getParamMapType();
+            this.argIndex = serviceParamObject.getArgIndex();
+            this.requestParamName = serviceParamObject.getRequestParamName();
+            this.annotation = serviceParamObject.getAnnotation();
+        }
+
+        boolean is() {
+            return myResult;
+        }
+
+        private String getParamName(Object[] args, MethodSignature methodSignature,
+            MockServiceRequest mockServiceRequest, int argIndex, String requestParamName,
+            Annotation annotation) {
+            if (annotation instanceof RequestParam) {
+                RequestParam requestParam = (RequestParam) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof PathVariable) {
+                PathVariable requestParam = (PathVariable) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof RequestBody) {
+                getBody(methodSignature, mockServiceRequest, argIndex, args[argIndex]);
+            } else if (annotation instanceof QueryParam) {
+                QueryParam requestParam = (QueryParam) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof PathParam) {
+                PathParam requestParam = (PathParam) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof FormParam) {
+                FormParam requestParam = (FormParam) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof HeaderParam) {
+                HeaderParam requestParam = (HeaderParam) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof MatrixParam) {
+                MatrixParam requestParam = (MatrixParam) annotation;
+                requestParamName = requestParam.value();
+            } else if (annotation instanceof CookieParam) {
+                CookieParam requestParam = (CookieParam) annotation;
+                requestParamName = requestParam.value();
+            }
+            return requestParamName;
+        }
+
+        public String getRequestParamName() {
+            return requestParamName;
+        }
+
+        public GetParams invoke() {
+            requestParamName = getParamName(args, methodSignature, mockServiceRequest,
+                argIndex, requestParamName, annotation);
+            if (requestParamName != null) {
+                if ((args[argIndex]) instanceof List) {
+                    paramMap.put(requestParamName, addQueryParamValue(args[argIndex]));
+                    parameters.put(requestParamName,addQueryParamValue(args[argIndex]));
+                } else {
+                    paramMap.put(requestParamName, String.valueOf(args[argIndex]));
+                    parameters.put(requestParamName, args[argIndex]);
+                }
+                if (args[argIndex] != null) {
+                    paramMapType.put(requestParamName, (args[argIndex]).getClass());
+                }
+                myResult = true;
+                return this;
+            }
+            myResult = false;
+            return this;
+        }
+    }
 }

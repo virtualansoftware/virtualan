@@ -29,11 +29,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,19 +62,9 @@ import io.virtualan.core.model.VirtualServiceRequest;
 
 public interface VirtualServiceInfo {
 
-    String MATCH_API_TYPE = "[\\sa-zA-Z0-9]Api";
-
-    String API_SUFFIX = "Api";
-
-    String PARENT_ROOT = "Parent-Root";
-
-    String CURLY_PATH = "Curly";
-
-    Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
-
-
-    String rxpCurly = "\\{(.*?)\\}";
-    Pattern pattern = Pattern.compile(rxpCurly, Pattern.MULTILINE);
+    @Slf4j
+    final class LogHolder
+    {}
 
     ApiType getApiType();
 
@@ -116,24 +104,27 @@ public interface VirtualServiceInfo {
             List<Class> classes = (List<Class>) f.get(classLoader);
             for (int i = 0; i < classes.size(); i++) {
                 Class classzz = classes.get(i);
-                try {
-                    if (classzz.isAnnotationPresent(VirtualService.class)) {
-                        String interfaceName = classzz.getTypeName();
-                        interfaceName = interfaceName.substring(interfaceName.lastIndexOf(".") + 1
-                        );
-                        interfaceName = interfaceName.toLowerCase();
-                        virtualInterfaces.put(interfaceName, classzz);
-                    }
-                } catch (ArrayStoreException e) {
-                    // ignore it
-                }
-
+                loadClasses(virtualInterfaces, classzz);
             }
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
                 | IllegalAccessException e1) {
-            log.error("Unable to load from the class loader " + e1.getMessage());
+            LogHolder.log.error("Unable to load from the class loader {}" , e1.getMessage());
         }
         return virtualInterfaces;
+    }
+
+    default void loadClasses(Map<String, Class> virtualInterfaces, Class classzz) {
+        try {
+            if (classzz.isAnnotationPresent(VirtualService.class)) {
+                String interfaceName = classzz.getTypeName();
+                interfaceName = interfaceName.substring(interfaceName.lastIndexOf('.') + 1
+                );
+                interfaceName = interfaceName.toLowerCase();
+                virtualInterfaces.put(interfaceName, classzz);
+            }
+        } catch (ArrayStoreException e) {
+            // ignore it
+        }
     }
 
 
@@ -150,7 +141,7 @@ public interface VirtualServiceInfo {
                     Map<String, Map<String, VirtualServiceRequest>> resourceGroup =
                             mockAPILoadChoice.entrySet().stream().filter(x -> !"virtualanendpoint".equalsIgnoreCase(x.getKey()))
                                     .collect(Collectors.groupingBy(f -> f.getValue().getResource(),
-                                            Collectors.toMap(f -> f.getKey(), f -> f.getValue())));
+                                            Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     mockLoadChoice.putAll(resourceGroup);
                 }
             }
@@ -163,7 +154,7 @@ public interface VirtualServiceInfo {
             Map.Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
             InstantiationException, IllegalAccessException, ClassNotFoundException {
         Map<String, VirtualServiceRequest> mockAPILoadChoice =
-                new LinkedHashMap<String, VirtualServiceRequest>();
+                new LinkedHashMap<>();
         for (Method method : virtualServiceEntry.getValue().getDeclaredMethods()) {
             ApiVirtual[] annotInstance = method.getAnnotationsByType(ApiVirtual.class);
             if (annotInstance != null && annotInstance.length > 0) {
@@ -223,7 +214,7 @@ public interface VirtualServiceInfo {
                                             .writeValueAsString(Class
                                                 .forName(apiResponse.response()
                                                     .getCanonicalName())
-                                                .newInstance()),
+                                                .getDeclaredConstructor().newInstance()),
                                         apiResponse.message()));
                         }
                     } catch (Exception e) {
@@ -240,7 +231,7 @@ public interface VirtualServiceInfo {
 
     default String getOperationId(String httpVerb, ResourceMapper resourceParent,
             List<String> resouceSplitterList) {
-        if (resouceSplitterList.size() == 0) {
+        if (resouceSplitterList.isEmpty()) {
             return resourceParent.getOperationId(httpVerb);
         }
         String resource = resouceSplitterList.get(0);
@@ -249,7 +240,7 @@ public interface VirtualServiceInfo {
             return getOperationId(httpVerb, mapper,
                     resouceSplitterList.subList(1, resouceSplitterList.size()));
         } else {
-            return getOperationId(httpVerb, resourceParent.findResource(CURLY_PATH),
+            return getOperationId(httpVerb, resourceParent.findResource(VirtualServiceConstants.CURLY_PATH),
                     resouceSplitterList.subList(1, resouceSplitterList.size()));
         }
 
@@ -264,7 +255,7 @@ public interface VirtualServiceInfo {
                 mockTransferInput.setResource(mockTransferInput.getUrl().substring(1, index));
             }
         }
-        if (mockTransferInput.getOperationId() != null) {
+        if (mockTransferInput != null && mockTransferInput.getOperationId() != null) {
             return getMockLoadChoice().get(mockTransferInput.getResource())
                     .get(mockTransferInput.getOperationId());
         }
@@ -281,7 +272,7 @@ public interface VirtualServiceInfo {
 
     default ResourceMapper loadMapper() {
         Set<ResourceMapper> resourceMapperList = new LinkedHashSet<>();
-        ResourceMapper resourceParent = new ResourceMapper(PARENT_ROOT, resourceMapperList);
+        ResourceMapper resourceParent = new ResourceMapper(VirtualServiceConstants.PARENT_ROOT, resourceMapperList);
         for (Entry<String, Map<String, VirtualServiceRequest>> obj : getMockLoadChoice()
                 .entrySet()) {
             for (Entry<String, VirtualServiceRequest> requestMockObject : obj.getValue()
@@ -305,9 +296,9 @@ public interface VirtualServiceInfo {
             List<String> resouceSplitterList, String operationId) {
         String resource = resouceSplitterList.get(0);
         String actualResource = resouceSplitterList.get(0);
-        final Matcher matcher = pattern.matcher(resouceSplitterList.get(0));
+        final Matcher matcher = VirtualServiceConstants.pattern.matcher(resouceSplitterList.get(0));
         if (matcher.find()) {
-            resource = CURLY_PATH;
+            resource = VirtualServiceConstants.CURLY_PATH;
         }
         if (resouceSplitterList.size() == 1) {
             ResourceMapper resourceMapper = resourceParent.findResource(resource);
@@ -339,7 +330,7 @@ public interface VirtualServiceInfo {
             throws JsonProcessingException, InstantiationException, IllegalAccessException,
             ClassNotFoundException {
         Map<String, VirtualServiceApiResponse> responseType = buildOpenAPIResponseType(method);
-        if (responseType == null && responseType.isEmpty()) {
+        if (responseType == null || responseType.isEmpty()) {
             responseType = new HashMap<>();
             String defaultResponse = "Default";
             // Check for generic return types
@@ -352,7 +343,7 @@ public interface VirtualServiceInfo {
                                 new VirtualServiceApiResponse(defaultResponse, type.getTypeName(),
                                         getObjectMapper().writerWithDefaultPrettyPrinter()
                                                 .writeValueAsString(Class
-                                                        .forName(type.getTypeName()).newInstance()),
+                                                        .forName(type.getTypeName()).getDeclaredConstructor().newInstance()),
                                         null));
                     } catch (Exception e) {
                         responseType.put(defaultResponse,

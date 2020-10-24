@@ -17,11 +17,13 @@ package io.virtualan.requestbody;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.util.XMLConverter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author  Elan Thangamani
  * 
  **/
+@Slf4j
 public enum RequestBodyTypes {
     NO_REQUEST_PARAM("NO_REQUEST_PARAM") {
         @Override
@@ -53,7 +56,7 @@ public enum RequestBodyTypes {
     BOOLEAN("java.lang.Boolean") {
         @Override
         public Object getValidMockRequestBody(RequestBody requestBody) {
-            return new Boolean(requestBody.getInputRequest());
+            return Boolean.parseBoolean(requestBody.getInputRequest());
         }
 
         @Override
@@ -121,12 +124,10 @@ public enum RequestBodyTypes {
             for (Map.Entry<String, String> actualMap : ((Map<String, String>) requestBody
                     .getActualInput()).entrySet()) {
                 if (requestBody.getExcludeList() == null
-                        || !requestBody.getExcludeList().contains(actualMap.getKey())) {
-                    if (!actualMap.getValue().equals(expectedMap.get(actualMap.getKey()))) {
+                        || !requestBody.getExcludeList().contains(actualMap.getKey()) && !actualMap.getValue().equals(expectedMap.get(actualMap.getKey()))) {
                         return false;
                     }
                 }
-            }
             return true;
         }
     },
@@ -141,8 +142,9 @@ public enum RequestBodyTypes {
         public String getDefaultMessageBody(RequestBody requestBody) throws IOException {
             try {
                 return requestBody.getObjectMapper().writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(requestBody.getInputObjectType().newInstance());
-            } catch (InstantiationException | IllegalAccessException e) {
+                        .writeValueAsString(requestBody.getInputObjectType().getDeclaredConstructor().newInstance());
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                log.warn(" getDefaultMessageBody unexpected error {}", e.getMessage());
             }
             return null;
         }

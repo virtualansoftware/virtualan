@@ -15,6 +15,8 @@
 
 package io.virtualan.api;
 
+import lombok.Data;
+
 /**
  *  This is type of VirtualServiceType supported.
  * 
@@ -29,10 +31,6 @@ public enum VirtualServiceType {
 
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     VirtualServiceType(String type) {

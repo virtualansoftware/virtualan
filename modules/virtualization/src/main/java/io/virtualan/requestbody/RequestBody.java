@@ -28,7 +28,6 @@ import lombok.Data;
  **/
 @Data
 public class RequestBody {
-
     private Object actualInput;
     private String inputRequest;
     private String expectedInput;

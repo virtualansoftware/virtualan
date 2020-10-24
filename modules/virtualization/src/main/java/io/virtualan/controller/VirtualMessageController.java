@@ -16,26 +16,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("virtualMessageController")
+@Slf4j
 public class VirtualMessageController {
 
-  private static final Logger log = LoggerFactory.getLogger(VirtualMessageController.class);
   Locale locale = LocaleContextHolder.getLocale();
 
   @Autowired
@@ -50,15 +51,14 @@ public class VirtualMessageController {
   @Autowired
   private Converter converter;
 
-  @RequestMapping(value = "/virtualservices/load-topics", method = RequestMethod.GET)
-  public ResponseEntity<String> listAllTopics()
-      throws Exception {
+  @GetMapping(value = "/virtualservices/load-topics")
+  public ResponseEntity<String> listAllTopics() throws IOException {
     JSONArray array = getAvailableQueues();
     return ResponseEntity.status(HttpStatus.OK).body(array.toString());
   }
 
   public ResponseEntity checkIfServiceDataAlreadyExists(
-      VirtualServiceRequest virtualServiceRequest) throws Exception {
+      VirtualServiceRequest virtualServiceRequest) throws JAXBException, IOException {
     final Long id = messageUtil.isMockAlreadyExists(virtualServiceRequest);
     if (id != null && id != 0) {
       final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
@@ -76,17 +76,17 @@ public class VirtualMessageController {
     return null;
   }
 
-  @RequestMapping(value = "/virtualservices/message/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping(value = "/virtualservices/message/{id}")
   public ResponseEntity<VirtualServiceRequest> deleteMockRequest(@PathVariable("id") long id) {
-    final VirtualServiceRequest MockLoadRequest = virtualService.findById(id);
-    if (MockLoadRequest == null) {
-      return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NOT_FOUND);
+    final VirtualServiceRequest mockLoadRequest = virtualService.findById(id);
+    if (mockLoadRequest == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     virtualService.deleteMockRequestById(id);
-    return new ResponseEntity<VirtualServiceRequest>(HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @RequestMapping(value = "/virtualservices/message", method = RequestMethod.GET)
+  @GetMapping(value = "/virtualservices/message")
   public ResponseEntity<List<VirtualServiceMessageRequest>> listAllMockMessageLoadRequests() {
     final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
 
@@ -107,12 +107,12 @@ public class VirtualMessageController {
     }
 
     if (msgList.isEmpty()) {
-      return new ResponseEntity<List<VirtualServiceMessageRequest>>(HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    return new ResponseEntity<List<VirtualServiceMessageRequest>>(msgList, HttpStatus.OK);
+    return new ResponseEntity<>(msgList, HttpStatus.OK);
   }
 
-  @RequestMapping(value = "/virtualservices/message", method = RequestMethod.POST)
+  @PostMapping(value = "/virtualservices/message")
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceMessageRequest virtualServiceMessageRequest) {
     try {
@@ -151,7 +151,7 @@ public class VirtualMessageController {
   }
 
 
-  private JSONArray getAvailableQueues() throws Exception {
+  private JSONArray getAvailableQueues() throws IOException {
     //KAFKA CONFIGS
     InputStream stream = VirtualMessageController.class.getClassLoader()
         .getResourceAsStream("conf/kafka.json");
@@ -178,7 +178,7 @@ public class VirtualMessageController {
           JSONObject jmsObject = new JSONObject();
           if("IBMMQ".equalsIgnoreCase(key)) {
 
-            StringBuffer messageIndentifier = new StringBuffer();
+            StringBuilder messageIndentifier = new StringBuilder();
             messageIndentifier.append(expected.getString("host"));
             messageIndentifier.append("(");
             messageIndentifier.append(expected.getInt("port"));

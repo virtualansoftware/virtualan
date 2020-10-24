@@ -1,7 +1,5 @@
 package io.virtualan.message.core;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.*;
@@ -11,7 +9,6 @@ import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.VirtualServiceValidRequest;
 import io.virtualan.core.util.XMLConverter;
 import io.virtualan.core.util.rule.ScriptExecutor;
-import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,16 +37,12 @@ public class MessageUtil {
 
 	@Autowired
 	private VirtualServiceUtil virtualServiceUtil;
-
-	@PostConstruct
-	public void init() {
-	}
 	
-	public ReturnMockResponse isResponseExists(final Map<Integer, ReturnMockResponse> returnMockResponseMap) throws IOException {
+	public ReturnMockResponse isResponseExists(final Map<Integer, ReturnMockResponse> returnMockResponseMap) {
 		final List<ReturnMockResponse> returnMockResponseList =
 				new ArrayList<>(returnMockResponseMap.values());
 		Collections.sort(returnMockResponseList, new BestMatchComparator());
-		log.debug("Sorted list : " + returnMockResponseList);
+		log.debug("Sorted list : {}" , returnMockResponseList);
 		final ReturnMockResponse rMockResponse = returnMockResponseList.iterator().next();
 		if (rMockResponse != null && rMockResponse.getHeaderResponse() != null && rMockResponse.isExactMatch()) {
 			return rMockResponse;
@@ -100,8 +93,7 @@ public class MessageUtil {
 			
 			
 		} catch (final Exception e) {
-			e.printStackTrace();
-			log.error("getMatchingRecord :: " + e.getMessage());
+			log.error("getMatchingRecord :: {}" , e.getMessage());
 		}
 		return null;
 	}
@@ -113,9 +105,8 @@ public class MessageUtil {
 				mockServiceRequest);
 	}
 	
-	public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject) throws  Exception{
-		
-		try {
+	public Long isMockAlreadyExists(VirtualServiceRequest mockTransferObject)
+			throws JAXBException, IOException {
 			final Map<MockRequest, MockResponse> mockDataSetupMap = virtualServiceUtil.readDynamicResponse(
 					mockTransferObject.getResource(), mockTransferObject.getOperationId());
 			final MockServiceRequest mockServiceRequest = new MockServiceRequest();
@@ -147,30 +138,21 @@ public class MessageUtil {
 			}
 			mockServiceRequest.setContentType(mockTransferObject.getContentType());
 			mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
-
+			mockServiceRequest.setOutput(mockTransferObject.getOutput());
 			final Map<Integer, ReturnMockResponse> returnMockResponseMap =
 					isResponseExists(mockDataSetupMap, mockServiceRequest);
 			
 			if (returnMockResponseMap.size() > 0) {
-				return isResposeExists(mockTransferObject, mockServiceRequest,
-						returnMockResponseMap);
+				return isResposeExists(returnMockResponseMap);
 			}
-			
-			
-		} catch (final Exception e) {
-			e.printStackTrace();
-			log.error("isMockAlreadyExists :: " + e.getMessage());
-			throw  e;
-		}
-		return null;
+			return null;
 	}
 	
-	public long isResposeExists(VirtualServiceRequest mockTransferObject, final MockServiceRequest mockServiceRequest,
-	                             final Map<Integer, ReturnMockResponse> returnMockResponseMap) throws IOException {
+	public long isResposeExists( final Map<Integer, ReturnMockResponse> returnMockResponseMap)  {
 		final List<ReturnMockResponse> returnMockResponseList =
 				new ArrayList<>(returnMockResponseMap.values());
 		Collections.sort(returnMockResponseList, new BestMatchComparator());
-		log.debug("Sorted list : " + returnMockResponseList);
+		log.debug("Sorted list : {}",  returnMockResponseList);
 		final ReturnMockResponse rMockResponse = returnMockResponseList.iterator().next();
 		if (rMockResponse != null && rMockResponse.getHeaderResponse() != null && rMockResponse.isExactMatch()) {
 			return rMockResponse.getMockRequest().getVirtualServiceId();

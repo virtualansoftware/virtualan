@@ -21,8 +21,7 @@ import io.virtualan.core.model.VirtualServiceApiResponse;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.requestbody.RequestBodyTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,9 +45,8 @@ import java.util.Map.Entry;
  */
 
 @Service("openApiVirtualServiceInfo")
+@Slf4j
 public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
-
-    private static final Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -113,7 +111,7 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
         virtualServiceRequest.setDesc(getResourceDesc(method));
         if (annotInstance != null && annotInstance.length > 0) {
             RequestMapping requestMapping = annotInstance[0];
-            if (requestMapping.value() != null && requestMapping.value().length > 0) {
+            if (requestMapping.value().length > 0) {
                 virtualServiceRequest.setUrl(requestMapping.value()[0]);
                 int index = virtualServiceRequest.getUrl().indexOf('/', 1) == -1
                         ? virtualServiceRequest.getUrl().length()
@@ -123,7 +121,7 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
                             .setResource(virtualServiceRequest.getUrl().substring(1, index));
                 }
             }
-            if (requestMapping.method() != null && requestMapping.method().length > 0) {
+            if (requestMapping.method().length > 0) {
                 virtualServiceRequest.setMethod(requestMapping.method()[0].name());
             }
             virtualServiceRequest.setResponseType(buildResponseType(method));
@@ -177,8 +175,7 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
 
     @Override
     public Map<String, VirtualServiceApiResponse> buildResponseType(Method method) {
-        Map<String, VirtualServiceApiResponse> responseType = buildOpenAPIResponseType(method);
-        return responseType;
+        return buildOpenAPIResponseType(method);
     }
 
 }

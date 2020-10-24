@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javassist.CannotCompileException;
 import javax.annotation.PostConstruct;
 import javax.jws.WebParam;
 import javax.xml.parsers.DocumentBuilder;
@@ -36,8 +37,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +65,10 @@ import org.xml.sax.SAXException;
 @Component
 @Configuration
 @ConditionalOnProperty(name = {"virtualan.soap.package"}, matchIfMissing = false)
+@Slf4j
 public class WSEndpointConfiguration implements BeanFactoryAware {
 
-  final static Map<String, SoapService> wsServiceMockList = new HashMap<>();
-  private static final Logger log = LoggerFactory.getLogger(WSEndpointConfiguration.class);
+  static final  Map<String, SoapService> wsServiceMockList = new HashMap<>();
 
   @Autowired
   private SoapEndpointCodeGenerator soapEndpointCodeGenerator;
@@ -86,7 +86,8 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
   }
 
   @PostConstruct
-  public void loadSoapWSservice() throws Exception {
+  public void loadSoapWSservice()
+      throws SAXException, ParserConfigurationException, XPathExpressionException, IOException, CannotCompileException {
     DefaultListableBeanFactory beanRegistry = (DefaultListableBeanFactory) beanFactory;
     Map<String, String> documentations = getDocumentations();
     Arrays.stream(soapPackage.split(";")).forEach(packageName -> {
@@ -94,15 +95,15 @@ public class WSEndpointConfiguration implements BeanFactoryAware {
 
           for (Class clazz : portTypeList) {
             Method[] methods = clazz.getDeclaredMethods();
-            Arrays.stream(methods).forEach(method -> {
-              loadParameters(method, documentations.get(method.getName()));
-            });
+            Arrays.stream(methods).forEach(method ->
+              loadParameters(method, documentations.get(method.getName()))
+            );
           }
         }
     );
 
     GenericBeanDefinition virtualanSOAPWS = new GenericBeanDefinition();
-    virtualanSOAPWS.setBeanClass(soapEndpointCodeGenerator.buildEndpointClass(wsServiceMockList));
+    virtualanSOAPWS.setBeanClass(SoapEndpointCodeGenerator.buildEndpointClass(wsServiceMockList));
     beanRegistry.registerBeanDefinition("virtualanSOAPWS", virtualanSOAPWS);
   }
 

@@ -26,7 +26,7 @@ public enum ParamTypes {
     BOOLEAN("java.lang.Boolean") {
         @Override
         public Object getValidMockRequestBody(Param param) {
-            return new Boolean(param.getActualValue());
+            return Boolean.valueOf(param.getActualValue());
         }
 
         @Override
@@ -36,14 +36,14 @@ public enum ParamTypes {
 
         @Override
         public boolean compareParam(Param param) {
-            return Boolean.parseBoolean(param.actualValue) == Boolean
+            return Boolean.parseBoolean(param.getActualValue()) == Boolean
                     .parseBoolean(param.getExpectedValue());
         }
     },
     LONG("java.lang.Long") {
         @Override
         public Object getValidMockRequestBody(Param param) {
-            return new Long(param.getActualValue());
+            return Long.valueOf(param.getActualValue());
         }
 
         @Override
@@ -53,13 +53,13 @@ public enum ParamTypes {
 
         @Override
         public boolean compareParam(Param param) {
-            return Long.parseLong(param.actualValue) == Long.parseLong(param.getExpectedValue());
+            return Long.parseLong(param.getActualValue()) == Long.parseLong(param.getExpectedValue());
         }
     },
     INTEGER("java.lang.Integer") {
         @Override
         public Object getValidMockRequestBody(Param param) {
-            return new Integer(param.getActualValue());
+            return Integer.valueOf(param.getActualValue());
         }
 
         @Override
@@ -69,14 +69,14 @@ public enum ParamTypes {
 
         @Override
         public boolean compareParam(Param param) {
-            return Integer.parseInt(param.actualValue) == Integer
+            return Integer.parseInt(param.getActualValue()) == Integer
                     .parseInt(param.getExpectedValue());
         }
     },
     BYTE("java.lang.Byte") {
         @Override
         public Object getValidMockRequestBody(Param param) {
-            return new Byte(param.getActualValue());
+            return Byte.parseByte(param.getActualValue());
         }
 
         @Override
@@ -86,13 +86,13 @@ public enum ParamTypes {
 
         @Override
         public boolean compareParam(Param param) {
-            return Byte.parseByte(param.actualValue) == Byte.parseByte(param.getExpectedValue());
+            return Byte.parseByte(param.getActualValue()) == Byte.parseByte(param.getExpectedValue());
         }
     },
     FLOAT("java.lang.Float") {
         @Override
         public Object getValidMockRequestBody(Param param) {
-            return new Float(param.getActualValue());
+            return  Float.parseFloat(param.getActualValue());
         }
 
         @Override
@@ -102,14 +102,14 @@ public enum ParamTypes {
 
         @Override
         public boolean compareParam(Param param) {
-            return Float.parseFloat(param.actualValue) == Float
+            return Float.parseFloat(param.getActualValue()) == Float
                     .parseFloat(param.getExpectedValue());
         }
     },
     DOUBLE("java.lang.Double") {
         @Override
         public Object getValidMockRequestBody(Param param) {
-            return new Double(param.getActualValue());
+            return Double.parseDouble(param.getActualValue());
         }
 
         @Override
@@ -119,7 +119,7 @@ public enum ParamTypes {
 
         @Override
         public boolean compareParam(Param param) {
-            return Double.parseDouble(param.actualValue) == Double
+            return Double.parseDouble(param.getActualValue()) == Double
                     .parseDouble(param.getExpectedValue());
         }
     },
