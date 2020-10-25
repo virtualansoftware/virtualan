@@ -15,6 +15,7 @@
 
 package io.virtualan.aop;
 
+import io.virtualan.core.util.ScriptErrorException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -90,7 +91,7 @@ public class ApiVirtualAspect {
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-        throws IOException, JAXBException {
+        throws IOException, JAXBException, ScriptErrorException {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();

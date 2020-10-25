@@ -16,6 +16,7 @@ package io.virtualan.core;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import io.virtualan.core.util.ScriptErrorException;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -382,7 +383,7 @@ public class VirtualServiceUtil {
 
 
     public Object returnResponse(Method method, MockServiceRequest mockServiceRequest)
-        throws IOException,  JAXBException {
+        throws IOException, JAXBException, ScriptErrorException {
         VirtualServiceUtil.log
                 .info(" mockServiceRequest.getResource() :  {}" , mockServiceRequest.getResource());
         final Map<MockRequest, MockResponse> mockDataSetupMap = readDynamicResponse(
