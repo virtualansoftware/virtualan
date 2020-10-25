@@ -306,8 +306,6 @@ public class VirtualServiceUtil {
             if (inputObjectType != null) {
                 isBodyMatch = RequestBodyTypes.fromString(inputObjectType.getTypeName())
                         .compareRequestBody(requestBody);
-            } else {
-                //isBodyMatch = mockTransferObject.getInput().equals()
             }
             return checkExistsInEachCatagory(mockTransferObject, mockServiceRequest, rMockResponse,
                     isBodyMatch);

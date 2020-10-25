@@ -17,14 +17,11 @@ package io.virtualan.api;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -33,16 +30,17 @@ import io.virtualan.core.model.VirtualServiceKeyValue;
 
 /**
  *  This ApiType class identify what type of REST service would be implemented.
- * 
+ *
  * @author  Elan Thangamani
- * 
+ *
  **/
 @Component
+@Slf4j
 public class ApiType {
 
+    private  ApiType(){
 
-    final static Logger log = LoggerFactory.getLogger(ApiType.class);
-
+    }
 
     private static VirtualServiceType getType(Class clazz) {
         if (clazz.isAnnotationPresent(RequestMapping.class)) {
@@ -55,7 +53,6 @@ public class ApiType {
 
 
     public static VirtualServiceType findApiType() {
-        Map<String, Class> virtualInterfaces = new HashMap<>();
         try {
             Field f = ClassLoader.class.getDeclaredField("classes");
             f.setAccessible(true);
@@ -63,39 +60,50 @@ public class ApiType {
             List<Class> classes = (List<Class>) f.get(classLoader);
             for (int i = 0; i < classes.size(); i++) {
                 Class classzz = classes.get(i);
-                try {
-                    if (classzz.isAnnotationPresent(VirtualService.class)) {
-                        VirtualServiceType apiType = getType(classzz);
-                        if (apiType == null) {
-                            for (Method method : classzz.getDeclaredMethods()) {
-                                VirtualServiceKeyValue virtualServiceKeyValue =
-                                        ApiMethod.getApiMethodParamAndURL(method);
-                                if (virtualServiceKeyValue != null
-                                        && virtualServiceKeyValue.getServiceType() != null) {
-                                    log.info(" Virtualan Api Type would be : "
-                                            + virtualServiceKeyValue.getServiceType().getType());
-                                    return virtualServiceKeyValue.getServiceType();
-                                }
-                            }
-                        } else {
-                            log.info(" Virtualan Api Type would be : " + apiType.getType());
-                            return apiType;
-                        }
-                    }
-                } catch (ArrayStoreException e) {
-                    // ignore it
-                }
-
+                VirtualServiceType type = getVirtualServiceType(classzz);
+                if (type != null)
+                    return type;
             }
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                | IllegalAccessException e1) {
+            | IllegalAccessException e1) {
             log.error("Unable to load from the class loader " + e1.getMessage());
         }
         log.error(
-                "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
+            "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
         return null;
     }
 
+    public static VirtualServiceType getVirtualServiceType(Class classzz) {
+        try {
+            VirtualServiceType type =  getApiType(classzz);
+            if(type != null) return type;
+        } catch (ArrayStoreException e) {
+            // ignore it
+        }
+        return null;
+    }
+
+    public static VirtualServiceType getApiType(Class classzz) {
+        if (classzz.isAnnotationPresent(VirtualService.class)) {
+            VirtualServiceType apiType = getType(classzz);
+            if (apiType == null) {
+                for (Method method : classzz.getDeclaredMethods()) {
+                    VirtualServiceKeyValue virtualServiceKeyValue =
+                        ApiMethod.getApiMethodParamAndURL(method);
+                    if (virtualServiceKeyValue != null
+                        && virtualServiceKeyValue.getServiceType() != null) {
+                        log.info(" Virtualan Api Type would be : "
+                            + virtualServiceKeyValue.getServiceType().getType());
+                        return virtualServiceKeyValue.getServiceType();
+                    }
+                }
+            } else {
+                log.info(" Virtualan Api Type would be : " + apiType.getType());
+                return apiType;
+            }
+        }
+        return null;
+    }
 
 
     public static List<String> findApis() {
@@ -105,25 +113,27 @@ public class ApiType {
             f.setAccessible(true);
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             List<Class> classes = (List<Class>) f.get(classLoader);
-            for (int i = 0; i < classes.size(); i++) {
-                Class classzz = classes.get(i);
-                try {
-                    if (classzz.isAnnotationPresent(VirtualService.class)) {
-                        apis.add(classzz.getPackage().getName());
-                    }
-                } catch (ArrayStoreException e) {
-                    // ignore it
-                }
-
-            }
+            addApis(apis, classes);
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                | IllegalAccessException e1) {
+            | IllegalAccessException e1) {
             log.error("Unable to load from the class loader " + e1.getMessage());
         }
         log.error(
-                "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
+            "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
         return apis;
     }
 
+    public static void addApis(List<String> apis, List<Class> classes) {
+        for (int i = 0; i < classes.size(); i++) {
+            Class classzz = classes.get(i);
+            try {
+                if (classzz.isAnnotationPresent(VirtualService.class)) {
+                    apis.add(classzz.getPackage().getName());
+                }
+            } catch (ArrayStoreException e) {
+                // ignore it
+            }
 
+        }
+    }
 }

@@ -36,26 +36,24 @@ public class VirtualServiceParamComparator {
 
 
     public boolean isAllParamPresent(final MockServiceRequest mockServiceRequest,
-            final ReturnMockResponse rMockResponse) {
+        final ReturnMockResponse rMockResponse) {
         for (final VirtualServiceKeyValue virtualServiceKeyValue : rMockResponse.getMockRequest()
-                .getAvailableParams()) {
+            .getAvailableParams()) {
             if (mockServiceRequest.getParams().containsKey(virtualServiceKeyValue.getKey())
-                    && mockServiceRequest.getParams().get(virtualServiceKeyValue.getKey())
-                            .equals(virtualServiceKeyValue.getValue())) {
+                && mockServiceRequest.getParams().get(virtualServiceKeyValue.getKey())
+                .equals(virtualServiceKeyValue.getValue())) {
                 mockServiceRequest.getParams().remove(virtualServiceKeyValue.getKey());
             } else {
                 if (mockServiceRequest.getHeaderParams() != null
-                        && mockServiceRequest.getHeaderParams()
-                                .get(virtualServiceKeyValue.getKey().toLowerCase()) != null) {
-                    if (!mockServiceRequest.getHeaderParams()
-                            .get(virtualServiceKeyValue.getKey().toLowerCase())
-                            .contains(virtualServiceKeyValue.getValue())) {
-                        return false;
-                    }
+                    && mockServiceRequest.getHeaderParams()
+                    .get(virtualServiceKeyValue.getKey().toLowerCase()) != null && !mockServiceRequest.getHeaderParams()
+                    .get(virtualServiceKeyValue.getKey().toLowerCase())
+                    .contains(virtualServiceKeyValue.getValue())) {
+                    return false;
                 }
             }
         }
-      return mockServiceRequest.getParams().size() == 0;
+        return mockServiceRequest.getParams().isEmpty();
     }
 
 
@@ -70,22 +68,29 @@ public class VirtualServiceParamComparator {
             final Param param = new Param();
             if (mockServiceRequest.getParams().containsKey(mockKeyValueParams.getKey())) {
                 param.setActualValue(
-                        mockServiceRequest.getParams().get(mockKeyValueParams.getKey()));
+                    mockServiceRequest.getParams().get(mockKeyValueParams.getKey()));
             } else {
                 param.setActualValue(mockServiceRequest.getHeaderParams()
-                        .get(mockKeyValueParams.getKey().toLowerCase()));
+                    .get(mockKeyValueParams.getKey().toLowerCase()));
             }
             param.setExpectedValue(mockKeyValueParams.getValue());
             param.setName(mockKeyValueParams.getKey());
-            if (mockRequest.getExcludeSet() == null
-                    || !mockRequest.getExcludeSet().contains(mockKeyValueParams.getKey())) {
-                if (type == null) {
-                    if (ParamTypes.DEFAULT.compareParam(param)) {
-                        numberOfMatch++;
-                    }
-                } else if (ParamTypes.fromString(type.getCanonicalName()).compareParam(param)) {
+            numberOfMatch = getNumberOfMatch(mockRequest, numberOfMatch, mockKeyValueParams, type,
+                param);
+        }
+        return numberOfMatch;
+    }
+
+    private int getNumberOfMatch(MockRequest mockRequest, int numberOfMatch,
+        VirtualServiceKeyValue mockKeyValueParams, Class type, Param param) {
+        if (mockRequest.getExcludeSet() == null
+            || !mockRequest.getExcludeSet().contains(mockKeyValueParams.getKey())) {
+            if (type == null) {
+                if (ParamTypes.DEFAULT.compareParam(param)) {
                     numberOfMatch++;
                 }
+            } else if (ParamTypes.fromString(type.getCanonicalName()).compareParam(param)) {
+                numberOfMatch++;
             }
         }
         return numberOfMatch;
@@ -95,18 +100,13 @@ public class VirtualServiceParamComparator {
     public int isParameterMatch(MockRequest mockRequest, Map<String, String> actualQueryMap) {
         final Map<String, String> filteredActualQueryMap = new HashMap<>();
         int noumberOfMatch = 0;
-        for (final Map.Entry<String, String> mapEntry : actualQueryMap.entrySet()) {
-            if (mapEntry.getValue() != null && !"null".equals(mapEntry.getValue())) {
-                filteredActualQueryMap.put(mapEntry.getKey(), mapEntry.getValue());
-            }
-        }
+        getResp(actualQueryMap, filteredActualQueryMap);
         if (mockRequest.getAvailableParams().size() == filteredActualQueryMap.size()) {
-
             for (final VirtualServiceKeyValue vsKeyValueParams : mockRequest.getAvailableParams()) {
                 if (mockRequest.getExcludeSet() == null
-                        || !mockRequest.getExcludeSet().contains(vsKeyValueParams.getKey())) {
+                    || !mockRequest.getExcludeSet().contains(vsKeyValueParams.getKey())) {
                     if (vsKeyValueParams.getValue()
-                            .equals(filteredActualQueryMap.get(vsKeyValueParams.getKey()))) {
+                        .equals(filteredActualQueryMap.get(vsKeyValueParams.getKey()))) {
                         noumberOfMatch++;
                     } else {
                         return noumberOfMatch;
@@ -117,9 +117,18 @@ public class VirtualServiceParamComparator {
         return noumberOfMatch;
     }
 
+    public void getResp(Map<String, String> actualQueryMap,
+        Map<String, String> filteredActualQueryMap) {
+        for (final Map.Entry<String, String> mapEntry : actualQueryMap.entrySet()) {
+            if (mapEntry.getValue() != null && !"null".equals(mapEntry.getValue())) {
+                filteredActualQueryMap.put(mapEntry.getKey(), mapEntry.getValue());
+            }
+        }
+    }
+
     public int compareQueryParams(MockRequest mockRequest, MockServiceRequest mockServiceRequest) {
         if (mockRequest.getAvailableParams() == null
-                || mockRequest.getAvailableParams().isEmpty()) {
+            || mockRequest.getAvailableParams().isEmpty()) {
             return isEmptyRequest(mockServiceRequest.getParams());
         } else {
             return isParameterMatch(mockRequest, mockServiceRequest);
@@ -129,7 +138,7 @@ public class VirtualServiceParamComparator {
 
     public int compareQueryParams(MockRequest mockRequest, Map<String, String> actualQueryMap) {
         if (mockRequest.getAvailableParams() == null
-                || mockRequest.getAvailableParams().isEmpty()) {
+            || mockRequest.getAvailableParams().isEmpty()) {
             return isEmptyRequest(actualQueryMap);
         } else {
             return isParameterMatch(mockRequest, actualQueryMap);

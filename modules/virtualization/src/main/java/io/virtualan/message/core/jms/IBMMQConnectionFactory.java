@@ -15,9 +15,6 @@ public class IBMMQConnectionFactory implements  VirtualanJMSConnectionFactory{
   public ConnectionFactory connectionFactory(JMSConfigurationDomain conf) throws JMSException {
     MQQueueConnectionFactory connectionFactory = null;
     connectionFactory = new MQQueueConnectionFactory();
-    if (conf.getUserName() != null && conf.getPassword() != null) {
-      //userCredentialsConnectionFactoryAdapter
-    }
     connectionFactory.setTransportType(1);
     connectionFactory.setCCSID(1208);
     connectionFactory.setHostName(conf.getHost());

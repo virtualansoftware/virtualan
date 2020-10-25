@@ -71,17 +71,17 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 					if(request.getOperationId() != null) {
 						requestList.add(request);
 					} else {
-						log.warn("This API("+request.getMethod()+" : "+request.getUrl()+") is not supported by this service any more:" + request);
+						log.warn("This API({} : {}) is not supported by this service any more: {}" , request.getMethod(), request.getUrl(), request);
 					}
 				}
 				virtualService.importAllMockRequests(requestList);
-				log.info("initial load of the file ("+dataLoadFileLocation+") successful!!");
+				log.info("initial load of the file ({}) successful!!", dataLoadFileLocation);
 				
 			} else {
-				log.warn("initial load of the file ("+dataLoadFileLocation+") is missing...");
+				log.warn("initial load of the file ({}) is missing...",dataLoadFileLocation);
 			}
 		}catch (Exception e){
-			log.warn("Unable to load the file ("+dataLoadFileLocation+") initial load -" + e.getMessage());
+			log.warn("Unable to load the file ({}) initial load -{}",dataLoadFileLocation , e.getMessage());
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 			}
 			virtualServiceRequest.setType(jsonObject.optString("type"));
 			virtualServiceRequest.setRequestType(jsonObject.optString("requestType"));
-			if(jsonObject.optString("contentType") != "") {
+			if(!jsonObject.optString("contentType").equals("")) {
 				virtualServiceRequest
 						.setContentType(ContentType.valueOf(jsonObject.optString("contentType")));
 			}
@@ -109,9 +109,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 				if (!"".equalsIgnoreCase(jsonObject.optString("url"))) {
 					virtualServiceRequest.setUrl(jsonObject.optString("url"));
 				} else if (!"".equalsIgnoreCase(jsonObject.optString("brokerUrl"))) {
-					{
 						virtualServiceRequest.setUrl(jsonObject.optString("brokerUrl"));
-					}
 				}
 			}
 			virtualServiceRequest
@@ -126,7 +124,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 				virtualServiceRequest.setOperationId(jsonObject.optString("operationId"));
 			}
 		} catch (Exception e) {
-			log.info(" unable to load the following data ("+ jsonObject +") : Failed due to :: " + e.getMessage());
+			log.info(" unable to load the following data ({}) : Failed due to ::{} ", jsonObject, e.getMessage());
 		}
 		return virtualServiceRequest;
 	}
@@ -143,7 +141,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 					virtualServiceKeyValue.setParameterType(object.optString("parameterType"));
 					virtualServiceKeyValueList.add(virtualServiceKeyValue);
 				}catch (JSONException e){
-					log.warn("Loader: " + e.getMessage());
+					log.warn("Loader: {}" , e.getMessage());
 				}
 			}
 		}

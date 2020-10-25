@@ -10,11 +10,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
@@ -25,10 +23,12 @@ public class Converter {
 
     private static final String PARAM_DELIMITER = ":_:";
 
+    @Autowired
+    private  ObjectMapper objectMapper;
+
     private String getString(Object jsonObject) throws JsonProcessingException {
-        if(jsonObject != null && jsonObject instanceof LinkedHashMap) {
-            String json = new ObjectMapper().writeValueAsString(jsonObject);
-            return json;
+        if(jsonObject instanceof LinkedHashMap) {
+            return objectMapper.writeValueAsString(jsonObject);
         }
         return null;
     }
@@ -37,7 +37,7 @@ public class Converter {
     private Object getJson(String jsonStr)  {
         if(jsonStr != null && !jsonStr.isEmpty()) {
             try {
-                return new ObjectMapper().readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
+                return objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
             } catch (JsonProcessingException e) {
                 throw new BadDataException(e.getMessage());
             }
@@ -68,7 +68,7 @@ public class Converter {
 
     public static Map<String, String> converter(List<VirtualServiceKeyValue> paramList) {
         final Map<String, String> mapkeyValue = new HashMap<>();
-        if (paramList != null && paramList.size() > 0) {
+        if (paramList != null && !paramList.isEmpty()) {
             for (final VirtualServiceKeyValue availableParam : paramList) {
                 if (availableParam.getValue() != null) {
                     mapkeyValue.put(availableParam.getKey(), availableParam.getValue());
@@ -125,9 +125,9 @@ public class Converter {
     }
 
     public static String readParameters(List<VirtualServiceKeyValue> paranList) {
-        final StringBuffer availableParamList = new StringBuffer();
+        final StringBuilder availableParamList = new StringBuilder();
         String availableParamStr = null;
-        if (paranList != null && paranList.size() > 0) {
+        if (paranList != null && !paranList.isEmpty()) {
             for (final VirtualServiceKeyValue availableParam : paranList) {
                 if (availableParam.getValue() != null) {
                     availableParamList.append(availableParam.getKey() + "="
@@ -138,7 +138,7 @@ public class Converter {
             if (availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER) > 0) {
                 return availableParamStr.substring(0,
                     availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER));
-            } else if (availableParamStr != null && availableParamStr.trim().length() > 0) {
+            } else if ( availableParamStr.trim().length() > 0) {
                 return availableParamStr;
             }
         }
