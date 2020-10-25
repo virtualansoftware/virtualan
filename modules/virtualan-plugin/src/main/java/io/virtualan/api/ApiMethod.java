@@ -27,10 +27,10 @@ import java.lang.reflect.Method;
  * 
  **/
 public class ApiMethod {
+    private ApiMethod(){}
 
     public static String getApiMethodParam(Method method) {
-        return getApiMethodParamAndURL(method) != null ? getApiMethodParamAndURL(method).getKey()
-                : null;
+        return getApiMethodParamAndURL(method).getKey();
     }
 
     public static VirtualServiceKeyValue getApiMethodParamAndURL(Method method) {
@@ -64,10 +64,10 @@ public class ApiMethod {
             RequestMapping requestMapping = annotInstance[0];
             virtualServiceKeyValue = new VirtualServiceKeyValue();
             virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-            if (requestMapping.method() != null && requestMapping.method().length > 0) {
+            if ( requestMapping.method().length > 0) {
                 virtualServiceKeyValue.setKey(requestMapping.method()[0].name());
             }
-            if (requestMapping.value() != null && requestMapping.value().length > 0) {
+            if (requestMapping.value().length > 0) {
                 virtualServiceKeyValue.setValue(requestMapping.value()[0]);
             }
         }
@@ -89,10 +89,8 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if (annotInstanceMapping[0].value() != null
-                        && annotInstanceMapping[0].value().length > 0) {
+                if (annotInstanceMapping[0].value().length > 0)
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
-                }
             }
         }
         return virtualServiceKeyValue;
@@ -113,8 +111,7 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if (annotInstanceMapping[0].value() != null
-                        && annotInstanceMapping[0].value().length > 0) {
+                if ( annotInstanceMapping[0].value().length > 0) {
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
                 }
             }
@@ -137,8 +134,7 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if (annotInstanceMapping[0].value() != null
-                        && annotInstanceMapping[0].value().length > 0) {
+                if (annotInstanceMapping[0].value().length > 0) {
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
                 }
             }
@@ -161,8 +157,7 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if (annotInstanceMapping[0].value() != null
-                        && annotInstanceMapping[0].value().length > 0) {
+                if (annotInstanceMapping[0].value().length > 0) {
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
                 }
             }

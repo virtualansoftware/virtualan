@@ -15,48 +15,18 @@
 
 package io.virtualan.params;
 
+import lombok.Data;
+
 /**
  * This is Virtual Service Param .
  * 
  * @author  Elan Thangamani
  * 
  **/
+@Data
 public class Param {
-    Class type;
-    String name;
-    String actualValue;
-    String expectedValue;
-
-    public Class getType() {
-        return type;
-    }
-
-    public void setType(Class type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getActualValue() {
-        return actualValue;
-    }
-
-    public void setActualValue(String actualValue) {
-        this.actualValue = actualValue;
-    }
-
-    public String getExpectedValue() {
-        return expectedValue;
-    }
-
-    public void setExpectedValue(String expectedValue) {
-        this.expectedValue = expectedValue;
-    }
-
+    private Class type;
+    private String name;
+    private String actualValue;
+    private String expectedValue;
 }

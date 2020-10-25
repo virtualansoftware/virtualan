@@ -56,11 +56,13 @@ public class VirtualServiceMessageRequest {
 
 
     public Object getHeaderParam(String param) {
-        return getHeaderParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+        return getHeaderParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(
+            VirtualServiceKeyValue::getValue);
     }
 
     public Object getAvailableParam(String param) {
-        return getAvailableParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(x -> x.getValue());
+        return getAvailableParams().stream().filter(x -> x.getKey().equalsIgnoreCase(param)).map(
+            VirtualServiceKeyValue::getValue);
     }
 
     public String groovyTemplateObj() {

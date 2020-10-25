@@ -31,12 +31,15 @@ import io.virtualan.core.model.VirtualServiceKeyValue;
 
 public class ApiResource {
 
+	private  ApiResource(){
+
+	}
 	
 	 public static String getResourceParent(Class clazz) {
 		 String parentPath =  null; 
 		 if(clazz.isAnnotationPresent(RequestMapping.class)) {
 			 RequestMapping requestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
-			 if(requestMapping.value() != null & requestMapping.value().length  == 1) {
+			 if(requestMapping.value().length  == 1) {
 				 parentPath = requestMapping.value()[0];
 			 }
 		 } else if(clazz.isAnnotationPresent(Path.class)) {
@@ -56,7 +59,7 @@ public class ApiResource {
 		 String parentPath =  null; 
 		 if(clazz.isAnnotationPresent(RequestMapping.class)) {
 			 RequestMapping requestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
-			 if(requestMapping.value() != null & requestMapping.value().length  == 1) {
+			 if(requestMapping.value().length  == 1) {
 				 parentPath = requestMapping.value()[0];
 			 }
 		 } else if(clazz.isAnnotationPresent(Path.class)) {
@@ -74,10 +77,8 @@ public class ApiResource {
 	 
     public static String getResource(Method method) {
         VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
-        if (virtualServiceKeyValue != null) {
-            if (virtualServiceKeyValue.getValue() != null) {
+        if (virtualServiceKeyValue != null && virtualServiceKeyValue.getValue() != null) {
                 return getResourceByURL(virtualServiceKeyValue.getValue());
-            }
         }
         return null;
     }

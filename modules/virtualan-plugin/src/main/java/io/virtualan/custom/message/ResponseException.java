@@ -13,45 +13,38 @@
  */
 
 package io.virtualan.custom.message;
-
-import java.io.Serializable;
-
 import javax.ws.rs.core.Response;
-
+import lombok.Data;
 import org.springframework.http.ResponseEntity;
 
 /**
  * This is ResponseException.
- * 
+ *
  * @author  Elan Thangamani
- * 
+ *
  **/
-public class ResponseException extends RuntimeException implements Serializable {
 
-    public ResponseException() {
-        super();
-    }
-
-    Response response;
-
-    ResponseEntity responseEntity;
-
-    private static final long serialVersionUID = 1169426381288170661L;
+@Data
+public class ResponseException extends RuntimeException  {
 
     public Response getResponse() {
         return response;
-    }
-
-    public void setResponse(Response response) {
-        this.response = response;
     }
 
     public ResponseEntity getResponseEntity() {
         return responseEntity;
     }
 
-    public void setResponseEntity(ResponseEntity responseEntity) {
-        this.responseEntity = responseEntity;
+    private  Response response ;
+    private  ResponseEntity responseEntity;
+
+    public void setResponse(Response response) {
+        this.response = response;
     }
+
+    public void setResponseEntity(ResponseEntity responseEntity) {
+        this.responseEntity =responseEntity;
+    }
+
 
 }

@@ -48,10 +48,10 @@ public class MockServiceRequest {
 
     public Object getParam(String param) {
         Optional<Object> obj = Optional.ofNullable(getAvailableParam(param));
-        if( obj == null) {
+        if( !obj.isPresent()) {
             obj=  getParameters().entrySet().stream().filter(e -> param.equals(e.getKey())).map(Map.Entry::getValue).findFirst();
         }
-        return obj.isPresent() ? obj.get() : null;
+        return obj.orElse(null);
     }
 
     public Optional<String> getAvailableParam(String param) {

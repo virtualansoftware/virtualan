@@ -14,14 +14,13 @@
 
 package io.virtualan.service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
-import io.virtualan.autoconfig.VirtualServiceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,34 +59,33 @@ public class VirtualServiceImpl implements VirtualService {
         final Iterable<VirtualServiceEntity> mockEntityList = virtualServiceRepository.findAll();
         return getVirtualServiceRequests(mockEntityList);
     }
-    
+
     @Override
     public void importAllMockRequests(List<VirtualServiceRequest> virtualServiceRequestList) {
-        List<VirtualServiceEntity> virtualServiceEntityList = new ArrayList<VirtualServiceEntity>();
+        List<VirtualServiceEntity> virtualServiceEntityList = new ArrayList<>();
         for (Iterator<VirtualServiceRequest> it = virtualServiceRequestList.iterator(); it.hasNext(); ) {
             VirtualServiceRequest request = it.next();
             VirtualServiceEntity virtualServiceEntity =
-                    Converter.converterRToE(request);
+                Converter.converterRToE(request);
             virtualServiceEntity.setLastUsedDateTime(Calendar.getInstance());
             virtualServiceEntityList.add(virtualServiceEntity);
         }
         virtualServiceRepository.saveAll(virtualServiceEntityList);
     }
-    
+
     @Override
     public VirtualServiceRequest findById(long id) {
-        return Converter.converterEToR(virtualServiceRepository.findById(id).get());
+        Optional<VirtualServiceEntity> virtualServiceRequest  = virtualServiceRepository.findById(id);
+        return virtualServiceRequest.map(Converter::converterEToR).orElse(null);
     }
 
     @Override
     @Transactional("virtualTransactionManager")
     public VirtualServiceRequest saveMockRequest(VirtualServiceRequest mockTransferObject) {
         final VirtualServiceEntity virtualServiceEntity =
-                Converter.converterRToE(mockTransferObject);
+            Converter.converterRToE(mockTransferObject);
         virtualServiceEntity.setLastUsedDateTime(Calendar.getInstance());
-        final VirtualServiceRequest mockTransferObjectResponse =
-                Converter.converterEToR(virtualServiceRepository.save(virtualServiceEntity));
-        return mockTransferObjectResponse;
+        return Converter.converterEToR(virtualServiceRepository.save(virtualServiceEntity));
     }
 
     @Override
@@ -105,34 +103,31 @@ public class VirtualServiceImpl implements VirtualService {
 
     @Override
     public boolean isMockRequestExist(VirtualServiceRequest mockRequest) {
-        return virtualServiceRepository.findById(mockRequest.getId()) != null;
+        return virtualServiceRepository.findById(mockRequest.getId()).isPresent();
     }
 
     public static Predicate<VirtualServiceRequest> filterOperationIdAndResource(String resource,
-            String operationId) {
+        String operationId) {
         return p -> (p.getResource().equalsIgnoreCase(resource)
-                && p.getOperationId().equalsIgnoreCase(operationId));
+            && p.getOperationId().equalsIgnoreCase(operationId));
     }
 
     @Override
     public List<VirtualServiceRequest> readByOperationId(String resource, String operationId) {
-        /*List<VirtualServiceRequest> requestList = findAllMockRequests().stream()
-                .filter(filterOperationIdAndResource(resource, operationId))
-                .collect(Collectors.toList());
-        */
         return getVirtualServiceRequests(
-                virtualServiceRepository.findByResourceAndOperationId(resource, operationId));
+            virtualServiceRepository.findByResourceAndOperationId(resource, operationId));
     }
 
     @Override
     @Async("asyncWorkExecutor")
     @Transactional("virtualTransactionManager")
     public void updateUsageTime(MockRequest request) {
-        final VirtualServiceEntity vsEntity =
-                virtualServiceRepository.findById(request.getVirtualServiceId()).get();
-        vsEntity.setLastUsedDateTime(Calendar.getInstance());
-      final long usageCount = request.getUsageCount() + 1;
-        vsEntity.setUsageCount(usageCount);
+        Optional<VirtualServiceEntity> virtualServiceRequest  = virtualServiceRepository.findById(request.getVirtualServiceId());
+        if(virtualServiceRequest.isPresent()) {
+            virtualServiceRequest.get().setLastUsedDateTime(Calendar.getInstance());
+            final long usageCount = request.getUsageCount() + 1;
+            virtualServiceRequest.get().setUsageCount(usageCount);
+        }
     }
 
     @Override
@@ -141,7 +136,7 @@ public class VirtualServiceImpl implements VirtualService {
             final Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -removeMockDataUnusedAfter);
             final Iterable<VirtualServiceEntity> mockEntityList =
-                    virtualServiceRepository.findByLastUsedDateTimeBefore(calendar);
+                virtualServiceRepository.findByLastUsedDateTimeBefore(calendar);
             final int count = getVirtualServiceRequests(mockEntityList).size();
             if (count > 0) {
                 virtualServiceRepository.deleteAll(mockEntityList);
@@ -152,7 +147,7 @@ public class VirtualServiceImpl implements VirtualService {
     }
 
     private List<VirtualServiceRequest> getVirtualServiceRequests(
-            Iterable<VirtualServiceEntity> mockEntityList) {
+        Iterable<VirtualServiceEntity> mockEntityList) {
         final List<VirtualServiceRequest> list = new ArrayList<>();
         for (final VirtualServiceEntity mockEntity : mockEntityList) {
             list.add(Converter.converterEToR(mockEntity));

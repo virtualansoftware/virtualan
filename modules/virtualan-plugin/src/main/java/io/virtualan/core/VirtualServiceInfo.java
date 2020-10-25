@@ -29,11 +29,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,19 +62,9 @@ import io.virtualan.core.model.VirtualServiceRequest;
 
 public interface VirtualServiceInfo {
 
-    String MATCH_API_TYPE = "[\\sa-zA-Z0-9]Api";
-
-    String API_SUFFIX = "Api";
-
-    String PARENT_ROOT = "Parent-Root";
-
-    String CURLY_PATH = "Curly";
-
-    Logger log = LoggerFactory.getLogger(VirtualServiceInfo.class);
-
-
-    String rxpCurly = "\\{(.*?)\\}";
-    Pattern pattern = Pattern.compile(rxpCurly, Pattern.MULTILINE);
+    @Slf4j
+    final class LogHolder
+    {}
 
     ApiType getApiType();
 
@@ -95,8 +83,8 @@ public interface VirtualServiceInfo {
     void setMockLoadChoice(Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice);
 
     void buildInput(Method method, VirtualServiceRequest mockLoadRequest)
-            throws JsonProcessingException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException;
+        throws JsonProcessingException, InstantiationException, IllegalAccessException,
+        ClassNotFoundException;
 
 
     default String getResourceDesc(Method method) {
@@ -116,41 +104,44 @@ public interface VirtualServiceInfo {
             List<Class> classes = (List<Class>) f.get(classLoader);
             for (int i = 0; i < classes.size(); i++) {
                 Class classzz = classes.get(i);
-                try {
-                    if (classzz.isAnnotationPresent(VirtualService.class)) {
-                        String interfaceName = classzz.getTypeName();
-                        interfaceName = interfaceName.substring(interfaceName.lastIndexOf(".") + 1
-                        );
-                        interfaceName = interfaceName.toLowerCase();
-                        virtualInterfaces.put(interfaceName, classzz);
-                    }
-                } catch (ArrayStoreException e) {
-                    // ignore it
-                }
-
+                loadClasses(virtualInterfaces, classzz);
             }
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                | IllegalAccessException e1) {
-            log.error("Unable to load from the class loader " + e1.getMessage());
+            | IllegalAccessException e1) {
+            LogHolder.log.error("Unable to load from the class loader {}" , e1.getMessage());
         }
         return virtualInterfaces;
     }
 
+    default void loadClasses(Map<String, Class> virtualInterfaces, Class classzz) {
+        try {
+            if (classzz.isAnnotationPresent(VirtualService.class)) {
+                String interfaceName = classzz.getTypeName();
+                interfaceName = interfaceName.substring(interfaceName.lastIndexOf('.') + 1
+                );
+                interfaceName = interfaceName.toLowerCase();
+                virtualInterfaces.put(interfaceName, classzz);
+            }
+        } catch (ArrayStoreException e) {
+            // ignore it
+        }
+    }
+
 
     default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices()
-            throws ClassNotFoundException, JsonProcessingException, InstantiationException,
-            IllegalAccessException {
+        throws ClassNotFoundException, JsonProcessingException, InstantiationException,
+        IllegalAccessException {
         Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice = getMockLoadChoice();
         if (mockLoadChoice == null) {
             mockLoadChoice = new TreeMap<>();
             for (Map.Entry<String, Class> virtualServiceEntry : findVirtualServices().entrySet()) {
                 Map<String, VirtualServiceRequest> mockAPILoadChoice =
-                        buildVirtualServiceInfo(virtualServiceEntry);
+                    buildVirtualServiceInfo(virtualServiceEntry);
                 if (!mockAPILoadChoice.isEmpty()) {
                     Map<String, Map<String, VirtualServiceRequest>> resourceGroup =
-                            mockAPILoadChoice.entrySet().stream().filter(x -> !"virtualanendpoint".equalsIgnoreCase(x.getKey()))
-                                    .collect(Collectors.groupingBy(f -> f.getValue().getResource(),
-                                            Collectors.toMap(f -> f.getKey(), f -> f.getValue())));
+                        mockAPILoadChoice.entrySet().stream().filter(x -> !"virtualanendpoint".equalsIgnoreCase(x.getKey()))
+                            .collect(Collectors.groupingBy(f -> f.getValue().getResource(),
+                                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     mockLoadChoice.putAll(resourceGroup);
                 }
             }
@@ -160,10 +151,10 @@ public interface VirtualServiceInfo {
     }
 
     default Map<String, VirtualServiceRequest> buildVirtualServiceInfo(
-            Map.Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+        Map.Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
+        InstantiationException, IllegalAccessException, ClassNotFoundException {
         Map<String, VirtualServiceRequest> mockAPILoadChoice =
-                new LinkedHashMap<String, VirtualServiceRequest>();
+            new LinkedHashMap<>();
         for (Method method : virtualServiceEntry.getValue().getDeclaredMethods()) {
             ApiVirtual[] annotInstance = method.getAnnotationsByType(ApiVirtual.class);
             if (annotInstance != null && annotInstance.length > 0) {
@@ -184,20 +175,20 @@ public interface VirtualServiceInfo {
         }
         if (mockTransferInput.getOperationId() != null) {
             VirtualServiceRequest mockTransferActual = getMockLoadChoice()
-                    .get(mockTransferInput.getResource()).get(mockTransferInput.getOperationId());
+                .get(mockTransferInput.getResource()).get(mockTransferInput.getOperationId());
             if (mockTransferActual != null) {
                 inputType = mockTransferActual.getInputObjectType();
             }
         } else {
             String resourceUrl =
-                    mockTransferInput.getUrl().substring(1);
+                mockTransferInput.getUrl().substring(1);
             List<String> resouceSplitterList =
-                    new LinkedList(Arrays.asList(resourceUrl.split("/")));
+                new LinkedList(Arrays.asList(resourceUrl.split("/")));
             if (!resouceSplitterList.isEmpty()) {
                 String operationId = getOperationId(mockTransferInput.getMethod(),
-                        getResourceParent(), resouceSplitterList);
+                    getResourceParent(), resouceSplitterList);
                 VirtualServiceRequest mockTransferActual =
-                        getMockLoadChoice().get(mockTransferInput.getResource()).get(operationId);
+                    getMockLoadChoice().get(mockTransferInput.getResource()).get(operationId);
                 if (mockTransferActual != null) {
                     inputType = mockTransferActual.getInputObjectType();
                 }
@@ -223,13 +214,13 @@ public interface VirtualServiceInfo {
                                             .writeValueAsString(Class
                                                 .forName(apiResponse.response()
                                                     .getCanonicalName())
-                                                .newInstance()),
+                                                .getDeclaredConstructor().newInstance()),
                                         apiResponse.message()));
                         }
                     } catch (Exception e) {
                         responseType.put(String.valueOf(apiResponse.code()),
-                                new VirtualServiceApiResponse(String.valueOf(apiResponse.code()),
-                                        null, null, apiResponse.message()));
+                            new VirtualServiceApiResponse(String.valueOf(apiResponse.code()),
+                                null, null, apiResponse.message()));
                     }
                 }
             }
@@ -239,18 +230,18 @@ public interface VirtualServiceInfo {
     }
 
     default String getOperationId(String httpVerb, ResourceMapper resourceParent,
-            List<String> resouceSplitterList) {
-        if (resouceSplitterList.size() == 0) {
+        List<String> resouceSplitterList) {
+        if (resouceSplitterList.isEmpty()) {
             return resourceParent.getOperationId(httpVerb);
         }
         String resource = resouceSplitterList.get(0);
         ResourceMapper mapper = resourceParent.findResource(resource);
         if (mapper != null) {
             return getOperationId(httpVerb, mapper,
-                    resouceSplitterList.subList(1, resouceSplitterList.size()));
+                resouceSplitterList.subList(1, resouceSplitterList.size()));
         } else {
-            return getOperationId(httpVerb, resourceParent.findResource(CURLY_PATH),
-                    resouceSplitterList.subList(1, resouceSplitterList.size()));
+            return getOperationId(httpVerb, resourceParent.findResource(VirtualServiceConstants.CURLY_PATH),
+                resouceSplitterList.subList(1, resouceSplitterList.size()));
         }
 
     }
@@ -259,14 +250,14 @@ public interface VirtualServiceInfo {
     default VirtualServiceRequest getResponseType(VirtualServiceRequest mockTransferInput) {
         if(mockTransferInput != null && mockTransferInput.getUrl() != null) {
             int index = mockTransferInput.getUrl().indexOf('/', 1) == -1
-                    ? mockTransferInput.getUrl().length() : mockTransferInput.getUrl().indexOf('/', 1);
+                ? mockTransferInput.getUrl().length() : mockTransferInput.getUrl().indexOf('/', 1);
             if (mockTransferInput.getResource() == null) {
                 mockTransferInput.setResource(mockTransferInput.getUrl().substring(1, index));
             }
         }
         if (mockTransferInput != null && mockTransferInput.getOperationId() != null) {
             return getMockLoadChoice().get(mockTransferInput.getResource())
-                    .get(mockTransferInput.getOperationId());
+                .get(mockTransferInput.getOperationId());
         }
         return null;
     }
@@ -281,19 +272,19 @@ public interface VirtualServiceInfo {
 
     default ResourceMapper loadMapper() {
         Set<ResourceMapper> resourceMapperList = new LinkedHashSet<>();
-        ResourceMapper resourceParent = new ResourceMapper(PARENT_ROOT, resourceMapperList);
+        ResourceMapper resourceParent = new ResourceMapper(VirtualServiceConstants.PARENT_ROOT, resourceMapperList);
         for (Entry<String, Map<String, VirtualServiceRequest>> obj : getMockLoadChoice()
-                .entrySet()) {
+            .entrySet()) {
             for (Entry<String, VirtualServiceRequest> requestMockObject : obj.getValue()
-                    .entrySet()) {
+                .entrySet()) {
                 String resource = requestMockObject.getValue().getUrl().substring(1
                 );
                 List<String> resouceSplitterList =
-                        new LinkedList(Arrays.asList(resource.split("/")));
+                    new LinkedList(Arrays.asList(resource.split("/")));
                 if (!resouceSplitterList.isEmpty()) {
                     ResourceMapper mapperChild = buildHierarchyObject(
-                            requestMockObject.getValue().getMethod(), resourceParent,
-                            resouceSplitterList, requestMockObject.getKey());
+                        requestMockObject.getValue().getMethod(), resourceParent,
+                        resouceSplitterList, requestMockObject.getKey());
                     resourceParent.addResourceMapper(mapperChild);
                 }
             }
@@ -302,12 +293,12 @@ public interface VirtualServiceInfo {
     }
 
     default ResourceMapper buildHierarchyObject(String httpVerb, ResourceMapper resourceParent,
-            List<String> resouceSplitterList, String operationId) {
+        List<String> resouceSplitterList, String operationId) {
         String resource = resouceSplitterList.get(0);
         String actualResource = resouceSplitterList.get(0);
-        final Matcher matcher = pattern.matcher(resouceSplitterList.get(0));
+        final Matcher matcher = VirtualServiceConstants.pattern.matcher(resouceSplitterList.get(0));
         if (matcher.find()) {
-            resource = CURLY_PATH;
+            resource = VirtualServiceConstants.CURLY_PATH;
         }
         if (resouceSplitterList.size() == 1) {
             ResourceMapper resourceMapper = resourceParent.findResource(resource);
@@ -320,7 +311,7 @@ public interface VirtualServiceInfo {
         } else if (resourceParent.findResource(resource) != null) {
             ResourceMapper resourceChild = resourceParent.findResource(resource);
             ResourceMapper resourceMapperReturn = buildHierarchyObject(httpVerb, resourceChild,
-                    resouceSplitterList.subList(1, resouceSplitterList.size()), operationId);
+                resouceSplitterList.subList(1, resouceSplitterList.size()), operationId);
             resourceChild.addResourceMapper(resourceMapperReturn);
             return resourceChild;
         } else {
@@ -328,7 +319,7 @@ public interface VirtualServiceInfo {
             ResourceMapper resourceMapper = new ResourceMapper(resource, mapperSet);
             resourceMapper.setActualResource(actualResource);
             ResourceMapper resourceMapperReturn = buildHierarchyObject(httpVerb, resourceMapper,
-                    resouceSplitterList.subList(1, resouceSplitterList.size()), operationId);
+                resouceSplitterList.subList(1, resouceSplitterList.size()), operationId);
             resourceMapper.addResourceMapper(resourceMapperReturn);
 
             return resourceMapper;
@@ -336,27 +327,27 @@ public interface VirtualServiceInfo {
     }
 
     default Map<String, VirtualServiceApiResponse> buildResponseType(Method method)
-            throws JsonProcessingException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException {
+        throws JsonProcessingException, InstantiationException, IllegalAccessException,
+        ClassNotFoundException {
         Map<String, VirtualServiceApiResponse> responseType = buildOpenAPIResponseType(method);
-        if (responseType == null && responseType.isEmpty()) {
+        if (responseType == null || responseType.isEmpty()) {
             responseType = new HashMap<>();
             String defaultResponse = "Default";
             // Check for generic return types
             if (method.getGenericReturnType() instanceof ParameterizedType) {
                 ParameterizedType parameterizedType =
-                        (ParameterizedType) method.getGenericReturnType();
+                    (ParameterizedType) method.getGenericReturnType();
                 for (Type type : parameterizedType.getActualTypeArguments()) {
                     try {
                         responseType.put(defaultResponse,
-                                new VirtualServiceApiResponse(defaultResponse, type.getTypeName(),
-                                        getObjectMapper().writerWithDefaultPrettyPrinter()
-                                                .writeValueAsString(Class
-                                                        .forName(type.getTypeName()).newInstance()),
-                                        null));
+                            new VirtualServiceApiResponse(defaultResponse, type.getTypeName(),
+                                getObjectMapper().writerWithDefaultPrettyPrinter()
+                                    .writeValueAsString(Class
+                                        .forName(type.getTypeName()).getDeclaredConstructor().newInstance()),
+                                null));
                     } catch (Exception e) {
                         responseType.put(defaultResponse,
-                                new VirtualServiceApiResponse(defaultResponse, null, null, null));
+                            new VirtualServiceApiResponse(defaultResponse, null, null, null));
                     }
                 }
             }
@@ -365,23 +356,23 @@ public interface VirtualServiceInfo {
     }
 
     default VirtualServiceRequest buildServiceDetails(Entry<String, Class> virtualServiceEntry,
-            Method method) throws JsonProcessingException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException {
-    	
-    	String rootResource = ApiResource.getResourceParent(virtualServiceEntry.getValue());
-    	VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
+        Method method) throws JsonProcessingException, InstantiationException,
+        IllegalAccessException, ClassNotFoundException {
+
+        String rootResource = ApiResource.getResourceParent(virtualServiceEntry.getValue());
+        VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
         virtualServiceRequest.setDesc(getResourceDesc(method));
         virtualServiceRequest.setResponseType(buildResponseType(method));
         virtualServiceRequest.setOperationId(method.getName());
         virtualServiceRequest.setHttpStatusMap(getHttpStatusMap());
         VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
         if(rootResource != null) {
-        	virtualServiceRequest.setUrl("/"+rootResource + virtualServiceKeyValue.getValue());
-        	virtualServiceRequest.setResource(rootResource);
+            virtualServiceRequest.setUrl("/"+rootResource + virtualServiceKeyValue.getValue());
+            virtualServiceRequest.setResource(rootResource);
         } else {
-        	virtualServiceRequest.setUrl(virtualServiceKeyValue.getValue());
-        	virtualServiceRequest
-               .setResource(ApiResource.getResourceByURL(virtualServiceKeyValue.getValue()));
+            virtualServiceRequest.setUrl(virtualServiceKeyValue.getValue());
+            virtualServiceRequest
+                .setResource(ApiResource.getResourceByURL(virtualServiceKeyValue.getValue()));
         }
         virtualServiceRequest.setMethod(virtualServiceKeyValue.getKey());
         buildInput(method, virtualServiceRequest);

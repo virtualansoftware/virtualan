@@ -17,21 +17,24 @@ package io.virtualan.requestbody;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.util.XMLConverter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This is Virtual Service request body types supported.
- * 
+ *
  * @author  Elan Thangamani
- * 
+ *
  **/
+@Slf4j
 public enum RequestBodyTypes {
     NO_REQUEST_PARAM("NO_REQUEST_PARAM") {
         @Override
@@ -47,13 +50,13 @@ public enum RequestBodyTypes {
         @Override
         public boolean compareRequestBody(RequestBody requestBody) {
             return ((requestBody.getExpectedInput() == null)
-                    && (requestBody.getActualInput() == null));
+                && (requestBody.getActualInput() == null));
         }
     },
     BOOLEAN("java.lang.Boolean") {
         @Override
         public Object getValidMockRequestBody(RequestBody requestBody) {
-            return new Boolean(requestBody.getInputRequest());
+            return Boolean.parseBoolean(requestBody.getInputRequest());
         }
 
         @Override
@@ -64,8 +67,8 @@ public enum RequestBodyTypes {
         @Override
         public boolean compareRequestBody(RequestBody requestBody) {
             return Boolean.parseBoolean(
-                    requestBody.getExpectedInput()) == ((Boolean) requestBody.getActualInput())
-                            .booleanValue();
+                requestBody.getExpectedInput()) == ((Boolean) requestBody.getActualInput())
+                .booleanValue();
         }
     },
     STRING("java.lang.String") {
@@ -98,33 +101,31 @@ public enum RequestBodyTypes {
         @Override
         public boolean compareRequestBody(RequestBody requestBody) {
             return new BigDecimal(requestBody.getExpectedInput())
-                    .compareTo((BigDecimal) requestBody.getActualInput()) == 0;
+                .compareTo((BigDecimal) requestBody.getActualInput()) == 0;
         }
     },
     MAP("java.util.Map") {
         @Override
         public Object getValidMockRequestBody(RequestBody requestBody) throws IOException {
             return requestBody.getObjectMapper().readValue(requestBody.getInputRequest(),
-                    HashMap.class);
+                HashMap.class);
         }
 
         @Override
         public String getDefaultMessageBody(RequestBody requestBody) {
             return "{\"additionalProp1\": \"string\",  " + "\"additionalProp2\": \"string\",  "
-                    + "\"additionalProp3\": \"string\"}";
+                + "\"additionalProp3\": \"string\"}";
         }
 
         @Override
         public boolean compareRequestBody(RequestBody requestBody) throws IOException {
             Map expectedMap =
-                    new ObjectMapper().readValue(requestBody.getExpectedInput(), HashMap.class);
+                new ObjectMapper().readValue(requestBody.getExpectedInput(), HashMap.class);
             for (Map.Entry<String, String> actualMap : ((Map<String, String>) requestBody
-                    .getActualInput()).entrySet()) {
+                .getActualInput()).entrySet()) {
                 if (requestBody.getExcludeList() == null
-                        || !requestBody.getExcludeList().contains(actualMap.getKey())) {
-                    if (!actualMap.getValue().equals(expectedMap.get(actualMap.getKey()))) {
-                        return false;
-                    }
+                    || !requestBody.getExcludeList().contains(actualMap.getKey()) && !actualMap.getValue().equals(expectedMap.get(actualMap.getKey()))) {
+                    return false;
                 }
             }
             return true;
@@ -134,15 +135,16 @@ public enum RequestBodyTypes {
         @Override
         public Object getValidMockRequestBody(RequestBody requestBody) throws IOException {
             return requestBody.getObjectMapper().readValue(requestBody.getInputRequest(),
-                    requestBody.getInputObjectType());
+                requestBody.getInputObjectType());
         }
 
         @Override
         public String getDefaultMessageBody(RequestBody requestBody) throws IOException {
             try {
                 return requestBody.getObjectMapper().writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(requestBody.getInputObjectType().newInstance());
-            } catch (InstantiationException | IllegalAccessException e) {
+                    .writeValueAsString(requestBody.getInputObjectType().getDeclaredConstructor().newInstance());
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                log.warn(" getDefaultMessageBody unexpected error {}", e.getMessage());
             }
             return null;
         }
@@ -164,21 +166,21 @@ public enum RequestBodyTypes {
                 } else {
                     return EqualsBuilder.reflectionEquals(
                         XMLConverter.xmlToObject(requestBody.getInputObjectType(),requestBody.getExpectedInput()),
-                            requestBody.getActualInput(), requestBody.getExcludeList());
+                        requestBody.getActualInput(), requestBody.getExcludeList());
                 }
             } else if (requestBody.getInputRequest() != null) {
                 return EqualsBuilder.reflectionEquals(
-                        requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
-                                requestBody.getInputObjectType()),
-                        requestBody.getObjectMapper().readValue(requestBody.getInputRequest(),
-                                requestBody.getInputObjectType()),
-                        requestBody.getExcludeList());
+                    requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
+                        requestBody.getInputObjectType()),
+                    requestBody.getObjectMapper().readValue(requestBody.getInputRequest(),
+                        requestBody.getInputObjectType()),
+                    requestBody.getExcludeList());
 
             } else {
                 return EqualsBuilder.reflectionEquals(
-                        requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
-                                requestBody.getInputObjectType()),
-                        requestBody.getActualInput(), requestBody.getExcludeList());
+                    requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
+                        requestBody.getInputObjectType()),
+                    requestBody.getActualInput(), requestBody.getExcludeList());
 
             }
         }
@@ -208,7 +210,7 @@ public enum RequestBodyTypes {
             if (requestBodyType.equals(currentType.getType())) {
                 return currentType;
             } else if ("java.util.HashMap".equals(currentType.getType())
-                    || "java.util.LinkedHashMap".equals(currentType.getType())) {
+                || "java.util.LinkedHashMap".equals(currentType.getType())) {
                 return MAP;
             }
         }
