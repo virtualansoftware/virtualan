@@ -212,21 +212,35 @@ public class VirtualServiceController {
       validateExpectedInput(virtualServiceRequest);
       // find the operationId for the given Request. It required for the Automation test cases
       virtualServiceUtil.findOperationIdForService(virtualServiceRequest);
-      ResponseEntity responseEntity = validateRequestBody(virtualServiceRequest);
-      if (responseEntity != null) {
-        return responseEntity;
+
+
+      if ("PARAMS".equalsIgnoreCase(virtualServiceRequest.getType())) {
+          Map response = virtualServiceUtil.handleParameterizedRequest(virtualServiceRequest);
+          if(!response.isEmpty()) {
+            final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
+                messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));
+            virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
+            virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
+            virtualServiceStatus.setResponseParam( response);
+            return new ResponseEntity<>(virtualServiceStatus,
+                HttpStatus.BAD_REQUEST);
+          }
       } else {
-        responseEntity = validateResponseBody(virtualServiceRequest);
+        ResponseEntity responseEntity = validateRequestBody(virtualServiceRequest);
+        if (responseEntity != null) {
+          return responseEntity;
+        } else {
+          responseEntity = validateResponseBody(virtualServiceRequest);
+          if (responseEntity != null) {
+            return responseEntity;
+          }
+        }
+        responseEntity = virtualServiceUtil.checkIfServiceDataAlreadyExists(virtualServiceRequest);
+
         if (responseEntity != null) {
           return responseEntity;
         }
       }
-      responseEntity = virtualServiceUtil.checkIfServiceDataAlreadyExists(virtualServiceRequest);
-
-      if (responseEntity != null) {
-        return responseEntity;
-      }
-
       VirtualServiceRequest mockTransferObject = virtualService
           .saveMockRequest(virtualServiceRequest);
       mockTransferObject = converter.convertAsJson(mockTransferObject);

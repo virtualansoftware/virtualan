@@ -22,6 +22,7 @@ import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.requestbody.RequestBodyTypes;
 import lombok.extern.slf4j.Slf4j;
+import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -136,8 +137,8 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
 
     @Override
     public void buildInput(Method method, VirtualServiceRequest mockLoadRequest)
-            throws
-            ClassNotFoundException {
+        throws
+        ClassNotFoundException, JsonProcessingException {
         int i = 0;
         List<VirtualServiceKeyValue> availableParams = new ArrayList();
         Annotation[][] annotations = method.getParameterAnnotations();
@@ -159,14 +160,7 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
                     requestBody.setInputObjectType(parameterType);
                     requestBody.setObjectMapper(objectMapper);
                     mockLoadRequest.setInputObjectType(Class.forName(parameterType.getName()));
-                    try {
-                        mockLoadRequest.setInput(
-                                RequestBodyTypes.fromString(requestBody.getInputObjectTypeName())
-                                        .getDefaultMessageBody(requestBody));
-                    } catch (IOException e) {
-
-                        // TO-DO
-                    }
+                    mockLoadRequest.setInput(new ObjectMapper().writeValueAsString(new EasyRandom().nextObject(requestBody.getInputObjectType())));
                 }
             }
         }

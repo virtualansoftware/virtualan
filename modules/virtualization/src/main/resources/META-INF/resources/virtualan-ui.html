@@ -597,6 +597,7 @@ json-tree .branch-preview::after {
 																		<option id="RESPONSE" selected>Response</option>
 																		<option id="RULE">Rule</option>
 																		<option id="SCRIPT">Script</option>
+																		<option id="PARAMS">Params</option>
 																	</select>
 																	<div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm.httpStatus.$error.required">This
@@ -690,13 +691,24 @@ json-tree .branch-preview::after {
 														 class="row">
 														<div class="form-group col-md-12">
 															<label class="head-text-black col-md-2 control-lable"
-																   for="file">Groovy Script: </label>
+																   for="groovy">Groovy Script: </label>
 															<div class="col-md-7">
 														<textarea type="text" ng-model="mockRequest.rule" name="rule"
 																  class="form-control input-sm bk-textarea"></textarea>
 															</div>
 														</div>
 													</div>
+														<div ng-show="mockRequest.type.toUpperCase() === 'PARAMS' "
+																 class="row">
+															<div class="form-group col-md-12">
+																<label class="head-text-black col-md-2 control-lable"
+																			 for="param">Parameterized: </label>
+																<div class="col-md-7">
+														<textarea type="text" ng-model="mockRequest.rule" name="rule"
+																			class="form-control input-sm bk-textarea"></textarea>
+																</div>
+															</div>
+														</div>
 
 												<div ng-show="mockRequest.inputObjectType != null"
 															class="row">
@@ -1134,6 +1146,7 @@ json-tree .branch-preview::after {
 																					<option id="RESPONSE" selected>Response</option>
 																					<option id="RULE">Rule</option>
 																					<option id="SCRIPT">Script</option>
+																					<option id="PARAMS">Params</option>
 																				</select> &nbsp; &nbsp; &nbsp; &nbsp;
 																				<select name="contentType" ng-model="mockSoapRequest.contentType"
 																								required>

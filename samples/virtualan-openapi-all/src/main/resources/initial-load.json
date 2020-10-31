@@ -193,6 +193,40 @@
     "output": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
     "httpStatusCode": "201",
     "method": "POST"
+  },
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets",
+    "type": "PARAMS",
+    "method": "POST",
+    "rule" : "[   { \"id\":\"104\", \"name\":\"doggie\"     } ]",
+    "input": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "resource": "pets"
+  },
+  {
+    "operationId": "addPet",
+    "httpStatusCode": "200",
+    "url": "/pets",
+    "type": "PARAMS",
+    "method": "POST",
+    "rule" : "[   { \"id\":\"105\", \"name\":\"doggie\"     } ]",
+    "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "resource": "pets"
+  },
+  {
+    "operationId": "updatePet",
+    "httpStatusCode": "200",
+    "url": "/pets/{petId}",
+    "type": "PARAMS",
+    "method": "PUT",
+    "rule" : "[     {         \"petId\": \"6003\", \"id\": \"6003\",         \"name\": \"None-PUT\"     },     {         \"petId\": \"6007\",\"id\": \"6007\",         \"name\": \"Sugar-PUT\"     } ]",
+    "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "availableParams":[{"key":"petId","value":"<petId>","type":null,"serviceType":null,"parameterType":"PATH_PARAM"}],
+    "resource": "pets"
   }
 
 ]

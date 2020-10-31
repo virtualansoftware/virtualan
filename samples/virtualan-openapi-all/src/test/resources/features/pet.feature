@@ -135,4 +135,3 @@ Feature: Test Pet API
     And Verify across response includes following in the response
       | id		| 130     	   |
       | name	| GoldFish-PUT |
-
