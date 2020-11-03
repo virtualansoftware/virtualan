@@ -29,7 +29,14 @@
 
 
 <style type="text/css">
-
+.scroll
+{
+width:95%;
+height:250pX;
+margin-left: 5%;
+padding: 1%;
+overflow:scroll;
+}
 
 hr.vertical {
   width: 0px;
@@ -592,7 +599,7 @@ json-tree .branch-preview::after {
 																		ng-options="httpStatus as (httpStatus + ' - ' + name)   for (httpStatus, name) in mockRequest.httpStatusMap"
 																		required></select>  &nbsp;&nbsp;&nbsp;&nbsp;
 
-																	<select ng-model="mockRequest.type" ng-click="mockRequest.rule = ctrl1.loadDefaultRule(mockRequest.type, mockRequest.rule)"
+																	<select ng-model="mockRequest.type" ng-click="mockRequest.rule = ctrl1.loadDefaultRule(mockRequest.type, mockRequest.rule, mockRequest)"
 																			required>
 																		<option id="RESPONSE" selected>Response</option>
 																		<option id="RULE">Rule</option>
@@ -687,28 +694,52 @@ json-tree .branch-preview::after {
 															</div>
 														</div>
 													</div>
-													<div ng-show="mockRequest.type.toUpperCase() === 'SCRIPT' "
+												<div ng-show="mockRequest.type.toUpperCase() === 'SCRIPT' "
+												 class="row">
+												<div class="form-group col-md-12">
+													<label class="head-text-black col-md-2 control-lable"
+															 for="groovy">Groovy Script: </label>
+													<div class="col-md-7">
+												<textarea type="text" ng-model="mockRequest.rule" name="rule"
+															class="form-control input-sm bk-textarea"></textarea>
+													</div>
+												</div>
+											</div>
+												<div ng-show="mockRequest.type.toUpperCase() === 'PARAMS' "
 														 class="row">
-														<div class="form-group col-md-12">
-															<label class="head-text-black col-md-2 control-lable"
-																   for="groovy">Groovy Script: </label>
-															<div class="col-md-7">
-														<textarea type="text" ng-model="mockRequest.rule" name="rule"
-																  class="form-control input-sm bk-textarea"></textarea>
-															</div>
+													<div class="form-group col-md-12">
+														<label class="head-text-black col-md-2 control-lable"
+																	 for="file">Parameterized values:</label>
+														<div class="col-md-7 scroll">
+															<table class="table table-striped">
+																<thead>
+																	<th ng-repeat="c in ctrl1.paramFinder(mockRequest)">{{ c }}
+																	</th>
+																	<th></th>
+																<tbody>
+																<tr ng-repeat="d in mockRequest.rule">
+																	<td ng-repeat="c in ctrl1.paramFinder(mockRequest)">{{ d[c] }}</td>
+																	<td>
+																		<img height="30" width="30" ng-click="ctrl1.removeParam(addKey, mockRequest.additionalParams);"
+																				 src= "static/img/minus-img.png"
+																				 alt="Remove">
+
+																	</td>
+																</tr>
+																<tr>
+																<td ng-repeat="c in ctrl1.paramFinder(mockRequest)">
+																	<input class="input form-control input-sm" type="text" ng-model="ctrl1.keyObject[$index]" />
+																</td>
+															 <td>
+																 <img height="30" width="30" id="btn1-param-{{mockRequest.resource}}-{{mockRequest.operationId}}" ng-click="ctrl1.addParametrizedParams(mockRequest, ctrl1.keyObject)"
+																			src= "static/img/plus-img.png"
+																			alt="Add">
+																 </td>
+															</tr>
+														</tbody></table>
 														</div>
 													</div>
-														<div ng-show="mockRequest.type.toUpperCase() === 'PARAMS' "
-																 class="row">
-															<div class="form-group col-md-12">
-																<label class="head-text-black col-md-2 control-lable"
-																			 for="param">Parameterized: </label>
-																<div class="col-md-7">
-														<textarea type="text" ng-model="mockRequest.rule" name="rule"
-																			class="form-control input-sm bk-textarea"></textarea>
-																</div>
-															</div>
-														</div>
+												</div>
 
 												<div ng-show="mockRequest.inputObjectType != null"
 															class="row">

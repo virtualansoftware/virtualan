@@ -119,7 +119,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       return false;
     };
 
-    self.loadDefaultRule = function(type, value) {
+    self.loadDefaultRule = function(type, value, mockRequest) {
      if(value != null) {
         self.tmp = value
      }if(type && type.toUpperCase() === 'SCRIPT') {
@@ -141,6 +141,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             } else {
                return self.tmp;
             }
+        } else if(type && type.toUpperCase() === 'PARAMS' && value == null) {
         }
     }
 
@@ -191,14 +192,13 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       var obj = term;
       self.filterList = $filter('filter')(self.mockRequests, obj);
       self.currentPage = 1;
-    }); 
+    });
 
    $scope.$watch(self.searchMsgText, function (term) {
          var obj = term;
          self.filterMsgList = $filter('filter')(self.mockMsgRequests, obj);
          self.currentMsgPage = 1;
        });
-
 
    $scope.$watch(self.searchSoapText, function (term) {
          var obj = term;
@@ -210,7 +210,67 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     		return typeof value !== 'undefined';
     }
 
-    
+    self.keyObject =[];
+
+
+    self.paramFinder = function (mockRequest) {
+       var output = null;
+       if(mockRequest.input.indexOf('<') && mockRequest.input.indexOf('>')) {
+          var reTagCatcher = /(<.[^(><.)]+>)/g;
+          var output = mockRequest.input.match(reTagCatcher);
+          for ( var i = 0; i < output.length; i++) {
+             output[i] = output[i].substring(1, output[i].length-1);
+          }
+       }
+       return output;
+    }
+
+
+    self.addParametrizedParams = function(mockRequest, key) {
+    	if(key != null) {
+        var headerNames = self.paramFinder(mockRequest);
+        const obj = {};
+        for ( var i = 0; i < key.length; i++) {
+          obj[headerNames[i]] = key[i];
+        }
+        if(self.isDefined(mockRequest.rule)){
+          if(!self.isExist(mockRequest, obj)) {
+            mockRequest.rule.push(obj);
+          }
+        } else {
+          mockRequest.rule = new Array();
+          mockRequest.rule.push(obj);
+        }
+    	}
+    };
+
+    self.objectsAreEqual = function(a, b) {
+       for (var prop in a) {
+         if (a.hasOwnProperty(prop)) {
+           if (b.hasOwnProperty(prop)) {
+             if (typeof a[prop] === 'object') {
+               if (!self.objectsAreEqual(a[prop], b[prop])) return false;
+             } else {
+               if (a[prop] !== b[prop]) return false;
+             }
+           } else {
+             return false;
+           }
+         }
+       }
+       return true;
+     }
+
+    self.isExist = function(mockRequest, key) {
+        for(const index in mockRequest.rule) {
+            if(self.objectsAreEqual(key, mockRequest.rule[index])){
+              return true;
+            }
+        }
+        return false;
+    };
+
+
     self.addParam = function(mockRequest, key, value) {
     	if(self.isDefined(mockRequest.additionalParams)){
     		mockRequest.additionalParams[key] = value;
@@ -533,12 +593,17 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         console.log('Saving New mockRequest', mockRequest);
         self.responseHeaderParamList = [];
         self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
-        self.mockCreateRequest= {id:'', 
+        var mockRule = mockRequest.rule;
+        if(mockRequest.type === 'Params') {
+          mockRule = JSON.stringify(mockRule);
+        }
+
+        self.mockCreateRequest= {id:'',
         			resource:mockRequest.resource,
         			url:mockRequest.url,
         			type:mockRequest.type,
-                    rule:mockRequest.rule,
-                    operationId:mockRequest.operationId,
+              rule:mockRule,
+              operationId:mockRequest.operationId,
         			input:mockRequest.input,
         			output:mockRequest.output,
         			excludeList:mockRequest.excludeList, 
