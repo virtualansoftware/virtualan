@@ -207,40 +207,123 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
        });
 
     self.isDefined = function (value) {
-    		return typeof value !== 'undefined';
+    		return typeof value !== 'undefined' && value;
+    }
+
+    self.isArrayDefined = function (value) {
+    		return typeof value !== 'undefined' && value && value.length > 0;
     }
 
     self.keyObject =[];
 
-
-    self.paramFinder = function (mockRequest) {
-       var output = null;
-       if(mockRequest.input.indexOf('<') && mockRequest.input.indexOf('>')) {
+  self.getObjectParams = function(input){
+      if(self.isDefined(input)) {
+        var outputAll = new Array();
+        var output;
+        for (var key in input) {
           var reTagCatcher = /(<.[^(><.)]+>)/g;
-          var output = mockRequest.input.match(reTagCatcher);
-          for ( var i = 0; i < output.length; i++) {
-             output[i] = output[i].substring(1, output[i].length-1);
+          output = input[key].match(reTagCatcher);
+          if(self.isArrayDefined(output)) {
+            for ( var i = 0; i < output.length; i++) {
+               outputAll.push(output[i].substring(1, output[i].length-1));
+            }
           }
        }
-       return output;
+        return outputAll;
+    }
+  }
+
+
+   self.getParams = function(input){
+      if(self.isDefined(input) && input.indexOf('<') && input.indexOf('>')) {
+         var outputAll = new Array();
+          var reTagCatcher = /(<.[^(><.)]+>)/g;
+          var output = input.match(reTagCatcher);
+          if(self.isArrayDefined(output)) {
+            for ( var i = 0; i < output.length; i++) {
+               outputAll.push(output[i].substring(1, output[i].length-1));
+            }
+          }
+        return outputAll;
+       }
+    }
+
+   self.getParamsMap = function(inputMap){
+      if(self.isArrayDefined(inputMap)) {
+         var outputAll = new Array();
+         var reTagCatcher = /(<.[^(><.)]+>)/g;
+         for ( var index in inputMap) {
+            var resValue  =  inputMap[index]['value'];
+            if(self.isDefined(resValue)){
+              var output = resValue.match(reTagCatcher);
+              if(self.isArrayDefined(output)){
+                outputAll.push(resValue.substring(1, resValue.length-1));
+              }
+            }
+         }
+         return outputAll;
+       }
+    }
+
+    self.paramHeaderMapper = {};
+    self.paramFinder =  function(mockRequest) {
+          var keyId = mockRequest.method
+          keyId = keyId.concat("-").concat(mockRequest.operationId)
+      return self.paramHeaderMapper[keyId]
+    }
+    self.paramMapper = function (mockRequest) {
+       var outputAll = new Array();
+
+       var availableParams = self.getParamsMap(mockRequest.availableParams);
+       if(self.isArrayDefined(availableParams)) {
+           Array.prototype.push.apply(outputAll, availableParams);
+       }
+
+       var additionalParams = self.getObjectParams(mockRequest.additionalParams)
+       if(self.isArrayDefined(additionalParams)) {
+           Array.prototype.push.apply(outputAll, additionalParams);
+       }
+
+       var responseHeaderParams = self.getObjectParams(mockRequest.responseHeaderParams);
+       if(self.isArrayDefined(responseHeaderParams)) {
+           Array.prototype.push.apply(outputAll, responseHeaderParams);
+       }
+
+       var input = self.getParams(mockRequest.input);
+       if(self.isArrayDefined(input)) {
+           Array.prototype.push.apply(outputAll, input);
+       }
+       var output = self.getParams(mockRequest.output);
+       if(self.isArrayDefined(output)) {
+           Array.prototype.push.apply(outputAll, output);
+       }
+
+       if(self.isArrayDefined(outputAll)) {
+          var keyId = mockRequest.method
+          keyId = keyId.concat("-").concat(mockRequest.operationId)
+          self.paramHeaderMapper[keyId] = outputAll.reduce((unique, item) => (unique.includes(item) ? unique : [...unique, item]), [],);;
+       }
+
     }
 
 
-    self.addParametrizedParams = function(mockRequest, key) {
-    	if(key != null) {
-        var headerNames = self.paramFinder(mockRequest);
-        const obj = {};
-        for ( var i = 0; i < key.length; i++) {
-          obj[headerNames[i]] = key[i];
+    self.addParametrizedParams = function(mockRequest, keyObject) {
+    	if(keyObject != null) {
+        const obj  = {}
+        for(var k in keyObject) {
+          if(keyObject.hasOwnProperty(k)) {
+            obj[k] = keyObject[k];
+           }
         }
         if(self.isDefined(mockRequest.rule)){
-          if(!self.isExist(mockRequest, obj)) {
+          if(!self.isExist(mockRequest.rule, obj)) {
             mockRequest.rule.push(obj);
           }
         } else {
           mockRequest.rule = new Array();
           mockRequest.rule.push(obj);
         }
+        keyObject = {};
     	}
     };
 
@@ -261,14 +344,15 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
        return true;
      }
 
-    self.isExist = function(mockRequest, key) {
-        for(const index in mockRequest.rule) {
-            if(self.objectsAreEqual(key, mockRequest.rule[index])){
+    self.isExist = function(rule, key) {
+        for(const index in rule) {
+            if(self.objectsAreEqual(key, rule[index])){
               return true;
             }
         }
         return false;
     };
+
 
 
     self.addParam = function(mockRequest, key, value) {
@@ -278,8 +362,9 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     		mockRequest.additionalParams = {};
     		mockRequest.additionalParams[key] = value;
     	}
-        self.additionalParamKey ='';
-        self.additionalParamValue ='';
+    	self.paramMapper(mockRequest);
+      self.additionalParamKey ='';
+      self.additionalParamValue ='';
     };
     
     self.addResponseHeaderParam = function(mockRequest, key, value) {
@@ -289,12 +374,18 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     		mockRequest.responseHeaderParams = {};
     		mockRequest.responseHeaderParams[key] = value;
     	}
-        self.responseHeaderParamKey ='';
-        self.responseHeaderParamValue ='';
+    	self.paramMapper(mockRequest);
+      self.responseHeaderParamKey ='';
+      self.responseHeaderParamValue ='';
     };
     
-    self.removeParam = function(item, params) {
+    self.removeParam = function(mockRequest, item, params) {
     	delete params[item];
+    	self.paramMapper(mockRequest);
+    };
+
+    self.removeParameterized = function(mockRequest, item) {
+        mockRequest.rule = mockRequest.rule.filter(key => !self.objectsAreEqual(key, item));
     };
 
 

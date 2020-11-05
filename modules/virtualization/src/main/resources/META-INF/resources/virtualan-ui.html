@@ -31,7 +31,7 @@
 <style type="text/css">
 .scroll
 {
-width:95%;
+width:96%;
 height:250pX;
 margin-left: 5%;
 padding: 1%;
@@ -627,9 +627,10 @@ json-tree .branch-preview::after {
 																	<table>
 																		<tr ng-repeat="mockKeyValue in mockRequest.availableParams track by $index">																		
 																			<td ><span >{{mockKeyValue.key}}: </span></td>
-																			<td><span >																			<input class="input form-control input-sm"
+																			<td><span >	<input class="input form-control input-sm"
+																													id="availableParams-{{mockRequest.method}}-{{mockRequest.operationId}}-{{mockKeyValue.key}}"
 																				type="text" name="{{mockKeyValue.key}}"
-																				ng-model="mockRequest.availableParams[$index].value" />
+																				ng-model="mockRequest.availableParams[$index].value"  ng-blur="ctrl1.paramMapper(mockRequest);" />
 																				</span>
 																			</td>
 																			<td></td>																			<td></td>
@@ -656,7 +657,7 @@ json-tree .branch-preview::after {
 																		<td  class="head-text-black"><span >{{addKey}}</span></td>
 																		<td  class="head-text-black"><span >{{addValue}}</span></td>
 																		<td>
-																		<img height="30" width="30" ng-click="ctrl1.removeParam(addKey, mockRequest.additionalParams);"
+																		<img height="30" width="30" ng-click="ctrl1.removeParam(mockRequest, addKey, mockRequest.additionalParams);"
 																			src= "static/img/minus-img.png"
 																			alt="Remove">
 
@@ -671,6 +672,7 @@ json-tree .branch-preview::after {
 																		</td>
 																		<td>
 																			<input class="input form-control input-sm"
+																				 id="additionalParamKey-{{mockRequest.method}}-{{mockRequest.operationId}}-{{mockKeyValue.additionalParamKey}}"
 																			type="text" ng-model="ctrl1.additionalParamValue"/>
 																		</td>
 																		<td>
@@ -713,25 +715,27 @@ json-tree .branch-preview::after {
 														<div class="col-md-7 scroll">
 															<table class="table table-striped">
 																<thead>
-																	<th ng-repeat="c in ctrl1.paramFinder(mockRequest)">{{ c }}
+																	<th ng-repeat="c in ctrl1.paramHeaderMapper[mockRequest.method+'-'+mockRequest.operationId] track by $index">{{ c }}
 																	</th>
 																	<th></th>
 																<tbody>
-																<tr ng-repeat="d in mockRequest.rule">
-																	<td ng-repeat="c in ctrl1.paramFinder(mockRequest)">{{ d[c] }}</td>
+																<tr ng-repeat="d in mockRequest.rule" ng-show="d != null">
+																	<td ng-repeat="keyId in ctrl1.paramHeaderMapper[mockRequest.method+'-'+mockRequest.operationId] track by $index">{{ d[keyId] }}</td>
 																	<td>
-																		<img height="30" width="30" ng-click="ctrl1.removeParam(addKey, mockRequest.additionalParams);"
+																		<img height="30" width="30" ng-click="ctrl1.removeParameterized(mockRequest, d);"
 																				 src= "static/img/minus-img.png"
 																				 alt="Remove">
-
 																	</td>
 																</tr>
 																<tr>
 																<td ng-repeat="c in ctrl1.paramFinder(mockRequest)">
-																	<input class="input form-control input-sm" type="text" ng-model="ctrl1.keyObject[$index]" />
+																	<input class="input form-control input-sm"
+																				 id="params-{{mockRequest.method}}-{{mockRequest.operationId}}-{{c}}"
+																				 type="text" ng-model="ctrl1.keyObject[c]" />
 																</td>
 															 <td>
-																 <img height="30" width="30" id="btn1-param-{{mockRequest.resource}}-{{mockRequest.operationId}}" ng-click="ctrl1.addParametrizedParams(mockRequest, ctrl1.keyObject)"
+																 <img height="30" width="30"
+																			id="btn1-param-{{mockRequest.resource}}-{{mockRequest.operationId}}" ng-click="ctrl1.addParametrizedParams(mockRequest, ctrl1.keyObject)"
 																			src= "static/img/plus-img.png"
 																			alt="Add">
 																 </td>
@@ -749,6 +753,8 @@ json-tree .branch-preview::after {
 																<div class="col-md-7">
 																	<textarea ng-model="mockRequest.input" name="input"
 																		class="input form-control input-sm bk-textarea"
+																						id="input-{{mockRequest.method}}-{{mockRequest.operationId}}"
+																						ng-blur="ctrl1.paramMapper(mockRequest)"
 																		rows="5"> {{mockRequest.input}}</textarea>
 																	<div layout-align="center center">Type:
 																		{{mockRequest.inputObjectType}}</div>
@@ -764,6 +770,8 @@ json-tree .branch-preview::after {
 																<div class="col-md-7">
 																	<textarea ng-model="mockRequest.output" name="output"
 																		class="response form-control input-sm bk-textarea"
+																						id="output-{{mockRequest.resource}}-{{mockRequest.operationId}}"
+																						ng-blur="ctrl1.paramMapper(mockRequest)"
 																		rows="5"> {{mockRequest.output}}</textarea>
 																	<div layout-align="center center">Type:
 																		{{mockRequest.outputObjectType}}</div>
@@ -790,7 +798,7 @@ json-tree .branch-preview::after {
 																			<td><span >{{resKey}}</span></td>
 																			<td><span >{{resValue}}</span></td>
 																			<td>
-																			<img height="30" width="30" ng-click="ctrl1.removeParam(resKey, mockRequest.responseHeaderParams);"
+																			<img height="30" width="30" ng-click="ctrl1.removeParam(mockRequest, resKey, mockRequest.responseHeaderParams);"
 																				src= "static/img/minus-img.png"
 																				alt="Remove">
 																			
@@ -804,7 +812,8 @@ json-tree .branch-preview::after {
 																			</td>
 																			<td >
 																				<input  class="input form-control input-sm"
-																				type="text" ng-model="ctrl1.responseHeaderParamValue"/>
+																								id="responseHeaderParamKey-{{mockRequest.method}}-{{mockRequest.operationId}}-{{ctrl1.responseHeaderParamKey}}"
+																								type="text" ng-model="ctrl1.responseHeaderParamValue"/>
 																			</td>
 																			<td>
 																				<img height="30" width="30" ng-click="ctrl1.addResponseHeaderParam(mockRequest, ctrl1.responseHeaderParamKey,ctrl1.responseHeaderParamValue);"
@@ -967,7 +976,7 @@ json-tree .branch-preview::after {
 																					<td  class="head-text-black"><span >{{addKey}}</span></td>
 																					<td  class="head-text-black"><span >{{addValue}}</span></td>
 																					<td>
-																						<img height="30" width="30" ng-click="ctrl2.removeParam(addKey, mockMsgRequest.additionalParams);"
+																						<img height="30" width="30" ng-click="ctrl2.removeParam(mockMsgRequest, addKey, mockMsgRequest.additionalParams);"
 																							 src= "static/img/minus-img.png"
 																							 alt="Remove">
 
@@ -1034,7 +1043,7 @@ json-tree .branch-preview::after {
 																					<td><span >{{resKey}}</span></td>
 																					<td><span >{{resValue}}</span></td>
 																					<td>
-																						<img height="30" width="30" ng-click="ctrl2.removeParam(resKey, mockMsgRequest.responseHeaderParams);"
+																						<img height="30" width="30" ng-click="ctrl2.removeParam(mockMsgRequest, resKey, mockMsgRequest.responseHeaderParams);"
 																							 src= "static/img/minus-img.png"
 																							 alt="Remove">
 
