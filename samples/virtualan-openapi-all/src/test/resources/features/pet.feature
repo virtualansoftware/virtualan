@@ -135,3 +135,10 @@ Feature: Test Pet API
     And Verify across response includes following in the response
       | id		| 130     	   |
       | name	| GoldFish-PUT |
+  Scenario: User calls service to validate username
+    Given pet with an path param username of John
+    When a user get application/json in user_username resource on pet
+    Then Verify the status code is 200
+    And Verify across response includes following in the response
+      | id		    | 111985     	    |
+      | firstName	| Biden         |
