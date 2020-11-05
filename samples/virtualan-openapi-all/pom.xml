@@ -155,6 +155,7 @@
 							<jsonFiles>
 								<param>**/*.json</param>
 							</jsonFiles>
+							<parallelTesting>false</parallelTesting>
 						</configuration>
 					</execution>
 				</executions>

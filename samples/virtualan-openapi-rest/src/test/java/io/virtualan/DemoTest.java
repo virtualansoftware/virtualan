@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(features = "classpath:features",
     extraGlue = {"io.virtualan.core"},
     plugin = {"pretty",
-        "json:target/cucumber-report.json"})
+        "json:target/jsonReports/cucumber-report.json"})
 
 public class DemoTest {
 
