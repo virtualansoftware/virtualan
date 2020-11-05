@@ -75,13 +75,6 @@
 		</dependency>
 
 
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20190722</version>
-		</dependency>
-
-
 		<!--SpringFox dependencies -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>

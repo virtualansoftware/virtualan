@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jeasy.random.EasyRandom;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -211,11 +212,9 @@ public interface VirtualServiceInfo {
                                         String.valueOf(apiResponse.code()),
                                         apiResponse.response().getCanonicalName(),
                                         getObjectMapper().writerWithDefaultPrettyPrinter()
-                                            .writeValueAsString(Class
-                                                .forName(apiResponse.response()
-                                                    .getCanonicalName())
-                                                .getDeclaredConstructor().newInstance()),
-                                        apiResponse.message()));
+                                            .writeValueAsString(
+                                    new EasyRandom().nextObject(apiResponse.response().getClass())),
+                                 apiResponse.message()));
                         }
                     } catch (Exception e) {
                         responseType.put(String.valueOf(apiResponse.code()),
@@ -342,8 +341,7 @@ public interface VirtualServiceInfo {
                         responseType.put(defaultResponse,
                                 new VirtualServiceApiResponse(defaultResponse, type.getTypeName(),
                                         getObjectMapper().writerWithDefaultPrettyPrinter()
-                                                .writeValueAsString(Class
-                                                        .forName(type.getTypeName()).getDeclaredConstructor().newInstance()),
+                                                .writeValueAsString(new EasyRandom().nextObject(type.getClass())),
                                         null));
                     } catch (Exception e) {
                         responseType.put(defaultResponse,

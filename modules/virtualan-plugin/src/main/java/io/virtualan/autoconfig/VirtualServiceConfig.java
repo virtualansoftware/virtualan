@@ -27,9 +27,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  *  This is base class to load the service virtaulized service(Virtualan).
- * 
+ *
  * @author  Elan Thangamani
- * 
+ *
  **/
 
 @Configuration
@@ -62,5 +62,5 @@ public class VirtualServiceConfig {
         return taskExecutor;
     }
 
-    
+
 }

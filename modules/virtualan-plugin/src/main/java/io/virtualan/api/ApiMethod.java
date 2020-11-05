@@ -22,15 +22,19 @@ import java.lang.reflect.Method;
 
 /**
  *  This ApiMethod class identify the rest operation type for the selected operation.
- * 
+ *
  * @author  Elan Thangamani
- * 
+ *
  **/
 public class ApiMethod {
-    private ApiMethod(){}
+
+    private ApiMethod(){
+
+    }
 
     public static String getApiMethodParam(Method method) {
         return getApiMethodParamAndURL(method).getKey();
+
     }
 
     public static VirtualServiceKeyValue getApiMethodParamAndURL(Method method) {
@@ -64,7 +68,7 @@ public class ApiMethod {
             RequestMapping requestMapping = annotInstance[0];
             virtualServiceKeyValue = new VirtualServiceKeyValue();
             virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-            if ( requestMapping.method().length > 0) {
+            if (requestMapping.method().length > 0) {
                 virtualServiceKeyValue.setKey(requestMapping.method()[0].name());
             }
             if (requestMapping.value().length > 0) {
@@ -89,8 +93,9 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if (annotInstanceMapping[0].value().length > 0)
+                if ( annotInstanceMapping[0].value().length > 0) {
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
             }
         }
         return virtualServiceKeyValue;
@@ -111,7 +116,7 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if ( annotInstanceMapping[0].value().length > 0) {
+                if (annotInstanceMapping[0].value().length > 0) {
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
                 }
             }
@@ -134,7 +139,7 @@ public class ApiMethod {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
                 virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
-                if (annotInstanceMapping[0].value().length > 0) {
+                if ( annotInstanceMapping[0].value().length > 0) {
                     virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
                 }
             }

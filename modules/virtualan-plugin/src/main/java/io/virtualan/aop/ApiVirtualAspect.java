@@ -212,7 +212,7 @@ public class ApiVirtualAspect {
         }
 
         private String getParamName(Object[] args, MethodSignature methodSignature,
-            MockServiceRequest mockServiceRequest, int argIndex, String requestParamName,
+            MockServiceRequest mockServiceRequest, int argIndex,
             Annotation annotation) {
             if (annotation instanceof RequestParam) {
                 RequestParam requestParam = (RequestParam) annotation;
@@ -265,7 +265,7 @@ public class ApiVirtualAspect {
 
         public GetParams invoke() {
             requestParamName = getParamName(args, methodSignature, mockServiceRequest,
-                argIndex, requestParamName, annotation);
+                argIndex,  annotation);
             if (requestParamName != null) {
                 if ((args[argIndex]) instanceof List) {
                     paramMap.put(requestParamName, addQueryParamValue(args[argIndex]));

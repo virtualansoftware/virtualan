@@ -15,81 +15,83 @@
 
 package io.virtualan.api;
 
+import io.virtualan.core.model.VirtualServiceKeyValue;
 import java.lang.reflect.Method;
-
 import javax.ws.rs.Path;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import io.virtualan.core.model.VirtualServiceKeyValue;
-
 /**
- *  This ApiResource class identify the resource name.
- * 
- * @author  Elan Thangamani
- * 
+ * This ApiResource class identify the resource name.
+ *
+ * @author Elan Thangamani
  **/
 
 public class ApiResource {
 
-	private  ApiResource(){
+	private ApiResource() {
 
 	}
-	
-	 public static String getResourceParent(Class clazz) {
-		 String parentPath =  null; 
-		 if(clazz.isAnnotationPresent(RequestMapping.class)) {
-			 RequestMapping requestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
-			 if(requestMapping.value().length  == 1) {
-				 parentPath = requestMapping.value()[0];
-			 }
-		 } else if(clazz.isAnnotationPresent(Path.class)) {
-			 Path path = (Path) clazz.getAnnotation(Path.class);
-			 if(path != null) {
-				 parentPath = path.value();
-			 }
-		 }
-		 if(parentPath != null && parentPath.contains("/")) {
+
+	public static String getResourceParent(Class clazz) {
+		String parentPath = null;
+		if (clazz.isAnnotationPresent(RequestMapping.class)) {
+			RequestMapping requestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
+			if (requestMapping.value().length == 1) {
+				parentPath = requestMapping.value()[0];
+			}
+		} else if (clazz.isAnnotationPresent(Path.class)) {
+			Path path = (Path) clazz.getAnnotation(Path.class);
+			if (path != null) {
+				parentPath = path.value();
+			}
+		}
+		if (parentPath != null && parentPath.contains("/")) {
 			String[] resources = parentPath.split("/");
 			return resources.length >= 1 && resources[1].length() > 1 ? resources[1] : null;
-		 } 
-		 return null;
-	    }
-
-	 public static String getResource(Class clazz) {
-		 String parentPath =  null; 
-		 if(clazz.isAnnotationPresent(RequestMapping.class)) {
-			 RequestMapping requestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
-			 if(requestMapping.value().length  == 1) {
-				 parentPath = requestMapping.value()[0];
-			 }
-		 } else if(clazz.isAnnotationPresent(Path.class)) {
-			 Path path = (Path) clazz.getAnnotation(Path.class);
-			 if(path != null) {
-				 parentPath = path.value();
-			 }
-		 }
-		 if(parentPath != null && parentPath.contains("/")) {
-			return parentPath;
-		 } 
-			return null;
+		}
+		return null;
 	}
- 
-	 
-    public static String getResource(Method method) {
-        VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
-        if (virtualServiceKeyValue != null && virtualServiceKeyValue.getValue() != null) {
-                return getResourceByURL(virtualServiceKeyValue.getValue());
-        }
-        return null;
-    }
 
-    public static String getResourceByURL(String url) {
-        if (url != null && url.length() > 0) {
-            int index = url.indexOf('/', 1) == -1 ? url.length() : url.indexOf('/', 1);
-            url = '/' == url.charAt(0) ? url.substring(1, index) : url.substring(0, index);
-            return url;
-        }
-        return null;
-    }
+	public static String getResource(Class clazz) {
+		String parentPath = null;
+		parentPath = getParentPath(clazz, parentPath);
+		if (parentPath != null && parentPath.contains("/")) {
+			return parentPath;
+		}
+		return null;
+	}
+
+	public static String getParentPath(Class clazz, String parentPath) {
+		if (clazz.isAnnotationPresent(RequestMapping.class)) {
+			RequestMapping requestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
+			if (requestMapping.value().length == 1) {
+				parentPath = requestMapping.value()[0];
+			}
+		} else if (clazz.isAnnotationPresent(Path.class)) {
+			Path path = (Path) clazz.getAnnotation(Path.class);
+			if (path != null) {
+				parentPath = path.value();
+			}
+		}
+		return parentPath;
+	}
+
+
+	public static String getResource(Method method) {
+		VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
+		if (virtualServiceKeyValue.getValue() != null) {
+			return getResourceByURL(virtualServiceKeyValue.getValue());
+		}
+		return null;
+	}
+
+	public static String getResourceByURL(String url) {
+		if (url != null && url.length() > 0) {
+			int index = url.indexOf('/', 1) == -1 ? url.length() : url.indexOf('/', 1);
+			url = '/' == url.charAt(0) ? url.substring(1, index) : url.substring(0, index);
+			return url;
+		}
+		return null;
+	}
 
 }
