@@ -135,10 +135,41 @@ Feature: Test Pet API
     And Verify across response includes following in the response
       | id		| 130     	   |
       | name	| GoldFish-PUT |
-  Scenario: User calls service to validate username
+  Scenario: Parameterized GET - validate username
     Given pet with an path param username of John
     When a user get application/json in user_username resource on pet
     Then Verify the status code is 200
     And Verify across response includes following in the response
       | id		    | 111985     	    |
       | firstName	| Biden         |
+  Scenario: Parameterized PUT - PET
+    Given pet with an path param petId of 6003
+    And Update with mock data with given input
+      | category.id		            | i~130 		|
+      | category.name 	            | None-PUT      |
+      | id							| i~6003        |
+      | name 					 	| None-PUT      |
+      | photoUrls[0]			    | /fish/ 		|
+      |	status					    |available	    |
+      |tags[0].id				    | i~130         |
+      |tags[0].name			        | Fish-PUT	    |
+    When a user update application/json in pets_petId resource on pet
+    Then Verify the status code is 200
+    And Verify across response includes following in the response
+      | id		| 6003     	   |
+      | name	| None-PUT |
+  Scenario: Parameterized POST - PET test
+    Given Create a pet with given input
+      | category.id		            | i~100 		|
+      | category.name 	            | Fish-POST     |
+      | id							| i~105			|
+      | name 					 	| doggie |
+      |photoUrls[0]			        | /fish/ 		|
+      |	status					    |available	    |
+      |tags[0].id				    | i~100         |
+      |tags[0].name			        | Fish-POST	    |
+    When a user post accept application/json in pets resource on pet
+    Then Verify the status code is 201
+    And Verify across response includes following in the response
+      | id		    | 105        	   |
+      | name		| doggie       |

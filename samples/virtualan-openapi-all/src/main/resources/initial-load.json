@@ -207,7 +207,7 @@
   },
   {
     "operationId": "addPet",
-    "httpStatusCode": "200",
+    "httpStatusCode": "201",
     "url": "/pets",
     "type": "PARAMS",
     "method": "POST",
