@@ -101,6 +101,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 
    self.jsonObj = JSON.parse("{  \"message\": \"No Data Found\" }");
    self.groovyObj = "NO Data ";
+   self.parameterized = [];
 
     self.copyToClipboard = function (data) {
          angular.element('<textarea/>')
@@ -145,8 +146,12 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         }
     }
 
-    self.loadJson = function (value) {
-      try{
+    self.loadJson = function (value, contentType) {
+      if(contentType === 'XML') {
+        self.jsonObj = "{ \"message\" : \"NO-DATA\"}";
+        self.jsonStr = prettifyXml(value);
+      } else {
+        try{
           if(typeof value === 'object' && value !== null ) {
             self.jsonObj = JSON.parse(JSON.stringify(value, undefined, 4));
             self.jsonStr =  JSON.stringify(value, undefined, 4);
@@ -156,7 +161,8 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
           }
         }catch(e){
           self.jsonObj = "{ \"message\" : \"NO-DATA\"}";
-          self.jsonStr = prettifyXml(value);
+          self.jsonStr = value;
+        }
         }
     };
 
@@ -187,6 +193,20 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       console.log(value);
       self.groovyObj = value;
     };
+
+    self.loadParameterized = function (value) {
+      console.log(value);
+      self.parameterized = value;
+    };
+
+    self.getKeys = function() {
+      return  self.parameterized && self.parameterized.length > 0 && Object.keys(JSON.parse(self.parameterized)[0]);
+    }
+
+    self.getParameterized = function() {
+      return JSON.parse(self.parameterized);
+    }
+
 
     $scope.$watch(self.searchText, function (term) {
       var obj = term;

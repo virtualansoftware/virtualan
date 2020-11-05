@@ -207,7 +207,7 @@
   },
   {
     "operationId": "addPet",
-    "httpStatusCode": "200",
+    "httpStatusCode": "201",
     "url": "/pets",
     "type": "PARAMS",
     "method": "POST",
@@ -227,6 +227,40 @@
     "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
     "availableParams":[{"key":"petId","value":"<petId>","type":null,"serviceType":null,"parameterType":"PATH_PARAM"}],
     "resource": "pets"
+  },
+  {
+    "resource": "user",
+    "url": "/user/{username}",
+    "type": "Params",
+    "rule": "[{\"username\":\"John\",\"password\":\"pass4321\",\"firstName\":\"Biden\",\"id\":\"111985\",\"lastName\":\"John\",\"phone\":\"323-839-3225\",\"status\":\"2\",\"email\":\"john.biden@gmail.com\"},{\"username\":\"Rick\",\"password\":\"pass4321\",\"firstName\":\"Rick\",\"id\":\"8876811\",\"lastName\":\"Copper\",\"phone\":\"672-321-9876\",\"status\":\"2\",\"email\":\"rick.copper@gmail.com\"}]",
+    "operationId": "getUserByName",
+    "output": "{\n  \"email\": \"<email>\",\n  \"firstName\": \"<firstName>\",\n  \"id\": <id>,\n  \"lastName\": \"<lastName>\",\n  \"password\": \"<password>\",\n  \"phone\": \"<phone>\",\n  \"userStatus\": <status>,\n  \"username\": \"<username>\"\n}",
+    "httpStatusCode": "200",
+    "method": "GET",
+    "availableParams": [
+      {
+        "key": "username",
+        "value": "<username>",
+        "parameterType": "PATH_PARAM"
+      }
+    ]
+  },
+  {
+    "resource": "pets",
+    "url": "/pets/{petId}",
+    "type": "Params",
+    "rule": "[{\"petId\":\"10000\",\"name\":\"Doggie\"}]",
+    "operationId": "getPetById",
+    "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": <petId>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "httpStatusCode": "200",
+    "method": "GET",
+    "availableParams": [
+      {
+        "key": "petId",
+        "value": "<petId>",
+        "parameterType": "PATH_PARAM"
+      }
+    ]
   }
 
 ]
