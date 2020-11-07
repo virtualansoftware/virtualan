@@ -106,6 +106,9 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 			virtualServiceRequest.setRule(jsonObject.optString("rule"));
 			if (!"".equalsIgnoreCase(jsonObject.optString("url"))) {
 				virtualServiceRequest.setUrl(jsonObject.optString("url"));
+				if(jsonObject.optString("resource").equalsIgnoreCase("")) {
+					virtualServiceRequest.setResource(jsonObject.optString("url"));
+				}
 			}
 			if (!"".equalsIgnoreCase(jsonObject.optString("brokerUrl"))) {
 					virtualServiceRequest.setUrl(jsonObject.optString("brokerUrl"));

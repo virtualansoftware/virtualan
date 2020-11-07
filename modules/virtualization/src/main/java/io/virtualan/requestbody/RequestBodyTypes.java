@@ -162,7 +162,8 @@ public enum RequestBodyTypes {
                             requestBody.getInputRequest()),
                         requestBody.getExcludeList());
 
-                } else if(requestBody.getActualInput() instanceof String) {
+                } else if(requestBody.getActualInput() instanceof String
+                    && requestBody.getExpectedInput() instanceof  String) {
                     return EqualsBuilder.reflectionEquals(
                         XMLConverter.xmlToObject(requestBody.getInputObjectType(),
                             requestBody.getActualInput().toString()),
