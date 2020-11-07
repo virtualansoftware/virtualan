@@ -15,7 +15,7 @@ public class FragmentContentHandler extends DefaultHandler {
     private XMLReader xmlReader;
     private FragmentContentHandler parent;
     private StringBuilder characters = new StringBuilder();
-    private Map<String, Integer> elementNameCount = new HashMap<String, Integer>();
+    private Map<String, Integer> elementNameCount = new HashMap<>();
     private List<String>  xPaths;
 
     public FragmentContentHandler(List<String>  xPaths, XMLReader xmlReader) {
@@ -38,7 +38,7 @@ public class FragmentContentHandler extends DefaultHandler {
             count++;
         }
         elementNameCount.put(qName, count);
-        String childXPath = xPath + "/" + qName + "[" + count + "]";
+        String childXPath = xPath + '/' + qName + '[' + count + ']';
 
         int attsLength = atts.getLength();
         for(int x=0; x<attsLength; x++) {

@@ -43,6 +43,7 @@ import io.virtualan.core.util.XMLConverter;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
 import io.virtualan.mapson.Mapson;
+import io.virtualan.message.core.MessageUtil;
 import io.virtualan.params.Param;
 import io.virtualan.params.ParamTypes;
 import io.virtualan.requestbody.RequestBody;
@@ -107,6 +108,9 @@ public class VirtualServiceUtil {
   private MessageSource messageSource;
   @Autowired
   private VirtualServiceParamComparator virtualServiceParamComparator;
+
+  @Autowired
+  private MessageUtil messageUtil;
 
   @Autowired
   private XMLConverter xmlConverter;
@@ -449,16 +453,12 @@ public class VirtualServiceUtil {
         && mockServiceRequest.getInput() == null) {
       return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
           mockServiceRequest);
-    } else if (ResponseProcessType.RULE.name().equalsIgnoreCase(mockServiceRequest.getType()) ||
-        ((ResponseProcessType.RESPONSE.name().equalsIgnoreCase(mockServiceRequest.getType())
-            || mockServiceRequest.getType() == null) &&
-            (mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
-            && mockServiceRequest.getInput() != null)) {
+    } else if((mockServiceRequest.getParams() == null
+            || mockServiceRequest.getParams().isEmpty())
+            && mockServiceRequest.getInput() != null) {
       return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
           mockServiceRequest);
-    } else if (mockServiceRequest.getType() == null
-        || ResponseProcessType.RESPONSE.name().equalsIgnoreCase(mockServiceRequest.getType())
-        && mockServiceRequest.getParams() != null
+    } else if (mockServiceRequest.getParams() != null
         && mockServiceRequest.getParams().size() > 0) {
       return virtualServiceValidRequest.validForParam(mockDataSetupMap,
           mockServiceRequest);
@@ -688,21 +688,27 @@ public class VirtualServiceUtil {
   public Map<Integer, ResponseParam> handleParameterizedRequest(
       Map<MockRequest, MockResponse> mockDataSetupMap,
       MockServiceRequest mockServiceRequest) {
-    JSONArray paramArray = new JSONArray(mockServiceRequest.getRule().toString());
     Map<Integer, ResponseParam> responseMap = new HashMap<>();
-    for (int i = 0; i < paramArray.length(); i++) {
+    if (mockServiceRequest.getRule() != null) {
+      JSONArray paramArray = new JSONArray(mockServiceRequest.getRule().toString());
+      for (int i = 0; i < paramArray.length(); i++) {
+        ResponseParam response = new ResponseParam();
+        try {
+          JSONObject map = paramArray.getJSONObject(i);
+          Map<String, Object> context = map.toMap();
+          checkRequest(mockDataSetupMap, mockServiceRequest, response, context);
+          checkResponse(mockServiceRequest, response, context);
+        } catch (Exception e) {
+          response.getRecords().put("error", e.getMessage());
+        }
+        if (!response.getRecords().isEmpty()) {
+          responseMap.put(i, response);
+        }
+      }
+    } else {
       ResponseParam response = new ResponseParam();
-      try {
-        JSONObject map = paramArray.getJSONObject(i);
-        Map<String, Object> context = map.toMap();
-        checkRequest(mockDataSetupMap, mockServiceRequest, response, context);
-        checkResponse(mockServiceRequest, response, context);
-      } catch (Exception e) {
-        response.getRecords().put("error", e.getMessage());
-      }
-      if (!response.getRecords().isEmpty()) {
-        responseMap.put(i, response);
-      }
+      response.getRecords().put("error", "rule data is missing");
+      responseMap.put(0, response);
     }
     return responseMap;
   }
