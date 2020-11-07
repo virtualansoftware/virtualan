@@ -1677,9 +1677,9 @@ json-tree .branch-preview::after {
 												<button type="button" class="btn btn-info btn-sm"
 																ng-show="mockRequest.type.toUpperCase() == 'PARAMS'"
 																data-toggle="modal"
+																id = "param-{{mockRequest.operationId}}-{{mockRequest.method}}-{{$index}}"
 																data-target="#parameterized-editor"
-																data-target="#parameterized-editor"
-																ng-click="ctrl.loadParameterized(mockRequest.rule)">Parameterized!!</button>
+																ng-click="ctrl.loadParameterizedFromTable(mockRequest.rule)">Parameterized!!</button>
 
 											</td>
 											<td>
@@ -1759,17 +1759,17 @@ json-tree .branch-preview::after {
 							</div>
 						</div>
 						<div class="modal-body table-responsive">
-							<table width="100%" class="table">
+							<table width="100%" class="table" >
 								<thead>
-								<tr >
-									<th ng-repeat="key in ctrl.getKeys() track by $index">
+								<tr>
+									<th ng-repeat="key in ctrl.parameterizedKeys track by $index">
 										{{key}}
 									</th>
 								</tr>
 								</thead>
 								<tbody>
-								<tr ng-repeat="row in ctrl.getParameterized() track by $index">
-									<td ng-repeat="key in ctrl.getKeys() track by $index">{{row[key]}}</td>
+								<tr ng-repeat="paramRow in ctrl.parameterizedTable track by $index">
+									<td ng-repeat = "columns in paramRow">{{columns}}</td>
 								</tr>
 								</tbody>
 							</table>

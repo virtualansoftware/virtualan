@@ -210,6 +210,14 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       }
     }
 
+  self.parameterizedTable = [];
+  self.parameterizedKeys = [];
+
+  self.loadParameterizedFromTable = function (value) {
+    console.log(value);
+    self.parameterizedTable = JSON.parse(value);
+    self.parameterizedKeys = Object.keys(self.parameterizedTable[0]);
+  };
 
     $scope.$watch(self.searchText, function (term) {
       var obj = term;
