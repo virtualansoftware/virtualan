@@ -42,6 +42,9 @@ public class VirtualSoapController {
   private MessageSource messageSource;
 
   @Autowired
+  private Converter converter;
+
+  @Autowired
   private VirtualService virtualService;
 
   @Autowired
@@ -57,7 +60,7 @@ public class VirtualSoapController {
       if(!response.isEmpty()) {
         final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
             messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));
-        virtualServiceRequest = Converter.convertAsJson(virtualServiceRequest);
+        virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
         virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
         virtualServiceStatus.setResponseParam( response);
         return new ResponseEntity<>(virtualServiceStatus,

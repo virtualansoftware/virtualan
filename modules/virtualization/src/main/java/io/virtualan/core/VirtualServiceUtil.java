@@ -292,7 +292,7 @@ public class VirtualServiceUtil {
       final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
           messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
       virtualServiceRequest.setId(response);
-      virtualServiceRequest = Converter.convertAsJson(virtualServiceRequest);
+      virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
       virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
       return new ResponseEntity<>(virtualServiceStatus,
           HttpStatus.BAD_REQUEST);
