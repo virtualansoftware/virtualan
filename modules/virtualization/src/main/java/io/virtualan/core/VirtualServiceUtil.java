@@ -38,6 +38,7 @@ import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.ScriptErrorException;
 import io.virtualan.core.util.VirtualServiceParamComparator;
 import io.virtualan.core.util.VirtualServiceValidRequest;
+import io.virtualan.core.util.VirtualXPaths;
 import io.virtualan.core.util.XMLConverter;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
@@ -134,19 +135,20 @@ public class VirtualServiceUtil {
       Map<String, Object> contextObject) {
     for (Map.Entry<String, String> param : paramMap.entrySet()) {
       paramMap
-          .put(param.getKey(), getActualValueForAll(param.getValue(), contextObject).toString());
+          .put(param.getKey(), getActualValueForAll(getDelimiter(ContentType.JSON) ,param.getValue(), contextObject).toString());
     }
   }
 
-  public static Object getActualValueForAll(Object object, Map<String, Object> contextObject) {
+  public static Object getActualValueForAll(Map.Entry<String, String> delimiter,Object object, Map<String, Object> contextObject) {
     String key = object.toString();
-    if (key.indexOf('<') != -1 && key.indexOf('>') != -1) {
-      String idkey = key.substring(key.indexOf('<') + 1, key.indexOf('>'));
+    if (key.indexOf(delimiter.getKey()) != -1 && key.indexOf(delimiter.getValue()) != -1) {
+      String idkey = key.substring(key.indexOf(delimiter.getKey()) + 1, key.indexOf(delimiter.getValue()));
       if (contextObject.containsKey(idkey)) {
-        String replaceValue = key.replaceAll(key.substring(key.indexOf('<'), key.indexOf('>') + 1),
+        String prefix = delimiter.getKey().contains("{") ? "\\"  : "";
+        String replaceValue = key.replaceAll(prefix+key.substring(key.indexOf(delimiter.getKey()), key.indexOf(delimiter.getValue()) + 1),
             contextObject.get(idkey).toString());
-        if (replaceValue.indexOf('<') != -1 && replaceValue.indexOf('>') != -1) {
-          return getActualValueForAll(replaceValue, contextObject);
+        if (replaceValue.indexOf(delimiter.getKey()) != -1 && replaceValue.indexOf(delimiter.getValue()) != -1) {
+          return getActualValueForAll(delimiter, replaceValue, contextObject);
         }
         return replaceValue;
       } else {
@@ -286,7 +288,7 @@ public class VirtualServiceUtil {
       final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
           messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
       virtualServiceRequest.setId(response);
-      virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
+      virtualServiceRequest = Converter.convertAsJson(virtualServiceRequest);
       virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
       return new ResponseEntity<>(virtualServiceStatus,
           HttpStatus.BAD_REQUEST);
@@ -414,11 +416,17 @@ public class VirtualServiceUtil {
   public boolean isMockResponseBodyValid(VirtualServiceRequest mockTransferObject)
       throws InvalidMockResponseException {
     try {
-      final VirtualServiceRequest mockTransferObjectActual =
-          virtualServiceInfo.getResponseType(mockTransferObject);
-      if (!mockTransferObjectActual.getResponseType().isEmpty()) {
-        virtualServiceValidRequest
-            .validResponse(mockTransferObjectActual, mockTransferObject);
+      if(ContentType.XML.equals(mockTransferObject.getContentType())) {
+        XMLConverter.xmlToObject(mockTransferObject.getResponseObjectType(),mockTransferObject.getOutput().toString());
+      } else {
+        VirtualServiceRequest
+          mockTransferObjectActual = virtualServiceInfo.getResponseType(mockTransferObject);
+        if (mockTransferObjectActual != null && mockTransferObjectActual.getResponseType() != null
+            &&
+            !mockTransferObjectActual.getResponseType().isEmpty()) {
+          virtualServiceValidRequest
+              .validResponse(mockTransferObjectActual, mockTransferObject);
+        }
       }
     } catch (final Exception e) {
       throw new InvalidMockResponseException(e);
@@ -461,11 +469,18 @@ public class VirtualServiceUtil {
   private MockServiceRequest buildMockServiceRequest(VirtualServiceRequest mockTransferObject) {
 
     MockServiceRequest mockServiceRequest = new MockServiceRequest();
-    Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
+
+    if(mockTransferObject.getInputObjectType() == null){
+      Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
+      mockServiceRequest.setInputObjectType(inputObjectType);
+    } else {
+      mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
+    }
+    mockServiceRequest.setResponseObjectType(mockTransferObject.getResponseObjectType());
     mockServiceRequest
         .setHeaderParams(Converter.converter(mockTransferObject.getHeaderParams()));
     mockServiceRequest.setOperationId(mockTransferObject.getOperationId());
-    mockServiceRequest.setInputObjectType(inputObjectType);
+    mockServiceRequest.setContentType(mockTransferObject.getContentType());
     mockServiceRequest.setType(mockTransferObject.getType());
     mockServiceRequest.setRule(mockTransferObject.getRule());
     mockServiceRequest
@@ -547,12 +562,12 @@ public class VirtualServiceUtil {
     return false;
   }
 
-  private SimpleEntry<String, String> getDelimiter(ContentType contentType) {
+  private static SimpleEntry<String, String> getDelimiter(ContentType contentType) {
     String start_param = "<";
     String end_param = ">";
     if (ContentType.XML.equals(contentType)) {
-      start_param = "{{";
-      end_param = "}}";
+      start_param = "{";
+      end_param = "}";
     }
     return new SimpleEntry<>(start_param, end_param);
   }
@@ -560,28 +575,54 @@ public class VirtualServiceUtil {
   private boolean getMatchByInput(MockServiceRequest mockServiceRequest,
       Entry<MockRequest, MockResponse> entry, Map<String, Object> context)
       throws JsonProcessingException {
-    Map<String, String> requestObjectMap = Mapson.buildMAPsonFromJson(entry.getKey().getInput());
-
-    Map.Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
-    List<String> parameters = requestObjectMap.entrySet().stream().filter(
-        x -> x.getValue().startsWith(delimiter.getKey()) && x.getValue()
-            .endsWith(delimiter.getValue()))
-        .map(Entry::getKey).collect(Collectors.toList());
-    Map<String, String> replacedValueMap = Mapson
-        .buildMAPsonFromJson(getActualValueForAll(entry.getKey().getInput(), context).toString());
-    Map<String, String> matches = replacedValueMap.entrySet().stream().filter(
-        x -> parameters.contains(x.getKey())).collect(
-        Collectors.toMap(Entry::getKey, Entry::getValue));
-
+    Map<String, String> requestObjectMap = null;
     Map<String, String> requestActualValueParam = null;
-    if (isJSONValid(mockServiceRequest.getInput().toString())) {
-      requestActualValueParam = Mapson
-          .buildMAPsonFromJson(mockServiceRequest.getInput().toString());
+    Map<String, String> replacedValueMap = null;
+    Map.Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
+    if(ContentType.XML.equals(entry.getKey().getContentType())) {
+      List<String> existingPaths = VirtualXPaths.readXPaths(entry.getKey().getInput());
+      List<String> input =  null;
+      if(mockServiceRequest.getInput().toString().contains("</")) {
+          input = VirtualXPaths.readXPaths(mockServiceRequest.getInput().toString());
+      } else {
+          input = VirtualXPaths.readXPaths(XMLConverter.objectToXML(
+              mockServiceRequest.getInputObjectType(), mockServiceRequest.getInput()));
+        }
+      List<String> filterList =  existingPaths.stream().filter(
+          x -> x.contains("{") && x
+              .contains("}")).map(x -> x.substring(x.lastIndexOf(':'), x.lastIndexOf('='))).collect(Collectors.toList());
+      List<String> filteredListWithValue = existingPaths.stream()
+          .filter(  x -> x.contains("{") && x.contains("}")).
+              map(x -> x.substring(x.lastIndexOf(':'))).map(x ->
+              getActualValueForAll(delimiter,x, context).toString()).collect(Collectors.toList());
+
+      List<String> matches = input.stream().filter(x -> x.lastIndexOf(':') < x.lastIndexOf('=')).filter(
+                x -> filterList.contains(x.substring(x.lastIndexOf(':'), x.lastIndexOf('='))))
+                .map(x -> x.substring(x.lastIndexOf(':'))).collect(
+                  Collectors.toList());
+
+      return  matches.containsAll(filteredListWithValue);
     } else {
-      requestActualValueParam = Mapson
-          .buildMAPsonFromJson(getObjectMapper().writeValueAsString(mockServiceRequest.getInput()));
+      requestObjectMap = Mapson.buildMAPsonFromJson(entry.getKey().getInput());
+      if (isJSONValid(mockServiceRequest.getInput().toString())) {
+        requestActualValueParam = Mapson
+            .buildMAPsonFromJson(mockServiceRequest.getInput().toString());
+      } else {
+        requestActualValueParam = Mapson
+            .buildMAPsonFromJson(
+                getObjectMapper().writeValueAsString(mockServiceRequest.getInput()));
+      }
+      replacedValueMap = Mapson
+          .buildMAPsonFromJson(getActualValueForAll(delimiter, entry.getKey().getInput(), context).toString());
+      List<String> parameters = requestObjectMap.entrySet().stream().filter(
+          x -> x.getValue().startsWith(delimiter.getKey()) && x.getValue()
+              .endsWith(delimiter.getValue()))
+          .map(Entry::getKey).collect(Collectors.toList());
+      Map<String, String> matches = replacedValueMap.entrySet().stream().filter(
+          x -> parameters.contains(x.getKey())).collect(
+          Collectors.toMap(Entry::getKey, Entry::getValue));
+      return requestActualValueParam.entrySet().containsAll(matches.entrySet());
     }
-    return requestActualValueParam.entrySet().containsAll(matches.entrySet());
   }
 
   private boolean isJSONValid(String test) {
@@ -603,7 +644,7 @@ public class VirtualServiceUtil {
     Map<Integer, ReturnMockResponse> matchResponse;
     matchResponse = new HashMap<>();
     entry.getValue()
-        .setOutput(getActualValueForAll(entry.getValue().getOutput(), context).toString());
+        .setOutput(getActualValueForAll(getDelimiter(entry.getKey().getContentType()), entry.getValue().getOutput(), context).toString());
     final ReturnMockResponse returnMockResponse = virtualServiceValidRequest
         .returnMockResponse(mockServiceRequest,
             entry, 1);
@@ -624,7 +665,7 @@ public class VirtualServiceUtil {
     List<VirtualServiceKeyValue> replacedParamMap = new ArrayList<>();
     for (VirtualServiceKeyValue param : entry.getKey().getAvailableParams()) {
       replacedParamMap.add(new VirtualServiceKeyValue(param.getKey(),
-          getActualValueForAll(param.getValue(), context).toString()));
+          getActualValueForAll(delimiter, param.getValue(), context).toString()));
     }
     boolean matches = replacedParamMap.stream().filter(
         x -> requestMatchingParam.contains(x.getKey())).allMatch(
@@ -670,7 +711,7 @@ public class VirtualServiceUtil {
       Map<String, Object> context) throws InvalidMockResponseException {
     if (mockServiceRequest.getOutput() != null) {
       mockServiceRequest
-          .setOutput(getActualValueForAll(mockServiceRequest.getOutput(), context));
+          .setOutput(getActualValueForAll(getDelimiter(mockServiceRequest.getContentType()), mockServiceRequest.getOutput(), context));
       VirtualServiceRequest request = new VirtualServiceRequest();
       BeanUtils.copyProperties(mockServiceRequest, request);
       boolean isValidResponse = isMockResponseBodyValid(request);
@@ -693,15 +734,15 @@ public class VirtualServiceUtil {
       populateMapParams(mockServiceRequest.getParams(), context);
       returnMockResponseMap = virtualServiceValidRequest
         .validForParam(mockDataSetupMap, mockServiceRequest);
-      checkIfExists  =  returnMockResponseMap != null ? returnMockResponseMap.isEmpty() : false;
+      checkIfExists  = returnMockResponseMap == null || returnMockResponseMap.isEmpty();
     }
 
     if (mockServiceRequest.getInput() != null) {
       mockServiceRequest
-          .setInput(getActualValueForAll(mockServiceRequest.getInput(), context));
+          .setInput(getActualValueForAll(getDelimiter(mockServiceRequest.getContentType()), mockServiceRequest.getInput(), context));
           returnMockResponseMap = virtualServiceValidRequest
           .validObject(mockDataSetupMap, mockServiceRequest);
-      checkIfExists  =  returnMockResponseMap != null ? returnMockResponseMap.isEmpty() : false;
+      checkIfExists  = returnMockResponseMap == null || returnMockResponseMap.isEmpty();
     }
     if (checkIfExists && mockDataSetupMap.entrySet().stream().
             anyMatch(x -> ResponseProcessType.PARAMS.name()

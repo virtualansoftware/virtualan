@@ -601,10 +601,10 @@ json-tree .branch-preview::after {
 
 																	<select ng-model="mockRequest.type" ng-click="mockRequest.rule = ctrl1.loadDefaultRule(mockRequest.type, mockRequest.rule, mockRequest)"
 																			required>
+																		<option id="PARAMS">Params</option>
 																		<option id="RESPONSE" selected>Response</option>
 																		<option id="RULE">Rule</option>
 																		<option id="SCRIPT">Script</option>
-																		<option id="PARAMS">Params</option>
 																	</select>
 																	<div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm.httpStatus.$error.required">This
@@ -1183,10 +1183,10 @@ json-tree .branch-preview::after {
 																			<div class="col-md-7">
 																				<select name="type" ng-model="mockSoapRequest.type" ng-click="mockSoapRequest.rule = ctrl3.loadDefaultRule(mockSoapRequest.type, mockSoapRequest.rule)"
 																								required>
+																					<option id="PARAMS">Params</option>
 																					<option id="RESPONSE" selected>Response</option>
 																					<option id="RULE">Rule</option>
 																					<option id="SCRIPT">Script</option>
-																					<option id="PARAMS">Params</option>
 																				</select> &nbsp; &nbsp; &nbsp; &nbsp;
 																				<select name="contentType" ng-model="mockSoapRequest.contentType"
 																								required>
@@ -1252,6 +1252,45 @@ json-tree .branch-preview::after {
 																		</div>
 																	</div>
 
+																	<div ng-show="mockSoapRequest.type.toUpperCase() === 'PARAMS' "
+																			 class="row">
+																		<div class="form-group col-md-12">
+																			<label class="head-text-black col-md-2 control-lable"
+																						 for="file">Parameterized values:</label>
+																			<div class="col-md-7 scroll">
+																				<table class="table table-striped">
+																					<thead>
+																					<th ng-repeat="c in ctrl3.paramHeaderMapper[mockSoapRequest.method+'-'+mockSoapRequest.operationId] track by $index">{{ c }}
+																					</th>
+																					<th></th>
+																					<tbody>
+																					<tr ng-repeat="d in mockSoapRequest.rule" ng-show="d != null">
+																						<td ng-repeat="keyId in ctrl3.paramHeaderMapper[mockSoapRequest.method+'-'+mockSoapRequest.operationId] track by $index">{{ d[keyId] }}</td>
+																						<td>
+																							<img height="30" width="30" ng-click="ctrl3.removeParameterized(mockSoapRequest, d);"
+																									 src= "static/img/minus-img.png"
+																									 alt="Remove">
+																						</td>
+																					</tr>
+																					<tr>
+																						<td ng-repeat="c in ctrl3.paramFinder(mockSoapRequest)">
+																							<input class="input form-control input-sm"
+																										 id="params-{{mockSoapRequest.method}}-{{mockSoapRequest.operationId}}-{{c}}"
+																										 type="text" ng-model="ctrl3.keyObject[c]" />
+																						</td>
+																						<td>
+																							<img height="30" width="30"
+																									 id="btn1-param-{{mockSoapRequest.resource}}-{{mockSoapRequest.operationId}}" ng-click="ctrl3.addParametrizedParams(mockSoapRequest, ctrl3.keyObject)"
+																									 src= "static/img/plus-img.png"
+																									 alt="Add">
+																						</td>
+																					</tr>
+																					</tbody></table>
+																			</div>
+																		</div>
+																	</div>
+
+
 																	<div
 																			class="row nomargin">
 																		<div class="form-group col-md-12 nomargin">
@@ -1260,6 +1299,7 @@ json-tree .branch-preview::after {
 																			<div class="col-md-7">
 																		<textarea ng-model="mockSoapRequest.input" name="input"
 																							class="input form-control input-sm bk-textarea"
+																							ng-blur="ctrl3.paramMapper(mockSoapRequest);"
 																							rows="3"> {{mockSoapRequest.input}}</textarea>
 																			</div>
 																		</div>
@@ -1273,6 +1313,7 @@ json-tree .branch-preview::after {
 																			<div class="col-md-7">
 																		<textarea ng-model="mockSoapRequest.output" name="output"
 																							class="response form-control input-sm bk-textarea"
+																							ng-blur="ctrl3.paramMapper(mockSoapRequest);"
 																							rows="3"> {{mockSoapRequest.output}}</textarea>
 																				<div class="has-error" ng-show="myFormSoap.$dirty">
 																			<span ng-show="myFormSoap.output.$error.required">This
@@ -1396,12 +1437,12 @@ json-tree .branch-preview::after {
 															ng-show="ctrl.isEmptyNotPresent(mockSoapRequest.input) === false "
 															data-toggle="modal"
 															data-target="#load-json"
-															ng-click="ctrl.loadJson(mockSoapRequest.input, mockSoapRequest.type)">Request</button>
+															ng-click="ctrl.loadJson(mockSoapRequest.input, mockSoapRequest.contentType)">Request</button>
 										</td>
 										<td><button type="button" class="btn btn-info btn-sm"
 																data-toggle="modal" data-target="#load-json"
 																ng-show="ctrl.isEmptyNotPresent(mockSoapRequest.output) === false "
-																ng-click="ctrl.loadJson(mockSoapRequest.output, mockSoapRequest.type)">Response</button>
+																ng-click="ctrl.loadJson(mockSoapRequest.output, mockSoapRequest.contentType)">Response</button>
 										</td>
 										<td><span ng-bind="mockMsgRequest.excludeList"></span></td>
 										<td>
@@ -1513,12 +1554,12 @@ json-tree .branch-preview::after {
 															ng-show="ctrl.isEmptyNotPresent(mockMsgRequest.input) === false"
 															data-toggle="modal"
 															data-target="#load-json"
-															ng-click="ctrl.loadJson(mockMsgRequest.input, mockMsgRequest.type)">Request</button>
+															ng-click="ctrl.loadJson(mockMsgRequest.input, mockMsgRequest.contentType)">Request</button>
 										</td>
 										<td><button type="button" class="btn btn-info btn-sm"
 																data-toggle="modal" data-target="#load-json"
 																ng-show="ctrl.isEmptyNotPresent(mockMsgRequest.output) === false"
-																ng-click="ctrl.loadJson(mockMsgRequest.output, mockMsgRequest.type)">Response</button>
+																ng-click="ctrl.loadJson(mockMsgRequest.output, mockMsgRequest.contentType)">Response</button>
 										</td>
 										<td><div
 												ng-repeat="headerKeyValue in mockMsgRequest.headerParams track by $index">
@@ -1647,12 +1688,12 @@ json-tree .branch-preview::after {
 																		data-target="#load-json"
 																				ng-show="ctrl.isEmptyNotPresent(mockRequest.input) === false "
 
-																				ng-click="ctrl.loadJson(mockRequest.input, mockRequest.type)">Request</button>
+																				ng-click="ctrl.loadJson(mockRequest.input, mockRequest.contentType)">Request</button>
 											</td>
 											<td><button type="button" class="btn btn-info btn-sm"
 													data-toggle="modal" data-target="#load-json"
 													ng-show="ctrl.isEmptyNotPresent(mockRequest.output) === false "
-													ng-click="ctrl.loadJson(mockRequest.output, mockRequest.type)">Response</button>
+													ng-click="ctrl.loadJson(mockRequest.output, mockRequest.contentType)">Response</button>
 											</td>
 											<td><div
 													ng-repeat="headerKeyValue in mockRequest.headerParams track by $index">

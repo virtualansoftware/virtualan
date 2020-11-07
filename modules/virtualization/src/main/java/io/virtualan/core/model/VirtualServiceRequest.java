@@ -43,6 +43,7 @@ public class VirtualServiceRequest {
     private int priority;
     private String method;
     private Class inputObjectType;
+    private Class responseObjectType;
     private String outputObjectType;
     private Object input;
     private String rule;

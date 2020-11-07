@@ -24,7 +24,7 @@ public class Converter {
     private static final String PARAM_DELIMITER = ":_:";
 
     @Autowired
-    private  ObjectMapper objectMapper;
+    private  static ObjectMapper objectMapper;
 
     private String getString(Object jsonObject) throws JsonProcessingException {
         if(jsonObject instanceof LinkedHashMap) {
@@ -34,7 +34,7 @@ public class Converter {
     }
 
 
-    private Object getJson(String jsonStr)  {
+    private static Object getJson(String jsonStr)  {
         if(jsonStr != null && !jsonStr.isEmpty()) {
             try {
                 return objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
@@ -54,7 +54,7 @@ public class Converter {
         }
     }
 
-    public VirtualServiceRequest convertAsJson(
+    public static VirtualServiceRequest convertAsJson(
         VirtualServiceRequest virtualServiceRequest) {
         VirtualServiceRequest virtualServiceRequestRes = new VirtualServiceRequest();
         BeanUtils.copyProperties(virtualServiceRequest, virtualServiceRequestRes);

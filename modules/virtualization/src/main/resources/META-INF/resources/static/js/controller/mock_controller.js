@@ -204,7 +204,10 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     }
 
     self.getParameterized = function() {
-      return JSON.parse(self.parameterized);
+      try{
+        return self.parameterized  && JSON.parse(self.parameterized);
+      }catch{
+      }
     }
 
 
@@ -236,12 +239,21 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 
     self.keyObject =[];
 
-  self.getObjectParams = function(input){
+    self.getRexEx  = function(contentType){
+      var reTagCatcher = /(<.[^(><.)]+>)/g;
+      if(contentType === 'XML'){
+         reTagCatcher = /(\{.[^(\}\{.)]+\})/g;
+      }
+      return reTagCatcher;
+    }
+
+
+  self.getObjectParams = function(input, contentType){
       if(self.isDefined(input)) {
         var outputAll = new Array();
         var output;
         for (var key in input) {
-          var reTagCatcher = /(<.[^(><.)]+>)/g;
+          var reTagCatcher = self.getRexEx(contentType);
           output = input[key].match(reTagCatcher);
           if(self.isArrayDefined(output)) {
             for ( var i = 0; i < output.length; i++) {
@@ -253,11 +265,18 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     }
   }
 
+   self.getParameterizedFormat = function(input, contentType) {
+     if('XML' ===   contentType) {
+        return input.indexOf('{') && input.indexOf('}');
+     } else {
+        return input.indexOf('<') && input.indexOf('>');
+     }
+   }
 
-   self.getParams = function(input){
-      if(self.isDefined(input) && input.indexOf('<') && input.indexOf('>')) {
+   self.getParams = function(input, contentType){
+      if(self.isDefined(input) && self.getParameterizedFormat(input, contentType)) {
          var outputAll = new Array();
-          var reTagCatcher = /(<.[^(><.)]+>)/g;
+         var reTagCatcher = self.getRexEx(contentType);
           var output = input.match(reTagCatcher);
           if(self.isArrayDefined(output)) {
             for ( var i = 0; i < output.length; i++) {
@@ -268,10 +287,10 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
        }
     }
 
-   self.getParamsMap = function(inputMap){
+   self.getParamsMap = function(inputMap, contentType){
       if(self.isArrayDefined(inputMap)) {
          var outputAll = new Array();
-         var reTagCatcher = /(<.[^(><.)]+>)/g;
+         var reTagCatcher = self.getRexEx(contentType);
          for ( var index in inputMap) {
             var resValue  =  inputMap[index]['value'];
             if(self.isDefined(resValue)){
@@ -294,26 +313,26 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.paramMapper = function (mockRequest) {
        var outputAll = new Array();
 
-       var availableParams = self.getParamsMap(mockRequest.availableParams);
+       var availableParams = self.getParamsMap(mockRequest.availableParams, mockRequest.contentType);
        if(self.isArrayDefined(availableParams)) {
            Array.prototype.push.apply(outputAll, availableParams);
        }
 
-       var additionalParams = self.getObjectParams(mockRequest.additionalParams)
+       var additionalParams = self.getObjectParams(mockRequest.additionalParams, mockRequest.contentType)
        if(self.isArrayDefined(additionalParams)) {
            Array.prototype.push.apply(outputAll, additionalParams);
        }
 
-       var responseHeaderParams = self.getObjectParams(mockRequest.responseHeaderParams);
+       var responseHeaderParams = self.getObjectParams(mockRequest.responseHeaderParams, mockRequest.contentType);
        if(self.isArrayDefined(responseHeaderParams)) {
            Array.prototype.push.apply(outputAll, responseHeaderParams);
        }
 
-       var input = self.getParams(mockRequest.input);
+       var input = self.getParams(mockRequest.input, mockRequest.contentType);
        if(self.isArrayDefined(input)) {
            Array.prototype.push.apply(outputAll, input);
        }
-       var output = self.getParams(mockRequest.output);
+       var output = self.getParams(mockRequest.output, mockRequest.contentType);
        if(self.isArrayDefined(output)) {
            Array.prototype.push.apply(outputAll, output);
        }
@@ -706,7 +725,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
         var mockRule = mockRequest.rule;
         if(mockRequest.type === 'Params') {
-          mockRule = JSON.stringify(mockRule);
+          mockRule = angular.toJson(mockRule);
         }
 
         self.mockCreateRequest= {id:'',
@@ -731,11 +750,15 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         console.log('Saving New Soap mock Request', mockRequest);
         self.responseHeaderParamList = [];
         self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
+        var mockRule = mockRequest.rule;
+        if(mockRequest.type === 'Params') {
+          mockRule = angular.toJson(mockRule);
+        }
         self.mockCreateRequest= {id:'',
             resource:mockRequest.resource,
             url:mockRequest.url,
             type:mockRequest.type,
-            rule:mockRequest.rule,
+            rule:mockRule,
             operationId:mockRequest.operationId,
             input:mockRequest.input,
             output:mockRequest.output,
@@ -750,23 +773,27 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     }
 
     self.submitMessage= function (mockRequest) {
-            console.log('Saving New message mock  Request', mockRequest);
-            self.responseHeaderParamList = [];
-            self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
-            self.mockCreateRequest= {id:'',
-            			resource:mockRequest.resource,
-            			brokerUrl:mockRequest.url,
-            			requestTopicOrQueueName:mockRequest.operationId,
-            			input:mockRequest.input,
-            			output:mockRequest.output,
-            			excludeList:mockRequest.excludeList,
-            			responseTopicOrQueueName:mockRequest.method,
-            			availableParams:self.mergeParams(mockRequest),
-            			headerParams:self.responseHeaderParamList};
-            console.log('Saving New mock message Request', self.mockCreateRequest);
-            createMockMsgRequest(self.mockCreateRequest);
-
+        console.log('Saving New message mock  Request', mockRequest);
+        var mockRule = mockRequest.rule;
+        if(mockRequest.type === 'Params') {
+          mockRule = angular.toJson(mockRule);
         }
+        self.responseHeaderParamList = [];
+        self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
+        self.mockCreateRequest= {id:'',
+              resource:mockRequest.resource,
+              brokerUrl:mockRequest.url,
+              requestTopicOrQueueName:mockRequest.operationId,
+              rule:mockRule,
+              input:mockRequest.input,
+              output:mockRequest.output,
+              excludeList:mockRequest.excludeList,
+              responseTopicOrQueueName:mockRequest.method,
+              availableParams:self.mergeParams(mockRequest),
+              headerParams:self.responseHeaderParamList};
+        console.log('Saving New mock message Request', self.mockCreateRequest);
+        createMockMsgRequest(self.mockCreateRequest);
+      }
 
     function edit(id){
         console.log('id to be edited', id);

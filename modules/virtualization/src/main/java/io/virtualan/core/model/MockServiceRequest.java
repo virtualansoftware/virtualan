@@ -28,18 +28,19 @@ import lombok.Data;
  **/
 @Data
 public class MockServiceRequest {
-    String resource = null;
-    String operationId = null;
-    RequestType requestType = null;
-    String type = null;
-    Map<String, String> params = null;
-    Map<String, Class> paramsType = null;
-    Map<String, Object> parameters = null;
-    Map<String, String> headerParams = null;
-    Class inputObjectType = null;
-    Object input = null;
-    Object output = null;
-    Object rule = null;
+    private String resource = null;
+    private String operationId = null;
+    private RequestType requestType = null;
+    private String type = null;
+    private Map<String, String> params = null;
+    private Map<String, Class> paramsType = null;
+    private Map<String, Object> parameters = null;
+    private Map<String, String> headerParams = null;
+    private Class inputObjectType = null;
+    private Class responseObjectType;
+    private Object input = null;
+    private Object output = null;
+    private Object rule = null;
     private ContentType contentType;
 
     public Object getHeaderParam(String param) {
