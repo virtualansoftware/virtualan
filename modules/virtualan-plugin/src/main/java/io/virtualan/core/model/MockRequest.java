@@ -34,6 +34,8 @@ public class MockRequest {
     private String rule;
     private String type;
     private Set excludeSet;
+    private ResponseProcessType responseProcessType;
+
     //Kafka Outbound Topic
     private String method;
     private ContentType contentType;

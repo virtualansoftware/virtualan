@@ -145,6 +145,7 @@ public class VirtualServiceParamComparator {
         }
     }
 
+
     public int isEmptyRequest(Map<String, String> actualQueryMap) {
         if(actualQueryMap != null) {
             for (final Map.Entry<String, String> checkEmpty : actualQueryMap.entrySet()) {

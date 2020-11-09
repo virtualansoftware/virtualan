@@ -1,5 +1,6 @@
 package io.virtualan.controller;
 
+import io.virtualan.core.VirtualParameterizedUtil;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.RequestType;
 import io.virtualan.core.model.SoapService;
@@ -42,6 +43,9 @@ public class VirtualSoapController {
   private MessageSource messageSource;
 
   @Autowired
+  private VirtualParameterizedUtil virtualParameterizedUtil;
+
+  @Autowired
   private Converter converter;
 
   @Autowired
@@ -56,7 +60,7 @@ public class VirtualSoapController {
   public ResponseEntity checkIfServiceDataAlreadyExists(
       VirtualServiceRequest virtualServiceRequest) throws JAXBException, IOException {
     if ("PARAMS".equalsIgnoreCase(virtualServiceRequest.getType())) {
-      Map response = virtualServiceUtil.handleParameterizedRequest(virtualServiceRequest);
+      Map response = virtualParameterizedUtil.handleParameterizedRequest(virtualServiceRequest);
       if(!response.isEmpty()) {
         final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
             messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));

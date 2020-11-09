@@ -44,6 +44,8 @@ public class VirtualServiceRequest {
     private String method;
     private Class inputObjectType;
     private String outputObjectType;
+    private Class responseObjectType;
+
     private Object input;
     private String rule;
     private Object output;
