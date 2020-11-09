@@ -95,18 +95,24 @@ public class VirtualServiceValidRequest {
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
             .entrySet()) {
-            buildRequestBody(mockServiceRequest, mockRequestResponse);
-            final int numberAttrMatch = virtualServiceParamComparator
-                .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
-            if (numberAttrMatch != 0) {
-                count++;
+            if(!ResponseProcessType.PARAMS.name().equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
+                buildRequestBody(mockServiceRequest, mockRequestResponse);
+                final int numberAttrMatch = virtualServiceParamComparator
+                    .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
+                if (numberAttrMatch != 0) {
+                    count++;
 
-                final ReturnMockResponse returnMockResponse = returnMockResponse(mockServiceRequest,
-                    mockRequestResponse, numberAttrMatch);
-                log.debug("{} : {}",numberAttrMatch , mockRequestResponse.getKey().getAvailableParams().size());
-                returnMockResponse.setExactMatch(numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size());
+                    final ReturnMockResponse returnMockResponse = returnMockResponse(
+                        mockServiceRequest,
+                        mockRequestResponse, numberAttrMatch);
+                    log.debug("{} : {}", numberAttrMatch,
+                        mockRequestResponse.getKey().getAvailableParams().size());
+                    returnMockResponse.setExactMatch(
+                        numberAttrMatch == mockRequestResponse.getKey().getAvailableParams()
+                            .size());
 
-                matchMap.put(count, returnMockResponse);
+                    matchMap.put(count, returnMockResponse);
+                }
             }
         }
         return matchMap;
@@ -135,6 +141,8 @@ public class VirtualServiceValidRequest {
         log.debug("Rule evaluated Ended : {}" , matchMap);
         return matchMap;
     }
+
+
 
     public Map<Integer, ReturnMockResponse> checkScriptResponse(
         final Map<MockRequest, MockResponse> mockDataSetupMap,
@@ -217,6 +225,7 @@ public class VirtualServiceValidRequest {
         return matchMap;
     }
 
+
     private boolean areEqual(Map<String, String> first, Map<String, String> second) {
         if (first.size() != second.size()) {
             return false;
@@ -234,7 +243,9 @@ public class VirtualServiceValidRequest {
             final int numberAttrMatch = virtualServiceParamComparator
                 .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
             if( (ResponseProcessType.RULE.name().equalsIgnoreCase(mockServiceRequest.getType()) || ResponseProcessType.SCRIPT.name().equalsIgnoreCase(mockServiceRequest.getType())
-                || ResponseProcessType.SCRIPT.name().equalsIgnoreCase(mockRequestResponse.getKey().getType()) || ResponseProcessType.RULE.name().equalsIgnoreCase(mockRequestResponse.getKey().getType())) && mockServiceRequest.getRule() != null && mockServiceRequest.getRule().equals(mockRequestResponse.getKey().getRule())) {
+                || ResponseProcessType.SCRIPT.name().equalsIgnoreCase(mockRequestResponse.getKey().getType()) ||
+                ResponseProcessType.RULE.name().equalsIgnoreCase(mockRequestResponse.getKey().getType()))
+                && mockServiceRequest.getRule() != null && mockServiceRequest.getRule().equals(mockRequestResponse.getKey().getRule())) {
                 count++;
                 return getScriptResponseCount(mockServiceRequest, matchMap, count,
                     mockRequestResponse, numberAttrMatch);
@@ -296,36 +307,53 @@ public class VirtualServiceValidRequest {
         int count = 0;
         for (final Map.Entry<MockRequest, MockResponse> mockRequestResponse : mockDataSetupMap
             .entrySet()) {
-            final RequestBody requestBody =
-                buildRequestBody(mockServiceRequest, mockRequestResponse);
+            if(!ResponseProcessType.PARAMS.name().equalsIgnoreCase(mockRequestResponse.getKey().getType())) {
+                final RequestBody requestBody =
+                    buildRequestBody(mockServiceRequest, mockRequestResponse);
+                if (RequestBodyTypes.fromString("NO_REQUEST_PARAM").compareRequestBody(requestBody)
+                    && (mockServiceRequest.getHeaderParams() == null
+                    || mockServiceRequest.getHeaderParams().isEmpty())) {
+                    count = getNoParamMatch(mockServiceRequest, matchMap, count,
+                        mockRequestResponse);
 
-            if (RequestBodyTypes.fromString("NO_REQUEST_PARAM").compareRequestBody(requestBody)
-                && (mockServiceRequest.getHeaderParams() == null
-                || mockServiceRequest.getHeaderParams().isEmpty())) {
+                } else {
+                    count = getMatch(mockServiceRequest, matchMap, count, mockRequestResponse);
 
-                if (mockRequestResponse.getKey().getAvailableParams().isEmpty()) {
-                    final int numberAttrMatch = 1;
-                    count++;
-                    final ReturnMockResponse returnMockResponse = returnMockResponse(
-                        mockServiceRequest, mockRequestResponse, numberAttrMatch);
-                    returnMockResponse.setExactMatch(true);
-                    matchMap.put(count, returnMockResponse);
                 }
-
-            } else {
-                final int numberAttrMatch = virtualServiceParamComparator
-                    .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
-                if (numberAttrMatch != 0) {
-                    count++;
-                    final ReturnMockResponse returnMockResponse = returnMockResponse(
-                        mockServiceRequest, mockRequestResponse, numberAttrMatch);
-                    returnMockResponse.setExactMatch(numberAttrMatch == mockRequestResponse.getKey().getAvailableParams().size());
-                    matchMap.put(count, returnMockResponse);
-                }
-
             }
         }
         return matchMap;
+    }
+
+    public int getNoParamMatch(MockServiceRequest mockServiceRequest,
+        Map<Integer, ReturnMockResponse> matchMap, int count,
+        Entry<MockRequest, MockResponse> mockRequestResponse) {
+        if (mockRequestResponse.getKey().getAvailableParams().isEmpty()) {
+            final int numberAttrMatch = 1;
+            count++;
+            final ReturnMockResponse returnMockResponse = returnMockResponse(
+                mockServiceRequest, mockRequestResponse, numberAttrMatch);
+            returnMockResponse.setExactMatch(true);
+            matchMap.put(count, returnMockResponse);
+        }
+        return count;
+    }
+
+    public int getMatch(MockServiceRequest mockServiceRequest,
+        Map<Integer, ReturnMockResponse> matchMap, int count,
+        Entry<MockRequest, MockResponse> mockRequestResponse) {
+        final int numberAttrMatch = virtualServiceParamComparator
+            .compareQueryParams(mockRequestResponse.getKey(), mockServiceRequest);
+        if (numberAttrMatch != 0) {
+            count++;
+            final ReturnMockResponse returnMockResponse = returnMockResponse(
+                mockServiceRequest, mockRequestResponse, numberAttrMatch);
+            returnMockResponse.setExactMatch(
+                numberAttrMatch == mockRequestResponse.getKey().getAvailableParams()
+                    .size());
+            matchMap.put(count, returnMockResponse);
+        }
+        return count;
     }
 
     private RequestBody buildRequestBody(MockServiceRequest mockServiceRequest,
@@ -350,4 +378,5 @@ public class VirtualServiceValidRequest {
         returnMockResponse.setNumberAttrMatch(numberAttrMatch);
         return returnMockResponse;
     }
+
 }

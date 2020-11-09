@@ -41,16 +41,13 @@ import io.virtualan.core.util.VirtualServiceValidRequest;
 import io.virtualan.core.util.XMLConverter;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
-import io.virtualan.mapson.Mapson;
-import io.virtualan.params.Param;
-import io.virtualan.params.ParamTypes;
+import io.virtualan.message.core.MessageUtil;
 import io.virtualan.requestbody.RequestBody;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,18 +58,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -108,6 +99,12 @@ public class VirtualServiceUtil {
   private VirtualServiceParamComparator virtualServiceParamComparator;
 
   @Autowired
+  private MessageUtil messageUtil;
+
+  @Autowired
+  private VirtualParameterizedUtil virtualParameterizedUtil;
+
+  @Autowired
   private XMLConverter xmlConverter;
 
   @Autowired
@@ -130,31 +127,6 @@ public class VirtualServiceUtil {
     return object;
   }
 
-  public static void populateMapParams(Map<String, String> paramMap,
-      Map<String, Object> contextObject) {
-    for (Map.Entry<String, String> param : paramMap.entrySet()) {
-      paramMap
-          .put(param.getKey(), getActualValueForAll(param.getValue(), contextObject).toString());
-    }
-  }
-
-  public static Object getActualValueForAll(Object object, Map<String, Object> contextObject) {
-    String key = object.toString();
-    if (key.indexOf('<') != -1 && key.indexOf('>') != -1) {
-      String idkey = key.substring(key.indexOf('<') + 1, key.indexOf('>'));
-      if (contextObject.containsKey(idkey)) {
-        String replaceValue = key.replaceAll(key.substring(key.indexOf('<'), key.indexOf('>') + 1),
-            contextObject.get(idkey).toString());
-        if (replaceValue.indexOf('<') != -1 && replaceValue.indexOf('>') != -1) {
-          return getActualValueForAll(replaceValue, contextObject);
-        }
-        return replaceValue;
-      } else {
-        log.error("id key :" + idkey);
-      }
-    }
-    return object;
-  }
 
   public VirtualServiceType getVirtualServiceType() {
     return virtualServiceType;
@@ -414,11 +386,17 @@ public class VirtualServiceUtil {
   public boolean isMockResponseBodyValid(VirtualServiceRequest mockTransferObject)
       throws InvalidMockResponseException {
     try {
-      final VirtualServiceRequest mockTransferObjectActual =
-          virtualServiceInfo.getResponseType(mockTransferObject);
-      if (!mockTransferObjectActual.getResponseType().isEmpty()) {
-        virtualServiceValidRequest
-            .validResponse(mockTransferObjectActual, mockTransferObject);
+      if(ContentType.XML.equals(mockTransferObject.getContentType())) {
+        XMLConverter.xmlToObject(mockTransferObject.getResponseObjectType(),mockTransferObject.getOutput().toString());
+      } else {
+        VirtualServiceRequest
+          mockTransferObjectActual = virtualServiceInfo.getResponseType(mockTransferObject);
+        if (mockTransferObjectActual != null && mockTransferObjectActual.getResponseType() != null
+            &&
+            !mockTransferObjectActual.getResponseType().isEmpty()) {
+          virtualServiceValidRequest
+              .validResponse(mockTransferObjectActual, mockTransferObject);
+        }
       }
     } catch (final Exception e) {
       throw new InvalidMockResponseException(e);
@@ -437,35 +415,38 @@ public class VirtualServiceUtil {
       final Map<MockRequest, MockResponse> mockDataSetupMap,
       MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
 
-    if ((mockServiceRequest.getParams() == null || !mockServiceRequest.getParams().isEmpty())
+    if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
         && mockServiceRequest.getInput() == null) {
       return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
           mockServiceRequest);
-    } else if (ResponseProcessType.RULE.name().equalsIgnoreCase(mockServiceRequest.getType()) ||
-        ((ResponseProcessType.RESPONSE.name().equalsIgnoreCase(mockServiceRequest.getType())
-            || mockServiceRequest.getType() == null) &&
-            (mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
-            && mockServiceRequest.getInput() != null)) {
+    } else if((mockServiceRequest.getParams() == null
+            || mockServiceRequest.getParams().isEmpty())
+            && mockServiceRequest.getInput() != null) {
       return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
           mockServiceRequest);
-    } else if (mockServiceRequest.getType() == null
-        || ResponseProcessType.RESPONSE.name().equalsIgnoreCase(mockServiceRequest.getType())
-        && mockServiceRequest.getParams() != null
-        && mockServiceRequest.getParams().size() > 0) {
+    } else if (mockServiceRequest.getParams() != null
+        && !mockServiceRequest.getParams().isEmpty()) {
       return virtualServiceValidRequest.validForParam(mockDataSetupMap,
           mockServiceRequest);
     }
     return null;
   }
 
-  private MockServiceRequest buildMockServiceRequest(VirtualServiceRequest mockTransferObject) {
+  MockServiceRequest buildMockServiceRequest(VirtualServiceRequest mockTransferObject) {
 
     MockServiceRequest mockServiceRequest = new MockServiceRequest();
-    Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
+
+    if(mockTransferObject.getInputObjectType() == null){
+      Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
+      mockServiceRequest.setInputObjectType(inputObjectType);
+    } else {
+      mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
+    }
+    mockServiceRequest.setResponseObjectType(mockTransferObject.getResponseObjectType());
     mockServiceRequest
         .setHeaderParams(Converter.converter(mockTransferObject.getHeaderParams()));
     mockServiceRequest.setOperationId(mockTransferObject.getOperationId());
-    mockServiceRequest.setInputObjectType(inputObjectType);
+    mockServiceRequest.setContentType(mockTransferObject.getContentType());
     mockServiceRequest.setType(mockTransferObject.getType());
     mockServiceRequest.setRule(mockTransferObject.getRule());
     mockServiceRequest
@@ -476,245 +457,6 @@ public class VirtualServiceUtil {
     return mockServiceRequest;
   }
 
-  public Map<Integer, ResponseParam> handleParameterizedRequest(
-      VirtualServiceRequest mockTransferObject) {
-    MockServiceRequest mockServiceRequest = buildMockServiceRequest(mockTransferObject);
-    final Map<MockRequest, MockResponse> mockDataSetupMap = readDynamicResponse(
-        mockServiceRequest.getResource(), mockServiceRequest.getOperationId());
-    return handleParameterizedRequest(
-        mockDataSetupMap, mockServiceRequest);
-  }
-
-  private Map<Integer, ReturnMockResponse> getParameterizedResponse(
-      Map<MockRequest, MockResponse> mockDataSetupMap,
-      MockServiceRequest mockServiceRequest) {
-    Map<Integer, ReturnMockResponse> matchResponse = null;
-    for (Map.Entry<MockRequest, MockResponse> entry : mockDataSetupMap.entrySet()) {
-      Map map = processParamComparison(entry, mockServiceRequest);
-      if (map != null) {
-        return map;
-      }
-    }
-    return matchResponse;
-  }
-
-  private Map processParamComparison(Entry<MockRequest, MockResponse> entry,
-      MockServiceRequest mockServiceRequest) {
-    if (ResponseProcessType.PARAMS.name().equalsIgnoreCase(entry.getKey().getType())) {
-      JSONArray paramArray = new JSONArray(entry.getKey().getRule());
-      for (int i = 0; i < paramArray.length(); i++) {
-        try {
-          HashMap context =
-              new ObjectMapper().readValue(paramArray.getJSONObject(i).toString(), HashMap.class);
-          if (isAnyMatchPresent(mockServiceRequest, entry, context)) {
-            return getMatchingResponse(mockServiceRequest, entry, context);
-          }
-        } catch (Exception e) {
-          log.warn(" {}", e.getMessage());
-        }
-      }
-    }
-    return null;
-  }
-
-  private boolean isAnyMatchPresent(MockServiceRequest mockServiceRequest,
-      Entry<MockRequest, MockResponse> entry, HashMap context) throws JsonProcessingException {
-    if (mockServiceRequest.getParams() != null &&
-        mockServiceRequest.getInput() == null &&
-        matchParameters(mockServiceRequest, entry, context)) {
-      return true;
-    }
-    return performParameterized(mockServiceRequest, entry, context);
-  }
-
-  private boolean performParameterized(MockServiceRequest mockServiceRequest,
-      Entry<MockRequest, MockResponse> entry, HashMap context) throws JsonProcessingException {
-    if ((mockServiceRequest.getParameters() != null && !mockServiceRequest.getParameters()
-        .isEmpty()) && mockServiceRequest.getInput() == null &&
-        matchParameters(mockServiceRequest, entry, context)) {
-      return true;
-    } else if (mockServiceRequest.getParameters() != null && mockServiceRequest.getInput() != null
-        &&
-        (matchParameters(mockServiceRequest, entry, context) && getMatchByInput(mockServiceRequest,
-            entry, context))) {
-      return true;
-    } else if (
-        (mockServiceRequest.getParameters() == null || mockServiceRequest.getParameters().isEmpty())
-            && mockServiceRequest.getInput() != null && getMatchByInput(mockServiceRequest, entry,
-            context)) {
-      return true;
-    }
-    return false;
-  }
-
-  private SimpleEntry<String, String> getDelimiter(ContentType contentType) {
-    String start_param = "<";
-    String end_param = ">";
-    if (ContentType.XML.equals(contentType)) {
-      start_param = "{{";
-      end_param = "}}";
-    }
-    return new SimpleEntry<>(start_param, end_param);
-  }
-
-  private boolean getMatchByInput(MockServiceRequest mockServiceRequest,
-      Entry<MockRequest, MockResponse> entry, Map<String, Object> context)
-      throws JsonProcessingException {
-    Map<String, String> requestObjectMap = Mapson.buildMAPsonFromJson(entry.getKey().getInput());
-
-    Map.Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
-    List<String> parameters = requestObjectMap.entrySet().stream().filter(
-        x -> x.getValue().startsWith(delimiter.getKey()) && x.getValue()
-            .endsWith(delimiter.getValue()))
-        .map(Entry::getKey).collect(Collectors.toList());
-    Map<String, String> replacedValueMap = Mapson
-        .buildMAPsonFromJson(getActualValueForAll(entry.getKey().getInput(), context).toString());
-    Map<String, String> matches = replacedValueMap.entrySet().stream().filter(
-        x -> parameters.contains(x.getKey())).collect(
-        Collectors.toMap(Entry::getKey, Entry::getValue));
-
-    Map<String, String> requestActualValueParam = null;
-    if (isJSONValid(mockServiceRequest.getInput().toString())) {
-      requestActualValueParam = Mapson
-          .buildMAPsonFromJson(mockServiceRequest.getInput().toString());
-    } else {
-      requestActualValueParam = Mapson
-          .buildMAPsonFromJson(getObjectMapper().writeValueAsString(mockServiceRequest.getInput()));
-    }
-    return requestActualValueParam.entrySet().containsAll(matches.entrySet());
-  }
-
-  private boolean isJSONValid(String test) {
-    try {
-      new JSONObject(test);
-    } catch (JSONException ex) {
-      try {
-        new JSONArray(test);
-      } catch (JSONException ex1) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public Map<Integer, ReturnMockResponse> getMatchingResponse(
-      MockServiceRequest mockServiceRequest,
-      Entry<MockRequest, MockResponse> entry, Map<String, Object> context) {
-    Map<Integer, ReturnMockResponse> matchResponse;
-    matchResponse = new HashMap<>();
-    entry.getValue()
-        .setOutput(getActualValueForAll(entry.getValue().getOutput(), context).toString());
-    final ReturnMockResponse returnMockResponse = virtualServiceValidRequest
-        .returnMockResponse(mockServiceRequest,
-            entry, 1);
-    returnMockResponse.setExactMatch(true);
-    matchResponse.put(1, returnMockResponse);
-    return matchResponse;
-  }
-
-  public boolean matchParameters(MockServiceRequest mockServiceRequest,
-      Entry<MockRequest, MockResponse> entry,
-      Map<String, Object> context) {
-
-    Map.Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
-    List<String> requestMatchingParam = entry.getKey().getAvailableParams().stream()
-        .filter(x -> x.getValue().startsWith(delimiter.getKey()) &&
-            x.getValue().endsWith(delimiter.getValue()))
-        .map(VirtualServiceKeyValue::getKey).collect(Collectors.toList());
-    List<VirtualServiceKeyValue> replacedParamMap = new ArrayList<>();
-    for (VirtualServiceKeyValue param : entry.getKey().getAvailableParams()) {
-      replacedParamMap.add(new VirtualServiceKeyValue(param.getKey(),
-          getActualValueForAll(param.getValue(), context).toString()));
-    }
-    boolean matches = replacedParamMap.stream().filter(
-        x -> requestMatchingParam.contains(x.getKey())).allMatch(
-        y -> getObjectValue(mockServiceRequest.getParams().get(y.getKey()), y.getValue()));
-    return !requestMatchingParam.isEmpty() && matches;
-  }
-
-  public boolean getObjectValue(Object actual, Object object) {
-    try {
-        Param param = new Param();
-      param.setType(actual.getClass());
-      param.setActualValue(actual.toString());
-      param.setExpectedValue(object.toString());
-      return ParamTypes.fromString(object.getClass().getCanonicalName()).compareParam(param);
-    } catch (ClassCastException e) {
-      return false;
-    }
-  }
-
-  public Map<Integer, ResponseParam> handleParameterizedRequest(
-      Map<MockRequest, MockResponse> mockDataSetupMap,
-      MockServiceRequest mockServiceRequest) {
-    JSONArray paramArray = new JSONArray(mockServiceRequest.getRule().toString());
-    Map<Integer, ResponseParam> responseMap = new HashMap<>();
-    for (int i = 0; i < paramArray.length(); i++) {
-      ResponseParam response = new ResponseParam();
-      try {
-        JSONObject map = paramArray.getJSONObject(i);
-        Map<String, Object> context = map.toMap();
-        checkRequest(mockDataSetupMap, mockServiceRequest, response, context);
-        checkResponse(mockServiceRequest, response, context);
-      } catch (Exception e) {
-        response.getRecords().put("error", e.getMessage());
-      }
-      if (!response.getRecords().isEmpty()) {
-        responseMap.put(i, response);
-      }
-    }
-    return responseMap;
-  }
-
-  public void checkResponse(MockServiceRequest mockServiceRequest, ResponseParam response,
-      Map<String, Object> context) throws InvalidMockResponseException {
-    if (mockServiceRequest.getOutput() != null) {
-      mockServiceRequest
-          .setOutput(getActualValueForAll(mockServiceRequest.getOutput(), context));
-      VirtualServiceRequest request = new VirtualServiceRequest();
-      BeanUtils.copyProperties(mockServiceRequest, request);
-      boolean isValidResponse = isMockResponseBodyValid(request);
-      if (!isValidResponse) {
-        response.getRecords().put(
-            "response", "Invalid response!");
-      }
-    }
-  }
-
-  public Map<Integer, ReturnMockResponse> checkRequest(
-      Map<MockRequest, MockResponse> mockDataSetupMap,
-      MockServiceRequest mockServiceRequest, ResponseParam response, Map<String, Object> context)
-      throws IOException, JAXBException {
-
-    Map<Integer, ReturnMockResponse> returnMockResponseMap = new HashMap<>();
-
-    boolean checkIfExists = false;
-    if (mockServiceRequest.getParams() != null && mockServiceRequest.getInput() == null){
-      populateMapParams(mockServiceRequest.getParams(), context);
-      returnMockResponseMap = virtualServiceValidRequest
-        .validForParam(mockDataSetupMap, mockServiceRequest);
-      checkIfExists  =  returnMockResponseMap != null ? returnMockResponseMap.isEmpty() : false;
-    }
-
-    if (mockServiceRequest.getInput() != null) {
-      mockServiceRequest
-          .setInput(getActualValueForAll(mockServiceRequest.getInput(), context));
-          returnMockResponseMap = virtualServiceValidRequest
-          .validObject(mockDataSetupMap, mockServiceRequest);
-      checkIfExists  =  returnMockResponseMap != null ? returnMockResponseMap.isEmpty() : false;
-    }
-    if (checkIfExists && mockDataSetupMap.entrySet().stream().
-            anyMatch(x -> ResponseProcessType.PARAMS.name()
-                .equalsIgnoreCase(x.getKey().getType().toLowerCase()))) {
-      returnMockResponseMap = getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
-    }
-
-    if (returnMockResponseMap != null && !returnMockResponseMap.isEmpty()) {
-      response.getRecords()
-          .put("request", "Mock already Present!");
-    }
-    return returnMockResponseMap;
-  }
 
   public Object returnResponse(Method method, MockServiceRequest mockServiceRequest)
       throws IOException, JAXBException {
@@ -727,7 +469,7 @@ public class VirtualServiceUtil {
     Map<Integer, ReturnMockResponse> returnMockResponseMap =
         validateBusinessRules(mockDataSetupMap, mockServiceRequest);
 
-    returnMockResponseMap = getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
+    returnMockResponseMap = virtualParameterizedUtil.getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
 
     //No Rule conditions exists/met then run the script
     if (returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {

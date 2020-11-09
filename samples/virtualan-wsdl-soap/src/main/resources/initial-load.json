@@ -19,5 +19,16 @@
     "resource": "http://virtualan.io/types/helloworld",
     "contentType": "XML",
     "requestType" : "SOAP"
+  },
+  {
+    "operationId": "person",
+    "url": "http://virtualan.io/types/helloworld",
+    "method": "person",
+    "type": "Params",
+    "rule": "[{\"firstName\":\"Elanj\",\"lastName\":\"Thangamani\"}]",
+    "input": "<hel:person xmlns:hel=\"http://virtualan.io/types/helloworld\">\n  <hel:firstName>{firstName}</hel:firstName>\n  <hel:lastName>{lastName}</hel:lastName>\n</hel:person>",
+    "output": "<ns2:greeting xmlns:ns2=\"http://virtualan.io/types/helloworld\">\n  <ns2:greeting>Welcome SOAP World {firstName}!!!</ns2:greeting>\n</ns2:greeting>",
+    "contentType": "XML",
+    "requestType" : "SOAP"
   }
 ]

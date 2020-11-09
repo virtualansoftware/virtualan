@@ -119,7 +119,7 @@ public class MessageUtil {
 			mockServiceRequest.setResource(mockTransferObject.getResource());
 			mockServiceRequest.setContentType(mockTransferObject.getContentType());
 			mockServiceRequest.setRule(mockTransferObject.getRule());
-
+		mockServiceRequest.setResponseObjectType(mockTransferObject.getResponseObjectType());
 			if (mockTransferObject.getInputObjectType() != null) {
 
 				//validate if it is a valid script

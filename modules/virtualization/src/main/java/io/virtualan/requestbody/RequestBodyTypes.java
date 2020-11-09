@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.EqualsBuilder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -163,10 +162,18 @@ public enum RequestBodyTypes {
                             requestBody.getInputRequest()),
                         requestBody.getExcludeList());
 
+                } else if(requestBody.getActualInput() instanceof String
+                    && requestBody.getExpectedInput() instanceof  String) {
+                    return EqualsBuilder.reflectionEquals(
+                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),
+                            requestBody.getActualInput().toString()),
+                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),
+                            requestBody.getExpectedInput()), requestBody.getExcludeList());
                 } else {
                     return EqualsBuilder.reflectionEquals(
-                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),requestBody.getExpectedInput()),
-                            requestBody.getActualInput(), requestBody.getExcludeList());
+                        XMLConverter.xmlToObject(requestBody.getInputObjectType(),
+                            requestBody.getExpectedInput()),
+                        requestBody.getActualInput(), requestBody.getExcludeList());
                 }
             } else if (requestBody.getInputRequest() != null) {
                 return EqualsBuilder.reflectionEquals(

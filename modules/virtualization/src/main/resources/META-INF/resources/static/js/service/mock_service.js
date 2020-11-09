@@ -31,7 +31,7 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
     };
 
     return factory;
-    
+
     function loadCatalogFiles(name) {
         var deferred = $q.defer();
         $http.get(REST_SERVICE_URI_SWAGGER+"/"+name)
@@ -105,7 +105,7 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
             );
             return deferred.promise;
         }
-    
+
     function readApplicationName() {
         var deferred = $q.defer();
         $http.get(REST_SERVICE_URI+'/app-name')

@@ -1,10 +1,13 @@
 package io.virtualan.controller;
 
+import io.virtualan.core.VirtualParameterizedUtil;
+import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.RequestType;
 import io.virtualan.core.model.SoapService;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.soap.WSEndpointConfiguration;
+import io.virtualan.core.util.Converter;
 import io.virtualan.message.core.MessageUtil;
 import io.virtualan.service.VirtualService;
 import java.io.IOException;
@@ -40,21 +43,43 @@ public class VirtualSoapController {
   private MessageSource messageSource;
 
   @Autowired
+  private VirtualParameterizedUtil virtualParameterizedUtil;
+
+  @Autowired
+  private Converter converter;
+
+  @Autowired
   private VirtualService virtualService;
+
+  @Autowired
+  private VirtualServiceUtil virtualServiceUtil;
 
   @Autowired(required = false)
   private WSEndpointConfiguration wsEndpointConfiguration;
 
   public ResponseEntity checkIfServiceDataAlreadyExists(
       VirtualServiceRequest virtualServiceRequest) throws JAXBException, IOException {
-    final Long id = messageUtil.isMockAlreadyExists(virtualServiceRequest);
-    if (id != null && id != 0) {
-      final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
-          messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
-      virtualServiceRequest.setId(id);
-      virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
-      return new ResponseEntity<VirtualServiceStatus>(virtualServiceStatus,
-          HttpStatus.BAD_REQUEST);
+    if ("PARAMS".equalsIgnoreCase(virtualServiceRequest.getType())) {
+      Map response = virtualParameterizedUtil.handleParameterizedRequest(virtualServiceRequest);
+      if(!response.isEmpty()) {
+        final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
+            messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));
+        virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
+        virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
+        virtualServiceStatus.setResponseParam( response);
+        return new ResponseEntity<>(virtualServiceStatus,
+            HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      final Long id = messageUtil.isMockAlreadyExists(virtualServiceRequest);
+      if (id != null && id != 0) {
+        final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
+            messageSource.getMessage("VS_DATA_ALREADY_EXISTS", null, locale));
+        virtualServiceRequest.setId(id);
+        virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
+        return new ResponseEntity<VirtualServiceStatus>(virtualServiceStatus,
+            HttpStatus.BAD_REQUEST);
+      }
     }
     return null;
   }
@@ -111,7 +136,9 @@ public class VirtualSoapController {
             try {
               Class reqClazzz = Class.forName(y.getValue().getRequestClassName());
               virtualServiceRequest.setInputObjectType(reqClazzz);
-             } catch (ClassNotFoundException e) {
+              Class resClazzz = Class.forName(y.getValue().getResponseClassName());
+              virtualServiceRequest.setResponseObjectType(resClazzz);
+            } catch (ClassNotFoundException e) {
               log.warn("return Class not found : {}" , e.getMessage());
             }
           });

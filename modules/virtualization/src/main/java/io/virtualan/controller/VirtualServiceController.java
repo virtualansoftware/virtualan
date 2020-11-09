@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.InvalidMockResponseException;
+import io.virtualan.core.VirtualParameterizedUtil;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.MockResponse;
@@ -97,6 +98,9 @@ public class VirtualServiceController {
   private VirtualServiceUtil virtualServiceUtil;
   @Value("${virtualan.application.name:Mock Service}")
   private String applicationName;
+
+  @Autowired
+  private VirtualParameterizedUtil virtualParameterizedUtil;
 
   private ObjectMapper getObjectMapper() {
     objectMapper.findAndRegisterModules();
@@ -215,7 +219,7 @@ public class VirtualServiceController {
 
 
       if ("PARAMS".equalsIgnoreCase(virtualServiceRequest.getType())) {
-          Map response = virtualServiceUtil.handleParameterizedRequest(virtualServiceRequest);
+          Map response = virtualParameterizedUtil.handleParameterizedRequest(virtualServiceRequest);
           if(!response.isEmpty()) {
             final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
                 messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));
