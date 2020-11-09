@@ -1,12 +1,12 @@
 swagger: '2.0'
 info:
   description: Virtual Service API
-  version: 2.1.4
+  version: 2.1.5
   title: Virtual Service API
 basePath: /
 schemes:
-  - https
   - http
+  - https
 produces:
   - application/json
 paths:
@@ -144,7 +144,11 @@ definitions:
         type: string
         desc: "possible values are Response, Rule and Script"
       rule:
-        type: string
+        anyOf:
+          - type: string
+          - type: array
+            items: {}
+          - type: object
         desc: "rule could be a groovy script or spring expression language business rule"
       input:
         anyOf:
