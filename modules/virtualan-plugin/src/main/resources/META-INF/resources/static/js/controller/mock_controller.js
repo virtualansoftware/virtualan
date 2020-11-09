@@ -1,7 +1,7 @@
 'use strict';
 
 myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService', function($scope, $filter,  $modal, MockService) {
-    
+
 	var self = this;
     self.mockRequest={id:'',resource:'',url:'',method:'',type:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
     self.mockCreateRequest= {id:'',resource:'',method:'',type:'',url:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
@@ -46,8 +46,9 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.setPage = function (pageNo) {
     	self.currentPage = pageNo;
     };
-    
-     function getAppName(){	
+
+
+     function getAppName(){
     	MockService.readApplicationName()
             .then(
             function(d) {
@@ -90,6 +91,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
            .remove();
    }
 
+
   self.isEmptyNotPresent = function (value) {
       if(value === null || value === '' || value === undefined){
          return  true ;
@@ -116,15 +118,47 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         }
     }
 
-    self.loadJson = function (value) {
-      if(typeof value === 'object' && value !== null ) {
-        self.jsonObj = JSON.parse(JSON.stringify(value));
-        self.jsonStr = JSON.parse(JSON.stringify(value));
-      } else {
-        self.jsonObj = JSON.parse(value);
-        self.jsonStr = JSON.parse(value);
+
+    self.loadParameterized = function (value) {
+      console.log(value);
+      self.parameterized = value;
+    };
+
+    self.getKeys = function() {
+      return  self.parameterized && self.parameterized.length > 0 && Object.keys(JSON.parse(self.parameterized)[0]);
+    };
+
+    self.getParameterized = function() {
+      try{
+        return self.parameterized  && JSON.parse(self.parameterized);
+      }catch{
       }
     };
+
+  self.parameterizedTable = [];
+  self.parameterizedKeys = [];
+
+  self.loadParameterizedFromTable = function (value) {
+    console.log(value);
+    self.parameterizedTable = JSON.parse(value);
+    self.parameterizedKeys = Object.keys(self.parameterizedTable[0]);
+  };
+
+    self.loadJson = function (value) {
+        try{
+          if(typeof value === 'object' && value !== null ) {
+            self.jsonObj = JSON.parse(JSON.stringify(value, undefined, 4));
+            self.jsonStr =  JSON.stringify(value, undefined, 4);
+          } else {
+            self.jsonObj = JSON.parse(value);
+            self.jsonStr = JSON.stringify(JSON.parse(value), undefined, 4);
+          }
+        }catch(e){
+          self.jsonObj = "{ \"message\" : \"NO-DATA\"}";
+          self.jsonStr = value;
+        }
+       };
+
 
 
     self.loadGroovy = function (value) {
@@ -136,7 +170,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       var obj = term;
       self.filterList = $filter('filter')(self.mockRequests, obj);
       self.currentPage = 1;
-    }); 
+    });
 
    $scope.$watch(self.searchMsgText, function (term) {
          var obj = term;
@@ -145,11 +179,174 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
        });
 
 
-    self.isDefined = function (value) {
-    		return typeof value !== 'undefined';
-    }
+  self.isDefined = function (value) {
+    		return typeof value !== 'undefined' && value;
+    };
 
-    
+    self.isArrayDefined = function (value) {
+    		return typeof value !== 'undefined' && value && value.length > 0;
+    };
+
+    self.keyObject =[];
+
+    self.getRexEx  = function(contentType){
+      var reTagCatcher = /(<.[^(><.)]+>)/g;
+      if(contentType === 'XML'){
+         reTagCatcher = /(\{.[^(\}\{.)]+\})/g;
+      }
+      return reTagCatcher;
+    };
+
+
+  self.getObjectParams = function(input, contentType){
+      if(self.isDefined(input)) {
+        var outputAll = new Array();
+        var output;
+        for (var key in input) {
+          var reTagCatcher = self.getRexEx(contentType);
+          output = input[key].match(reTagCatcher);
+          if(self.isArrayDefined(output)) {
+            for ( var i = 0; i < output.length; i++) {
+               outputAll.push(output[i].substring(1, output[i].length-1));
+            }
+          }
+       }
+        return outputAll;
+    }
+  };
+
+   self.getParameterizedFormat = function(input, contentType) {
+     if('XML' ===   contentType) {
+        return input.indexOf('{') && input.indexOf('}');
+     } else {
+        return input.indexOf('<') && input.indexOf('>');
+     }
+   };
+
+   self.getParams = function(input, contentType){
+      if(self.isDefined(input) && self.getParameterizedFormat(input, contentType)) {
+         var outputAll = new Array();
+         var reTagCatcher = self.getRexEx(contentType);
+          var output = input.match(reTagCatcher);
+          if(self.isArrayDefined(output)) {
+            for ( var i = 0; i < output.length; i++) {
+               outputAll.push(output[i].substring(1, output[i].length-1));
+            }
+          }
+        return outputAll;
+       }
+    };
+
+   self.getParamsMap = function(inputMap, contentType){
+      if(self.isArrayDefined(inputMap)) {
+         var outputAll = new Array();
+         var reTagCatcher = self.getRexEx(contentType);
+         for ( var index in inputMap) {
+            var resValue  =  inputMap[index]['value'];
+            if(self.isDefined(resValue)){
+              var output = resValue.match(reTagCatcher);
+              if(self.isArrayDefined(output)){
+                outputAll.push(resValue.substring(1, resValue.length-1));
+              }
+            }
+         }
+         return outputAll;
+       }
+    };
+
+    self.paramHeaderMapper = {};
+    self.paramFinder =  function(mockRequest) {
+          var keyId = mockRequest.method
+          keyId = keyId.concat("-").concat(mockRequest.operationId)
+      return self.paramHeaderMapper[keyId]
+    };
+    self.paramMapper = function (mockRequest) {
+       var outputAll = new Array();
+
+       var availableParams = self.getParamsMap(mockRequest.availableParams, mockRequest.contentType);
+       if(self.isArrayDefined(availableParams)) {
+           Array.prototype.push.apply(outputAll, availableParams);
+       }
+
+       var additionalParams = self.getObjectParams(mockRequest.additionalParams, mockRequest.contentType)
+       if(self.isArrayDefined(additionalParams)) {
+           Array.prototype.push.apply(outputAll, additionalParams);
+       }
+
+       var responseHeaderParams = self.getObjectParams(mockRequest.responseHeaderParams, mockRequest.contentType);
+       if(self.isArrayDefined(responseHeaderParams)) {
+           Array.prototype.push.apply(outputAll, responseHeaderParams);
+       }
+
+       var input = self.getParams(mockRequest.input, mockRequest.contentType);
+       if(self.isArrayDefined(input)) {
+           Array.prototype.push.apply(outputAll, input);
+       }
+       var output = self.getParams(mockRequest.output, mockRequest.contentType);
+       if(self.isArrayDefined(output)) {
+           Array.prototype.push.apply(outputAll, output);
+       }
+
+       if(self.isArrayDefined(outputAll)) {
+          var keyId = mockRequest.method
+          keyId = keyId.concat("-").concat(mockRequest.operationId)
+          self.paramHeaderMapper[keyId] = outputAll.reduce((unique, item) => (unique.includes(item) ? unique : [...unique, item]), [],);;
+       }
+
+    };
+
+
+    self.addParametrizedParams = function(mockRequest, keyObject) {
+    	if(keyObject != null) {
+        const obj  = {}
+        for(var k in keyObject) {
+          if(keyObject.hasOwnProperty(k) &&
+                k.substring(0, k.lastIndexOf('-'))  ===
+                ('params-'+mockRequest.method+'-'+mockRequest.operationId)) {
+            obj[k.substring(k.lastIndexOf('-')+1)] = keyObject[k];
+            keyObject[k] ='';
+           }
+        }
+        if(self.isDefined(mockRequest.rule)){
+          if(!self.isExist(mockRequest.rule, obj)) {
+            mockRequest.rule.push(obj);
+          }
+        } else {
+          mockRequest.rule = new Array();
+          mockRequest.rule.push(obj);
+        }
+        keyObject = {};
+    	}
+    };
+
+    self.objectsAreEqual = function(a, b) {
+       for (var prop in a) {
+         if (a.hasOwnProperty(prop)) {
+           if (b.hasOwnProperty(prop)) {
+             if (typeof a[prop] === 'object') {
+               if (!self.objectsAreEqual(a[prop], b[prop])) return false;
+             } else {
+               if (a[prop] !== b[prop]) return false;
+             }
+           } else {
+             return false;
+           }
+         }
+       }
+       return true;
+     };
+
+    self.isExist = function(rule, key) {
+        for(const index in rule) {
+            if(self.objectsAreEqual(key, rule[index])){
+              return true;
+            }
+        }
+        return false;
+    };
+
+
+
     self.addParam = function(mockRequest, key, value) {
     	if(self.isDefined(mockRequest.additionalParams)){
     		mockRequest.additionalParams[key] = value;
@@ -157,10 +354,11 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     		mockRequest.additionalParams = {};
     		mockRequest.additionalParams[key] = value;
     	}
-        self.additionalParamKey ='';
-        self.additionalParamValue ='';
+    	self.paramMapper(mockRequest);
+      self.additionalParamKey ='';
+      self.additionalParamValue ='';
     };
-    
+
     self.addResponseHeaderParam = function(mockRequest, key, value) {
     	if(self.isDefined(mockRequest.responseHeaderParams)){
     		mockRequest.responseHeaderParams[key] = value;
@@ -168,19 +366,25 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     		mockRequest.responseHeaderParams = {};
     		mockRequest.responseHeaderParams[key] = value;
     	}
-        self.responseHeaderParamKey ='';
-        self.responseHeaderParamValue ='';
+    	self.paramMapper(mockRequest);
+      self.responseHeaderParamKey ='';
+      self.responseHeaderParamValue ='';
     };
-    
-    self.removeParam = function(item, params) {
+
+    self.removeParam = function(mockRequest, item, params) {
     	delete params[item];
+    	self.paramMapper(mockRequest);
     };
-    
+
+    self.removeParameterized = function(mockRequest, item) {
+        mockRequest.rule = mockRequest.rule.filter(key => !self.objectsAreEqual(key, item));
+    };
+
     self.setItemsPerPage = function(num) {
 	    self.perPage = num;
 	    self.currentPage = 1; //reset to first page
     };
-        
+
     self.loadData = fetchAllMockRequest();
 
     function fetchAllMsgMockRequest(){
@@ -208,8 +412,8 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             }
         );
     };
-    
-    
+
+
     function loadAllMockRequest(){
         MockService.loadAllMockRequest()
             .then(
@@ -223,19 +427,6 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
         );
     }
 
-
-    function loadAllTopics(){
-            MockService.loadAllTopics()
-                .then(
-                function(d) {
-                	self.kafkaTopics = d;
-               	 console.log("ALL kafka's ", self.kafkaTopics.length);
-                },
-                function(errResponse){
-                    console.error('Error while fetching kafkaTopics');
-                }
-            );
-        }
 
 self.showJSONDialog = false;
 	self.closeJSONAlertDialog = false;
@@ -256,7 +447,7 @@ self.showJSONDialog = false;
 
 
 	self.showDialog = false;
-	
+
 	self.showAlert = function(operationId) {
 		if(operationId === self.selectedOperationId){
 			self.closeAlertDialog = true;
@@ -264,29 +455,29 @@ self.showJSONDialog = false;
 		}
 		return false;
 	}
-	
-	self.typeDialog = function() { 
+
+	self.typeDialog = function() {
 		if(self.typeWarning) {
 			return "warning";
-		} 
+		}
 			return "success";
 	}
-	
+
 	self.closeAlert = function(operationId) {
 		self.typeWarning = false;
 		self.showDialog = false;
 	}
-	
-	
-	
-	
+
+
+
+
 	self.showMessage = function(operationId) {
 		if(operationId === self.selectedOperationId){
 			return self.message;
 		}
 		return;
 	}
-    
+
     function createMockRequest(mockRequest){
 		self.showDialog = false;
     	self.typeWarning = false;
@@ -355,9 +546,9 @@ self.showJSONDialog = false;
     }
 
     self.mergeParams = function (mockRequest){
-    	
+
     	self.availableParamsWithAdditionalParam = [];
-    	
+
     	angular.forEach(mockRequest.availableParams, function(data){
     		self.availableParamsWithAdditionalParam.push(data);
     	});
@@ -375,36 +566,41 @@ self.showJSONDialog = false;
 			});
     	}
     }
-    
-    
-	
+
+
+
     self.addParamObj = function(key, value) {
     	self.additionalParam={};
         self.additionalParam['key'] =  key;
     	self.additionalParam['value'] =  value;
 		return self.additionalParam;
     }
-    
+
     self.addResParam = function(key, value) {
     	self.responseHeaderParam = {};
 	    self.responseHeaderParam['key'] =  key;
 		self.responseHeaderParam['value'] =  value;
 		return self.responseHeaderParam;
     }
-    
+
     self.submit= function (mockRequest) {
         console.log('Saving New mockRequest', mockRequest);
         self.responseHeaderParamList = [];
         self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
-        self.mockCreateRequest= {id:'', 
+         var mockRule = mockRequest.rule;
+          if(mockRequest.type === 'Params') {
+            mockRule = angular.toJson(mockRule);
+          }
+
+        self.mockCreateRequest= {id:'',
         			resource:mockRequest.resource,
         			url:mockRequest.url,
         			type:mockRequest.type,
-                    rule:mockRequest.rule,
-                    operationId:mockRequest.operationId,
+              rule:mockRule,
+              operationId:mockRequest.operationId,
         			input:mockRequest.input,
         			output:mockRequest.output,
-        			excludeList:mockRequest.excludeList, 
+        			excludeList:mockRequest.excludeList,
         			httpStatusCode:mockRequest.httpStatusCode,
         			method:mockRequest.method,
         			availableParams:self.mergeParams(mockRequest),
@@ -413,26 +609,6 @@ self.showJSONDialog = false;
         createMockRequest(self.mockCreateRequest);
 
     }
-
-
-    self.submitMessage= function (mockRequest) {
-            console.log('Saving New mock message Request', mockRequest);
-            self.responseHeaderParamList = [];
-            self.moveParams(mockRequest.responseHeaderParams, self.responseHeaderParamList)
-            self.mockCreateRequest= {id:'',
-            			resource:mockRequest.resource,
-            			brokerUrl:mockRequest.url,
-            			requestTopicOrQueueName:mockRequest.operationId,
-            			input:mockRequest.input,
-            			output:mockRequest.output,
-            			excludeList:mockRequest.excludeList,
-            			responseTopicOrQueueName:mockRequest.method,
-            			availableParams:self.mergeParams(mockRequest),
-            			headerParams:self.responseHeaderParamList};
-            console.log('Saving New mock message Request', self.mockCreateRequest);
-            createMockMsgRequest(self.mockCreateRequest);
-
-        }
 
     function edit(id){
         console.log('id to be edited', id);
@@ -444,14 +620,6 @@ self.showJSONDialog = false;
         }
     }
 
-
-    self.removeMsg = function(id){
-        console.log('id to be deleted', id);
-        if(self.mockRequest.id === id) {//clean form if the mockRequest to be deleted is shown there.
-            reset();
-        }
-        deleteMsgMockRequest(id);
-    }
 
     function remove(id){
         console.log('id to be deleted', id);

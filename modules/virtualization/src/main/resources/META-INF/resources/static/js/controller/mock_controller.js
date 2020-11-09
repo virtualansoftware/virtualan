@@ -358,8 +358,11 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     	if(keyObject != null) {
         const obj  = {}
         for(var k in keyObject) {
-          if(keyObject.hasOwnProperty(k)) {
-            obj[k] = keyObject[k];
+            if(keyObject.hasOwnProperty(k) &&
+                k.substring(0, k.lastIndexOf('-'))  ===
+                ('params-'+mockRequest.method+'-'+mockRequest.operationId)) {
+            obj[k.substring(k.lastIndexOf('-')+1)] = keyObject[k];
+            keyObject[k] ='';
            }
         }
         if(self.isDefined(mockRequest.rule)){

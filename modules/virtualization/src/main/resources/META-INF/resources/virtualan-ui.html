@@ -628,9 +628,10 @@ json-tree .branch-preview::after {
 																		<tr ng-repeat="mockKeyValue in mockRequest.availableParams track by $index">																		
 																			<td ><span >{{mockKeyValue.key}}: </span></td>
 																			<td><span >	<input class="input form-control input-sm"
-																													id="availableParams-{{mockRequest.method}}-{{mockRequest.operationId}}-{{mockKeyValue.key}}"
+																				id="availableParams-{{mockRequest.method}}-{{mockRequest.operationId}}-{{mockKeyValue.key}}"
 																				type="text" name="{{mockKeyValue.key}}"
-																				ng-model="mockRequest.availableParams[$index].value"  ng-blur="ctrl1.paramMapper(mockRequest);" />
+																				ng-model="mockRequest.availableParams[$index].value"
+																													ng-blur="ctrl1.paramMapper(mockRequest);" />
 																				</span>
 																			</td>
 																			<td></td>																			<td></td>
@@ -731,7 +732,7 @@ json-tree .branch-preview::after {
 																<td ng-repeat="c in ctrl1.paramFinder(mockRequest)">
 																	<input class="input form-control input-sm"
 																				 id="params-{{mockRequest.method}}-{{mockRequest.operationId}}-{{c}}"
-																				 type="text" ng-model="ctrl1.keyObject[c]" />
+                                         type="text" ng-model="ctrl.keyObject['params-'+mockRequest.method+'-'+mockRequest.operationId+'-'+c]" />
 																</td>
 															 <td>
 																 <img height="30" width="30"
