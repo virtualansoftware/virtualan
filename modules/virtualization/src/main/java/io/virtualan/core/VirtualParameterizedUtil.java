@@ -211,7 +211,7 @@ public class VirtualParameterizedUtil {
       Entry<MockRequest, MockResponse> entry, Map<String, Object> context) {
     Map<Integer, ReturnMockResponse> matchResponse;
     matchResponse = new HashMap<>();
-    if(entry.getValue() != null) {
+    if(entry.getValue().getOutput() != null) {
       entry.getValue()
           .setOutput(getActualValueForAll(getDelimiter(entry.getKey().getContentType()),
               entry.getValue().getOutput(), context).toString());
