@@ -409,7 +409,7 @@ public class VirtualServiceUtil {
         final Map<MockRequest, MockResponse> mockDataSetupMap,
         MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
 
-        if ((mockServiceRequest.getParams() == null || !mockServiceRequest.getParams().isEmpty())
+        if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
             && mockServiceRequest.getInput() == null) {
             return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
                 mockServiceRequest);
@@ -419,7 +419,7 @@ public class VirtualServiceUtil {
             return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
                 mockServiceRequest);
         } else if (mockServiceRequest.getParams() != null
-            && mockServiceRequest.getParams().size() > 0) {
+            && !mockServiceRequest.getParams().isEmpty()) {
             return virtualServiceValidRequest.validForParam(mockDataSetupMap,
                 mockServiceRequest);
         }
