@@ -64,7 +64,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 
     self.input = "Enter the Json here to get formatted";
     self.output = "You will see the Formatted Output or Error";
-    self.jsonOutputObj = JSON.parse("{  \"errorCode\": \"NOT_FOUND\" }");
+    self.jsonOutputObj = JSON.parse("{  \"errorCode\": \"-NA-\" }");
 
     self.jsonFormatter = function() {
         try {
@@ -100,8 +100,10 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     };
 
     self.loadDefaultRule = function(type, value) {
-     if(type.toUpperCase() === 'SCRIPT') {
-       if (value == null ) {
+     if(value != null) {
+        self.tmp = value
+     }if(type && type.toUpperCase() === 'SCRIPT') {
+       if (self.tmp == null && value == null ) {
         return  " def executeScript(mockServiceRequest, responseObject) { \n" +
             "     int age = getAge(mockServiceRequest.getInput().getBirthday()); \n" +
             "    String postalCode = mockServiceRequest.getInput().getPostalCode(); \n" +
@@ -110,13 +112,22 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             "    responseObject.setOutput(String.valueOf(riskFactor)); \n" +
             "    return responseObject.builder(); \n" +
             " } \n";
+          } else {
+            return self.tmp;
           }
-        } else if(type.toUpperCase() === 'RULE') {
-           if (value == null ) {
+        } else if( type && type.toUpperCase() === 'RULE') {
+           if (self.tmp == null && value == null ) {
               return " T(java.time.Period).between(input.dateOfBirth, T(java.time.LocalDate).now()).getYears() < 22 ";
-           }
+            } else {
+               return self.tmp;
+            }
+        } else if(type && type.toUpperCase() === 'PARAMS') {
+            if (self.tmp != null) {
+                 return self.tmp;
+            }
         }
     }
+
 
 
     self.loadParameterized = function (value) {
@@ -146,20 +157,40 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 
     self.loadJson = function (value) {
         try{
-          if(typeof value === 'object' && value !== null ) {
-            self.jsonObj = JSON.parse(JSON.stringify(value, undefined, 4));
-            self.jsonStr =  JSON.stringify(value, undefined, 4);
+           if(typeof value === 'object' && value !== null ) {
+              self.jsonObj = JSON.parse(JSON.stringify(value));
+              document.getElementById("jsonDisplay").innerHTML = syntaxHighlight(value);
           } else {
-            self.jsonObj = JSON.parse(value);
-            self.jsonStr = JSON.stringify(JSON.parse(value), undefined, 4);
-          }
+              self.jsonObj = JSON.parse(value);
+              document.getElementById("jsonDisplay").innerHTML = syntaxHighlight(value);
+            }
         }catch(e){
-          self.jsonObj = "{ \"message\" : \"NO-DATA\"}";
-          self.jsonStr = value;
+          self.jsonObj = JSON.parse("{ \"message\" : \"-NA-\"}");
+          document.getElementById("jsonDisplay").innerHTML = syntaxHighlight(value);
         }
        };
 
-
+  function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+           json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\\s*:)?|\b(true|false|null)\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+  };
 
     self.loadGroovy = function (value) {
       console.log(value);

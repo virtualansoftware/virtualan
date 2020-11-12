@@ -157,18 +157,12 @@ public class VirtualParameterizedUtil {
       }
       List<String> filterList =  existingPaths.stream().filter(
           x -> x.contains("{") && x
-              .contains("}")).map(x -> x.substring(x.lastIndexOf(':'), x.lastIndexOf('='))).collect(
-          Collectors.toList());
+              .contains("}")).map(x -> getElementKey(x)).collect(Collectors.toList());
       List<String> filteredListWithValue = existingPaths.stream()
-          .filter(  x -> x.contains("{") && x.contains("}")).
-              map(x -> x.substring(x.lastIndexOf(':'))).map(x ->
+          .filter(  x -> x.contains("{") && x.contains("}")).map(x -> getElement(x)).map(x ->
               getActualValueForAll(delimiter,x, context).toString()).collect(Collectors.toList());
-
-      List<String> matches = input.stream().filter(x -> x.lastIndexOf(':') < x.lastIndexOf('=')).filter(
-          x -> filterList.contains(x.substring(x.lastIndexOf(':'), x.lastIndexOf('='))))
-          .map(x -> x.substring(x.lastIndexOf(':'))).collect(
-              Collectors.toList());
-
+      List<String> matches = input.stream().filter(x -> x.lastIndexOf('/') < x.lastIndexOf('=')).filter(
+          x -> filterList.contains(getElementKey(x))).map(x -> getElement(x)).collect(Collectors.toList());
       return  matches.containsAll(filteredListWithValue);
     } else {
       requestObjectMap = Mapson.buildMAPsonFromJson(entry.getKey().getInput());
@@ -191,6 +185,21 @@ public class VirtualParameterizedUtil {
           Collectors.toMap(Entry::getKey, Entry::getValue));
       return requestActualValueParam.entrySet().containsAll(matches.entrySet());
     }
+  }
+
+  private String getElementKey(String element){
+    String localName = getElement(element);
+    if(localName.indexOf("=") != -1) {
+      localName = localName.substring(0,localName.indexOf("="));
+    }
+    return localName;
+  }
+  private String getElement(String element){
+    String localName = element.substring(element.lastIndexOf("/"));
+    if(localName.lastIndexOf(":") != -1) {
+      localName = localName.substring(localName.lastIndexOf(":")+1);
+    }
+    return localName;
   }
 
   private boolean isJSONValid(String test) {

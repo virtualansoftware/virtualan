@@ -31,6 +31,13 @@
 <style type="text/css">
 
 
+.jsondis {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }
+
 .scroll
 {
 width:96%;
@@ -1076,9 +1083,7 @@ json-tree .branch-preview::after {
 						<div class="panel panel-default">
 							<div class="panel-body" layout="row">
 								<div flex-gt-sm="50" flex="50">
-									<code>
-										<pre>{{ctrl.jsonStr |json}}</pre>
-									</code>
+									<pre id="jsonDisplay"></pre>
 								</div>
 								<div flex-gt-sm="50" flex="50">
 									<json-tree object="ctrl.jsonObj" start-expanded="true">
