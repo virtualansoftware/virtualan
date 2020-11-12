@@ -1277,7 +1277,7 @@ json-tree .branch-preview::after {
 																						<td ng-repeat="c in ctrl3.paramFinder(mockSoapRequest)">
 																							<input class="input form-control input-sm"
 																										 id="params-{{mockSoapRequest.method}}-{{mockSoapRequest.operationId}}-{{c}}"
-																										 type="text" ng-model="ctrl3.keyObject[c]" />
+																										 type="text" ng-model="ctrl3.keyObject['params-'+mockSoapRequest.method+'-'+mockSoapRequest.operationId+'-'+c]" />
 																						</td>
 																						<td>
 																							<img height="30" width="30"
