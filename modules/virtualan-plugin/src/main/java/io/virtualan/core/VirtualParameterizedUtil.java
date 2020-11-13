@@ -60,7 +60,7 @@ public class VirtualParameterizedUtil {
 
   public static void populateMapParams(Map<String, String> paramMap,
       Map<String, Object> contextObject) {
-    for (Entry<String, String> param : paramMap.entrySet()) {
+    for (Map.Entry<String, String> param : paramMap.entrySet()) {
       paramMap
           .put(param.getKey(), getActualValueForAll(getDelimiter(ContentType.JSON) ,param.getValue(), contextObject).toString());
     }
@@ -71,7 +71,7 @@ public class VirtualParameterizedUtil {
       Map<MockRequest, MockResponse> mockDataSetupMap,
       MockServiceRequest mockServiceRequest) {
     Map<Integer, ReturnMockResponse> matchResponse = null;
-    for (Entry<MockRequest, MockResponse> entry : mockDataSetupMap.entrySet()) {
+    for (Map.Entry<MockRequest, MockResponse> entry : mockDataSetupMap.entrySet()) {
       Map map = processParamComparison(entry, mockServiceRequest);
       if (map != null) {
         return map;
@@ -145,7 +145,7 @@ public class VirtualParameterizedUtil {
     Map<String, String> requestObjectMap = null;
     Map<String, String> requestActualValueParam = null;
     Map<String, String> replacedValueMap = null;
-    Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
+    Map.Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
     if(ContentType.XML.equals(entry.getKey().getContentType())) {
       List<String> existingPaths = VirtualXPaths.readXPaths(entry.getKey().getInput());
       List<String> input =  null;
@@ -157,18 +157,12 @@ public class VirtualParameterizedUtil {
       }
       List<String> filterList =  existingPaths.stream().filter(
           x -> x.contains("{") && x
-              .contains("}")).map(x -> x.substring(x.lastIndexOf(':'), x.lastIndexOf('='))).collect(
-          Collectors.toList());
+              .contains("}")).map(x -> getElementKey(x)).collect(Collectors.toList());
       List<String> filteredListWithValue = existingPaths.stream()
-          .filter(  x -> x.contains("{") && x.contains("}")).
-              map(x -> x.substring(x.lastIndexOf(':'))).map(x ->
+          .filter(  x -> x.contains("{") && x.contains("}")).map(x -> getElement(x)).map(x ->
               getActualValueForAll(delimiter,x, context).toString()).collect(Collectors.toList());
-
-      List<String> matches = input.stream().filter(x -> x.lastIndexOf(':') < x.lastIndexOf('=')).filter(
-          x -> filterList.contains(x.substring(x.lastIndexOf(':'), x.lastIndexOf('='))))
-          .map(x -> x.substring(x.lastIndexOf(':'))).collect(
-              Collectors.toList());
-
+      List<String> matches = input.stream().filter(x -> x.lastIndexOf('/') < x.lastIndexOf('=')).filter(
+          x -> filterList.contains(getElementKey(x))).map(x -> getElement(x)).collect(Collectors.toList());
       return  matches.containsAll(filteredListWithValue);
     } else {
       requestObjectMap = Mapson.buildMAPsonFromJson(entry.getKey().getInput());
@@ -191,6 +185,21 @@ public class VirtualParameterizedUtil {
           Collectors.toMap(Entry::getKey, Entry::getValue));
       return requestActualValueParam.entrySet().containsAll(matches.entrySet());
     }
+  }
+
+  private String getElementKey(String element){
+    String localName = getElement(element);
+    if(localName.indexOf("=") != -1) {
+      localName = localName.substring(0,localName.indexOf("="));
+    }
+    return localName;
+  }
+  private String getElement(String element){
+    String localName = element.substring(element.lastIndexOf("/")+1);
+    if(localName.lastIndexOf(":") != -1) {
+      localName = localName.substring(localName.lastIndexOf(":")+1);
+    }
+    return localName;
   }
 
   private boolean isJSONValid(String test) {
@@ -224,7 +233,7 @@ public class VirtualParameterizedUtil {
     return matchResponse;
   }
 
-  public static Object getActualValueForAll(Entry<String, String> delimiter,Object object, Map<String, Object> contextObject) {
+  public static Object getActualValueForAll(Map.Entry<String, String> delimiter,Object object, Map<String, Object> contextObject) {
     String key = object.toString();
     if (key.indexOf(delimiter.getKey()) != -1 && key.indexOf(delimiter.getValue()) != -1) {
       String idkey = key.substring(key.indexOf(delimiter.getKey()) + 1, key.indexOf(delimiter.getValue()));
@@ -248,7 +257,7 @@ public class VirtualParameterizedUtil {
       Entry<MockRequest, MockResponse> entry,
       Map<String, Object> context) {
 
-    Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
+    Map.Entry<String, String> delimiter = getDelimiter(entry.getKey().getContentType());
     List<String> requestMatchingParam = entry.getKey().getAvailableParams().stream()
         .filter(x -> x.getValue().startsWith(delimiter.getKey()) &&
             x.getValue().endsWith(delimiter.getValue()))

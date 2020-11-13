@@ -195,7 +195,7 @@ public class VirtualParameterizedUtil {
     return localName;
   }
   private String getElement(String element){
-    String localName = element.substring(element.lastIndexOf("/"));
+    String localName = element.substring(element.lastIndexOf("/")+1);
     if(localName.lastIndexOf(":") != -1) {
       localName = localName.substring(localName.lastIndexOf(":")+1);
     }
