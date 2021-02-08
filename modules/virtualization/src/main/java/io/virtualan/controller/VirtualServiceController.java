@@ -18,6 +18,8 @@ package io.virtualan.controller;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiParam;
+import io.virtualan.autoconfig.ApplicationContextProvider;
 import io.virtualan.core.InvalidMockResponseException;
 import io.virtualan.core.VirtualParameterizedUtil;
 import io.virtualan.core.VirtualServiceInfo;
@@ -28,12 +30,17 @@ import io.virtualan.core.model.RequestType;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.util.Converter;
+import io.virtualan.core.util.OpenApiGeneratorUtil;
+import io.virtualan.core.util.VirtualanConfiguration;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,9 +50,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -60,7 +69,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -98,6 +109,14 @@ public class VirtualServiceController {
   private VirtualServiceUtil virtualServiceUtil;
   @Value("${virtualan.application.name:Mock Service}")
   private String applicationName;
+
+  @Autowired
+  private ApplicationContextProvider applicationContext;
+
+  private File yamlFolder = VirtualanConfiguration.getYamlPath();
+
+  @Autowired
+  private OpenApiGeneratorUtil openApiGeneratorUtil;
 
   @Autowired
   private VirtualParameterizedUtil virtualParameterizedUtil;
@@ -162,7 +181,7 @@ public class VirtualServiceController {
       throws InstantiationException, IllegalAccessException, ClassNotFoundException,
       IOException {
     return virtualServiceUtil.getVirtualServiceInfo() != null ? virtualServiceUtil
-        .getVirtualServiceInfo().loadVirtualServices()
+        .getVirtualServiceInfo().loadVirtualServices(applicationContext.getClassLoader())
         : new HashMap<>();
   }
 
@@ -201,12 +220,41 @@ public class VirtualServiceController {
     return new ResponseEntity<>(mockLoadRequest, HttpStatus.OK);
   }
 
+  @Autowired
+  private static ConfigurableApplicationContext context;
+
+
   /**
    * Create mock request response entity.
    *
-   * @param virtualServiceRequest the virtual service request
    * @return the response entity
    */
+  @PostMapping(value = "/virtualservices/load")
+  public Map<String, Class> createVirtualanApis(@ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl, @ApiParam(value = "Skip the  validation of yaml.", defaultValue="true") @Valid @RequestPart(value = "skipValidation", required = false)  String skipValidation)
+      throws IOException {
+    String dataload = openApiUrl.getOriginalFilename();
+    writeYaml( yamlFolder+File.separator+dataload, openApiUrl.getInputStream());
+    return openApiGeneratorUtil.generateRestApi(dataload);
+  }
+
+  private  void writeYaml(String filename, InputStream in) throws IOException {
+    File targetFile = new File(filename);
+    InputStream initialStream = in;
+    java.nio.file.Files.copy(
+        initialStream,
+        targetFile.toPath(),
+        StandardCopyOption.REPLACE_EXISTING);
+
+    initialStream.close();
+  }
+
+
+    /**
+     * Create mock request response entity.
+     *
+     * @param virtualServiceRequest the virtual service request
+     * @return the response entity
+     */
   @PostMapping(value = "/virtualservices")
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {

@@ -33,7 +33,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  **/
 
 @Configuration
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableSwagger2
 @EnableAsync
 @ComponentScan(basePackages = {"io.virtualan"})

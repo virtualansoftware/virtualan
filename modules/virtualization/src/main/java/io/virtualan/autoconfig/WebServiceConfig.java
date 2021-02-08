@@ -23,5 +23,6 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     return new ServletRegistrationBean(servlet,
         "/virtualan/ws/*");
   }
+  
 
 }

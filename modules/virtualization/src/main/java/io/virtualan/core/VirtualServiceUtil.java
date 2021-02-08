@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.api.ApiType;
 import io.virtualan.api.VirtualServiceType;
 import io.virtualan.api.WSResource;
+import io.virtualan.autoconfig.ApplicationContextProvider;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.MockRequest;
 import io.virtualan.core.model.MockResponse;
@@ -99,6 +100,9 @@ public class VirtualServiceUtil {
   private VirtualServiceParamComparator virtualServiceParamComparator;
 
   @Autowired
+  private ApplicationContextProvider applicationContext;
+
+  @Autowired
   private MessageUtil messageUtil;
 
   @Autowired
@@ -137,9 +141,14 @@ public class VirtualServiceUtil {
       setVirtualServiceInfo(
           virtualServiceInfoFactory.getVirtualServiceInfo(virtualServiceType.getType()));
       this.virtualServiceType = virtualServiceType;
+    } else {
+      setVirtualServiceInfo(
+          virtualServiceInfoFactory.getVirtualServiceInfo(VirtualServiceType.SPRING.getType()));
+      this.virtualServiceType = VirtualServiceType.SPRING;
     }
 
   }
+
 
   @PostConstruct
   @Order(1)
@@ -586,7 +595,7 @@ public class VirtualServiceUtil {
           .setResponse(Response.status(responseEntity.getStatusCode().value())
               .entity(responseEntity.getBody()).build());
       throw new WebApplicationException(responseException.getResponse());
-    } else if (VirtualServiceType.SPRING.compareTo(getVirtualServiceType()) == 0) {
+    } else if (VirtualServiceType.SPRING.compareTo(getVirtualServiceType()) == 0 || true) {
       responseException.setResponseEntity(responseEntity);
       throw responseException;
     }

@@ -35,7 +35,6 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 
-@EnableKafka
 @SpringBootApplication
 @ComponentScan(basePackages = {"io.virtualan", "io.virtualan.configuration"})
 public class OpenAPI2SpringBoot implements CommandLineRunner {
@@ -61,44 +60,4 @@ public class OpenAPI2SpringBoot implements CommandLineRunner {
 
     }
 
-    @Bean
-    public WebMvcConfigurer webConfigurer() {
-        return new WebMvcConfigurer() {
-            /*@Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("*")
-                        .allowedHeaders("Content-Type");
-            }*/
-        };
-    }
-
-    @Autowired
-    private EmbeddedKafkaBroker broker;
-
-    @Autowired
-    private Config config;
-
-
-
-@Configuration
-public static class Config {
-
-    private int kafkaPort;
-
-
-    @Bean
-    public EmbeddedKafkaBroker broker() throws IOException {
-        ServerSocket ss = ServerSocketFactory.getDefault().createServerSocket(9092);
-        this.kafkaPort = ss.getLocalPort();
-        ss.close();
-
-        EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(1, false) ;
-        embeddedKafkaBroker.kafkaPorts(this.kafkaPort);
-        return embeddedKafkaBroker;
-
-    }
-
-}
 }
