@@ -56,7 +56,7 @@ public class VirtualanConfiguration {
   }
 
   public  static  File getDependencyPath() {
-    return getPath("dependencyFolder", "/conf/dependency");
+    return getPath("dependencyFolder", "/openapi/virtualan/lib");
   }
 
   public  static File getYamlPath() {
