@@ -5,7 +5,6 @@ FROM maven:3.6.0-jdk-11-slim AS build
 #FROM adoptopenjdk/openjdk11:alpine
 LABEL maintainer="info@virtualan.io"
 COPY . /home/app/
-RUN mvn dependency:go-offline
 RUN mvn -f /home/app/pom.xml clean install
 
 #
