@@ -11,6 +11,6 @@ RUN mvn -f /home/app/pom.xml clean install
 # Package stage
 #
 FROM openjdk:11-jre-alpine
-COPY --from=build /home/app/samples/virtualan-virtualization/dependency /conf/dependency
+#COPY --from=build /home/app/samples/virtualan-virtualization/dependency /conf/dependency
 COPY --from=build /home/app/samples/virtualan-virtualization/target/virtualan-virtualization.jar /openapi/virtualan/virtualan-virtualization.jar
 ENTRYPOINT ["java", "-cp", "/openapi/virtualan/virtualan-virtualization.jar", "-Dloader.main=io.virtualan.Virtualization",  "org.springframework.boot.loader.PropertiesLauncher"]
