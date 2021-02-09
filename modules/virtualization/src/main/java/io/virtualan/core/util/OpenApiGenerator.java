@@ -10,16 +10,45 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.PathParameter;
+import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
+import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.openapitools.codegen.serializer.SerializerUtils;
 
 public class OpenApiGenerator {
+
+
+  private static Parameter getType(String type) {
+    if ("PATH_PARAM".equalsIgnoreCase(type)) {
+      return new PathParameter();
+    } else if ("QUERY_PARAM".equalsIgnoreCase(type)) {
+      return new QueryParameter();
+    } else if ("HEADER_PARAM".equalsIgnoreCase(type)) {
+      return new HeaderParameter();
+    }
+    return null;
+  }
+  private static String getTypeValue(String type) {
+    if ("PATH_PARAM".equalsIgnoreCase(type)) {
+      return "path";
+    } else if ("QUERY_PARAM".equalsIgnoreCase(type)) {
+      return "query";
+    } else if ("HEADER_PARAM".equalsIgnoreCase(type)) {
+      return "header";
+    }
+    return null;
+  }
 
   public static OpenAPI generateAPI(VirtualServiceRequest request) {
     OpenAPI openAPI1 = new OpenAPI();
@@ -62,15 +91,27 @@ public class OpenApiGenerator {
     ApiResponses apiResponses = new ApiResponses();
     apiResponses.addApiResponse(request.getHttpStatusCode(), apiResponse);
     operation.setResponses(apiResponses);
-    String oper= request.getUrl().replaceAll("}","").replaceAll("\\{","");
-    String[] operationArray =  oper.split("/");
+
+    List<Parameter> parameterList = new ArrayList<>();
+    for (VirtualServiceKeyValue vkey : request.getAvailableParams()) {
+      Parameter parameter = getType(vkey.getParameterType());
+      parameter.setName(vkey.getKey());
+      parameter.schema(new StringSchema());
+      parameter.setIn(getTypeValue(vkey.getParameterType()));
+      parameterList.add(parameter);
+    }
+    operation.setParameters(parameterList);
+    String oper = request.getUrl().replaceAll("}", "").replaceAll("\\{", "");
+    String[] operationArray = oper.split("/");
     StringBuilder builder = new StringBuilder();
-    for(String array : operationArray) {
+    for (String array : operationArray) {
       if (!array.isEmpty()) {
         builder.append(array.substring(0, 1).toUpperCase() + array.substring(1));
       }
     }
-    operation.setOperationId(builder.toString().substring(0,1).toLowerCase()+builder.toString().substring(1)+request.getMethod());
+    operation.setOperationId(
+        builder.toString().substring(0, 1).toLowerCase() + builder.toString().substring(1) + request
+            .getMethod());
     request.setOperationId(operation.getOperationId());
     if ("GET".equalsIgnoreCase(request.getMethod())) {
       pathItem.setGet(operation);
