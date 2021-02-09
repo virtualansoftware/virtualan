@@ -1,30 +1,40 @@
 package io.virtualan.core.util;
 
+import com.sun.corba.se.pept.transport.ContactInfo;
 import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.virtualan.annotation.VirtualService;
 import io.virtualan.autoconfig.ApplicationContextProvider;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
+import io.virtualan.core.model.VirtualServiceRequest;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -39,6 +49,7 @@ import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.SpringCodegen;
+import org.openapitools.codegen.serializer.SerializerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +76,16 @@ public class OpenApiGeneratorUtil {
   @PostConstruct
   public void loadInitialYamlFiles() {
     File file = VirtualanConfiguration.getYamlPath();
-    if (file != null && file.listFiles().length > 0) {
+    getYaml(file);
+  }
+
+  public void getYaml(File file) {
+    if (file != null &&  file.listFiles() != null &&file.listFiles().length > 0) {
       for (File subFile : file.listFiles()) {
-        if (!subFile.isDirectory()) {
-          generateRestApi(subFile.getName());
+        if (subFile.isDirectory()) {
+          getYaml(subFile);
+        } else {
+          generateRestApi(subFile.getName(), null);
         }
       }
     }
@@ -140,18 +157,28 @@ public class OpenApiGeneratorUtil {
     }
   }
 
-  private void openApiGenerator(String apiFile) throws IOException {
-    String fileName = apiFile.substring(0, apiFile.lastIndexOf("."));
-    OpenAPI openAPI = new OpenAPIParser()
-        .readLocation(yamlFolder.getAbsolutePath() + File.separator + apiFile, null,
-            new ParseOptions()).getOpenAPI();
-    SpringCodegen codegen = new SpringCodegen();
-    File newFile = new File(srcFolder.getAbsolutePath() + File.separator+ fileName);
-    if(!newFile.exists()){
-      newFile.mkdir();
+  private void openApiGenerator(String apiFile, VirtualServiceRequest request) throws IOException {
+    OpenAPI openAPI = null;
+    String fileName = null;
+    if(apiFile != null) {
+      fileName = apiFile.substring(0, apiFile.lastIndexOf("."));
+       openAPI = new OpenAPIParser()
+          .readLocation(
+              yamlFolder.getAbsolutePath() + File.separator + fileName + File.separator + apiFile,
+              null,
+              new ParseOptions()).getOpenAPI();
+      File newFile = new File(srcFolder.getAbsolutePath() + File.separator + fileName);
+      if (!newFile.exists()) {
+        newFile.mkdir();
+      } else {
+        deleteFolder(newFile);
+      }
     } else {
-      deleteFolder(newFile);
+      openAPI = OpenApiGenerator.generateAPI(request);
+      fileName = request.getOperationId();
     }
+    File newFile = new File(srcFolder.getAbsolutePath() + File.separator + fileName);
+    SpringCodegen codegen = new SpringCodegen();
     codegen.setOutputDir(newFile.getAbsolutePath());
     ClientOptInput input = new ClientOptInput();
     DefaultGenerator generator = new DefaultGenerator();
@@ -171,13 +198,20 @@ public class OpenApiGeneratorUtil {
     generator.opts(input).generate();
   }
 
-  public Map<String, Class> generateRestApi(String yamlFile) {
+  public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request) {
     try {
-      Map<String, Class> loadedController =getVirtualServiceInfo().findVirtualServices(applicationContext.getClassLoader());
+      Map<String, Class> loadedController = getVirtualServiceInfo()
+          .findVirtualServices(applicationContext.getClassLoader());
       Map<String, Class> currentController = new HashMap<>();
-      openApiGenerator(yamlFile);
+      openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
-      File newFile = new File(destFolder.getAbsolutePath() + File.separator+ yamlFile.substring(0, yamlFile.lastIndexOf(".")));
+      File newFile = null;
+      if (yamlFile != null){
+        newFile = new File(destFolder.getAbsolutePath() + File.separator + yamlFile
+            .substring(0, yamlFile.lastIndexOf(".")));
+      }else {
+        newFile = new File(destFolder.getAbsolutePath() + File.separator + request.getOperationId());
+      }
       if(!newFile.exists()){
         newFile.mkdir();
       } else {
@@ -231,6 +265,7 @@ public class OpenApiGeneratorUtil {
           }
         }
       }
+      getVirtualServiceInfo().loadVirtualServices(applicationContext.getClassLoader());
       return getVirtualServiceInfo().findVirtualServices(applicationContext.getClassLoader());
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
@@ -239,7 +274,6 @@ public class OpenApiGeneratorUtil {
   }
 
   private void removeMapping(Class myControllerClzzz) {
-
     for (Method method : myControllerClzzz.getDeclaredMethods()) {
       boolean isPost = method.isAnnotationPresent(PostMapping.class);
       if (isPost) {

@@ -224,10 +224,12 @@ public interface VirtualServiceInfo {
       if (!resouceSplitterList.isEmpty()) {
         String operationId = getOperationId(mockTransferInput.getMethod(),
             getResourceParent(), resouceSplitterList);
-        VirtualServiceRequest mockTransferActual =
-            getMockLoadChoice().get(mockTransferInput.getResource()).get(operationId);
-        if (mockTransferActual != null) {
-          inputType = mockTransferActual.getInputObjectType();
+        Map<String, VirtualServiceRequest> request = getMockLoadChoice().get(mockTransferInput.getResource());
+        if(request != null) {
+          VirtualServiceRequest mockTransferActual = request.get(operationId);
+          if (mockTransferActual != null) {
+            inputType = mockTransferActual.getInputObjectType();
+          }
         }
       }
     }
@@ -266,20 +268,23 @@ public interface VirtualServiceInfo {
 
   default String getOperationId(String httpVerb, ResourceMapper resourceParent,
       List<String> resouceSplitterList) {
-    if (resouceSplitterList.isEmpty()) {
+    if ((resouceSplitterList == null || resouceSplitterList.isEmpty()) && resourceParent != null ) {
       return resourceParent.getOperationId(httpVerb);
     }
-    String resource = resouceSplitterList.get(0);
-    ResourceMapper mapper = resourceParent.findResource(resource);
-    if (mapper != null) {
-      return getOperationId(httpVerb, mapper,
-          resouceSplitterList.subList(1, resouceSplitterList.size()));
-    } else {
-      return getOperationId(httpVerb,
-          resourceParent.findResource(VirtualServiceConstants.CURLY_PATH),
-          resouceSplitterList.subList(1, resouceSplitterList.size()));
-    }
 
+    String resource = resouceSplitterList.get(0);
+    if(resourceParent != null) {
+      ResourceMapper mapper = resourceParent.findResource(resource);
+      if (mapper != null) {
+        return getOperationId(httpVerb, mapper,
+            resouceSplitterList.subList(1, resouceSplitterList.size()));
+      } else {
+        return getOperationId(httpVerb,
+            resourceParent.findResource(VirtualServiceConstants.CURLY_PATH),
+            resouceSplitterList.subList(1, resouceSplitterList.size()));
+      }
+    }
+    return null;
   }
 
   // RE THINK ABOUT IT

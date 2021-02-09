@@ -233,8 +233,13 @@ public class VirtualServiceController {
   public Map<String, Class> createVirtualanApis(@ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl, @ApiParam(value = "Skip the  validation of yaml.", defaultValue="true") @Valid @RequestPart(value = "skipValidation", required = false)  String skipValidation)
       throws IOException {
     String dataload = openApiUrl.getOriginalFilename();
-    writeYaml( yamlFolder+File.separator+dataload, openApiUrl.getInputStream());
-    return openApiGeneratorUtil.generateRestApi(dataload);
+    String fileName = dataload.substring(0, dataload.lastIndexOf("."));
+    File newFile = new File(yamlFolder + File.separator+ fileName);
+    if(!newFile.exists()){
+      newFile.mkdir();
+    }
+    writeYaml( newFile+File.separator+dataload, openApiUrl.getInputStream());
+    return openApiGeneratorUtil.generateRestApi(dataload, null);
   }
 
   private  void writeYaml(String filename, InputStream in) throws IOException {
@@ -543,9 +548,9 @@ public class VirtualServiceController {
     final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
     final PathMatchingResourcePatternResolver resolver =
         new PathMatchingResourcePatternResolver(classLoader);
-    return resolver.getResources("classpath:META-INF/resources/**/" + name + "/*.*");
+    return resolver
+        .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
   }
-
   private Resource[] getCatalogList(String path) throws IOException {
     final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
 

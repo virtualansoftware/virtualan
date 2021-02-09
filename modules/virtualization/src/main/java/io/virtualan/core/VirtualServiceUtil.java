@@ -35,6 +35,7 @@ import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.soap.SoapFaultException;
 import io.virtualan.core.util.BestMatchComparator;
 import io.virtualan.core.util.Converter;
+import io.virtualan.core.util.OpenApiGeneratorUtil;
 import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.ScriptErrorException;
 import io.virtualan.core.util.VirtualServiceParamComparator;
@@ -98,6 +99,9 @@ public class VirtualServiceUtil {
   private MessageSource messageSource;
   @Autowired
   private VirtualServiceParamComparator virtualServiceParamComparator;
+
+  @Autowired
+  private OpenApiGeneratorUtil openApiGeneratorUtil;
 
   @Autowired
   private ApplicationContextProvider applicationContext;
@@ -242,10 +246,16 @@ public class VirtualServiceUtil {
         final String operationId =
             virtualServiceInfo.getOperationId(mockLoadRequest.getMethod(),
                 virtualServiceInfo.getResourceParent(), resouceSplitterList);
-        mockLoadRequest.setOperationId(operationId);
-        mockLoadRequest.setResource(resouceSplitterList.get(0));
+        if(operationId != null){
+          mockLoadRequest.setOperationId(operationId);
+          mockLoadRequest.setResource(resouceSplitterList.get(0));
+        } else {
+          openApiGeneratorUtil.generateRestApi(null, mockLoadRequest);
+          log.warn(" Manually Resource registered " +mockLoadRequest.getMethod());
+        }
       }
     }
+
   }
 
   public ResponseEntity<VirtualServiceStatus> checkIfServiceDataAlreadyExists(

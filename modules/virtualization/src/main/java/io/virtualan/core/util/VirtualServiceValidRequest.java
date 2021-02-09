@@ -349,7 +349,7 @@ public class VirtualServiceValidRequest {
             final ReturnMockResponse returnMockResponse = returnMockResponse(
                 mockServiceRequest, mockRequestResponse, numberAttrMatch);
             returnMockResponse.setExactMatch(
-                numberAttrMatch == mockRequestResponse.getKey().getAvailableParams()
+                mockRequestResponse.getKey().getAvailableParams().size() == 0 ? true : numberAttrMatch == mockRequestResponse.getKey().getAvailableParams()
                     .size());
             matchMap.put(count, returnMockResponse);
         }
