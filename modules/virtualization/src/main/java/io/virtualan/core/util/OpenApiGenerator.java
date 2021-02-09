@@ -1,5 +1,6 @@
 package io.virtualan.core.util;
 
+import com.ibm.disthub2.impl.formats.OldEnvelop.payload.normal.body;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
@@ -101,6 +103,16 @@ public class OpenApiGenerator {
       parameterList.add(parameter);
     }
     operation.setParameters(parameterList);
+    if(request.getInput() != null) {
+      RequestBody body = new RequestBody();
+      Content content1 = new Content();
+      MediaType mediaType1 = new MediaType();
+      mediaType1.schema(new StringSchema());
+      content1.addMediaType("application/json", mediaType);
+      body.setContent(content1);
+      operation.setRequestBody(body);
+    }
+
     String oper = request.getUrl().replaceAll("}", "").replaceAll("\\{", "");
     String[] operationArray = oper.split("/");
     StringBuilder builder = new StringBuilder();
