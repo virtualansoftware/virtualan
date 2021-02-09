@@ -271,9 +271,8 @@ public interface VirtualServiceInfo {
     if ((resouceSplitterList == null || resouceSplitterList.isEmpty()) && resourceParent != null ) {
       return resourceParent.getOperationId(httpVerb);
     }
-
-    String resource = resouceSplitterList.get(0);
-    if(resourceParent != null) {
+    if(resourceParent != null && resouceSplitterList.size() > 0) {
+      String resource = resouceSplitterList.get(0);
       ResourceMapper mapper = resourceParent.findResource(resource);
       if (mapper != null) {
         return getOperationId(httpVerb, mapper,

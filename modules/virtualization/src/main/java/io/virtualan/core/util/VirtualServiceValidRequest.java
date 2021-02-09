@@ -81,7 +81,8 @@ public class VirtualServiceValidRequest {
         final VirtualServiceApiResponse apiResponse = mockTransferObjectActual.getResponseType()
                 .get(mockTransferObject.getHttpStatusCode());
         if (apiResponse != null && apiResponse.getObjectType() != null
-                && mockTransferObject.getOutput() != null) {
+                && mockTransferObject.getOutput() != null
+        && !(apiResponse.getObjectType() instanceof String)) {
             objectMapper.readValue(mockTransferObject.getOutput().toString(),
                     Class.forName(apiResponse.getObjectType()));
         }

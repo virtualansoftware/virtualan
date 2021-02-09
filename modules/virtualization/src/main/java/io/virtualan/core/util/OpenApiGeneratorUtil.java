@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -184,8 +186,12 @@ public class OpenApiGeneratorUtil {
 
   public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request) {
     try {
-      Map<String, Class> loadedController = getVirtualServiceInfo()
-          .findVirtualServices(applicationContext.getClassLoader());
+      Map<String, Class> loadedController = new HashMap<>();
+      if(virtualServiceUtil != null && getVirtualServiceInfo() != null) {
+         loadedController = getVirtualServiceInfo()
+            .findVirtualServices(applicationContext.getClassLoader());
+      }
+
       Map<String, Class> currentController = new HashMap<>();
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();

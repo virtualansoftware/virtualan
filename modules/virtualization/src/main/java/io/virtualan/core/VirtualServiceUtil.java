@@ -69,6 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -153,15 +154,18 @@ public class VirtualServiceUtil {
 
   }
 
+static {
+    log.info("start the loading");
+}
 
   @PostConstruct
-  @Order(1)
+  @Order(Ordered.HIGHEST_PRECEDENCE )
   public void init() throws ClassNotFoundException, JsonProcessingException,
       InstantiationException, IllegalAccessException {
-    setVirtualServiceType(ApiType.findApiType());
+    setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
       virtualServiceInfo = getVirtualServiceInfo();
-      virtualServiceInfo.loadVirtualServices();
+      virtualServiceInfo.loadVirtualServices(applicationContext.getClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
     } else if (getVirtualServiceType() == null) {
       setVirtualServiceType(VirtualServiceType.NON_REST);
