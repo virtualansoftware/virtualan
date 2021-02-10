@@ -188,21 +188,6 @@ public class OpenApiGeneratorUtil {
     input.config(codegen);
     generator.opts(input).generate();
   }
-  public byte[] toByteArray(InputStream in) throws IOException {
-
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-    byte[] buffer = new byte[1024];
-    int len;
-
-    // read bytes from the input stream and store them in buffer
-    while ((len = in.read(buffer)) != -1) {
-      // write bytes from the buffer into output stream
-      os.write(buffer, 0, len);
-    }
-
-    return os.toByteArray();
-  }
 
   public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request) {
     try {
@@ -211,7 +196,6 @@ public class OpenApiGeneratorUtil {
          loadedController = getVirtualServiceInfo()
             .findVirtualServices(applicationContext.getClassLoader());
       }
-
       Map<String, Class> currentController = new HashMap<>();
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
