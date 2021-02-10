@@ -62,6 +62,13 @@ public class OpenApiGenerator {
     }
     return null;
   }
+  private static PathItem getPathItem(OpenAPI openAPI, VirtualServiceRequest request) {
+    if(openAPI.getPaths() != null && openAPI.getPaths().get(request.getUrl()) != null){
+      return  openAPI.getPaths().get(request.getUrl());
+    } else {
+      return new PathItem();
+    }
+  }
 
   public static OpenAPI generateAPI(VirtualServiceRequest request) throws IOException {
     String resource = getResource(request);
@@ -98,7 +105,7 @@ public class OpenApiGenerator {
           .servers(Arrays.asList(new Server().url("http://localhost:8080/api/")));
       paths = new Paths();
     }
-    PathItem pathItem = new PathItem();
+    PathItem pathItem = getPathItem(openAPI, request);
     Operation operation = new Operation();
     ApiResponse apiResponse = new ApiResponse();
     Content content = new Content();
