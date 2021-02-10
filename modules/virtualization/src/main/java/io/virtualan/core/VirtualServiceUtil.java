@@ -459,8 +459,15 @@ public class VirtualServiceUtil {
       return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
           mockServiceRequest);
     } else if (mockServiceRequest.getParams() != null
-        && !mockServiceRequest.getParams().isEmpty()) {
+        && !mockServiceRequest.getParams().isEmpty()
+        && mockServiceRequest.getInput() == null ) {
       return virtualServiceValidRequest.validForParam(mockDataSetupMap,
+          mockServiceRequest);
+    }
+    else if (mockServiceRequest.getParams() != null
+        && !mockServiceRequest.getParams().isEmpty()
+      && mockServiceRequest.getInput() != null) {
+      return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
           mockServiceRequest);
     }
     return null;
