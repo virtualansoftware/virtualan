@@ -14,6 +14,7 @@
  */
 package io.virtualan.core.util;
 
+import com.cedarsoftware.util.io.JsonObject;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.ResponseProcessType;
 import java.io.IOException;
@@ -26,6 +27,9 @@ import io.virtualan.mapson.Mapson;
 import java.util.Map.Entry;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -266,8 +270,8 @@ public class VirtualServiceValidRequest {
         RequestBody requestBody =
                 buildRequestBody(mockServiceRequest, mockRequestResponse);
         if (numberAttrMatch != 0 && RequestBodyTypes
-                .fromString(mockServiceRequest.getInputObjectType().getTypeName())
-                .compareRequestBody(requestBody)) {
+                    .fromString(mockServiceRequest.getInputObjectType().getTypeName())
+                    .compareRequestBody(requestBody)) {
             count++;
             getResponseCount(mockServiceRequest, matchMap, count, mockRequestResponse,
                 numberAttrMatch,
@@ -363,6 +367,10 @@ public class VirtualServiceValidRequest {
         requestBody.setObjectMapper(getObjectMapper());
         requestBody.setExcludeList(mockRequestResponse.getKey().getExcludeSet());
         requestBody.setExpectedInput(mockRequestResponse.getKey().getInput());
+        if (VirtualanConfiguration.isValidJson(mockServiceRequest.getInput().toString()) &&
+            mockServiceRequest.getInputObjectType().isAssignableFrom(String.class) ) {
+            mockServiceRequest.setInputObjectType(JsonObject.class);
+        }
         requestBody.setInputObjectType(mockServiceRequest.getInputObjectType());
         requestBody.setActualInput(mockServiceRequest.getInput());
         requestBody.setContentType(mockRequestResponse.getKey().getContentType());

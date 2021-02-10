@@ -1,6 +1,10 @@
 package io.virtualan.core.util;
 
+import com.cedarsoftware.util.io.JsonObject;
+import com.cedarsoftware.util.io.JsonReader;
+import com.ibm.disthub2.impl.formats.OldEnvelop.payload.normal;
 import com.ibm.disthub2.impl.formats.OldEnvelop.payload.normal.body;
+import com.ibm.disthub2.impl.formats.Schema;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -9,7 +13,9 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -24,6 +30,7 @@ import io.virtualan.core.model.VirtualServiceRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.openapitools.codegen.serializer.SerializerUtils;
@@ -104,11 +111,12 @@ public class OpenApiGenerator {
     }
     operation.setParameters(parameterList);
     if(request.getInput() != null) {
+      JsonObject object = (JsonObject) JsonReader.jsonToJava(request.getInput().toString());
       RequestBody body = new RequestBody();
       Content content1 = new Content();
       MediaType mediaType1 = new MediaType();
       mediaType1.schema(new StringSchema());
-      content1.addMediaType("application/json", mediaType);
+      content1.addMediaType("application/json", mediaType1);
       body.setContent(content1);
       operation.setRequestBody(body);
     }

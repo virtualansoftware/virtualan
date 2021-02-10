@@ -15,6 +15,7 @@
 
 package io.virtualan.controller;
 
+import com.cedarsoftware.util.io.JsonObject;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,6 +80,7 @@ import org.springframework.web.multipart.MultipartFile;
  * <p>
  * Virtualan-UI and Virtualan-OpenAPI would interact through this web services.
  * </p>
+ *
  * @author Elan Thangamani
  */
 @RestController("virtualServiceController")
@@ -89,6 +91,8 @@ public class VirtualServiceController {
    * The constant VS_REQUEST_BODY_MISMATCH.
    */
   public static final String VS_REQUEST_BODY_MISMATCH = "VS_REQUEST_BODY_MISMATCH";
+  @Autowired
+  private static ConfigurableApplicationContext context;
   /**
    * The Locale.
    */
@@ -109,15 +113,11 @@ public class VirtualServiceController {
   private VirtualServiceUtil virtualServiceUtil;
   @Value("${virtualan.application.name:Mock Service}")
   private String applicationName;
-
   @Autowired
   private ApplicationContextProvider applicationContext;
-
   private File yamlFolder = VirtualanConfiguration.getYamlPath();
-
   @Autowired
   private OpenApiGeneratorUtil openApiGeneratorUtil;
-
   @Autowired
   private VirtualParameterizedUtil virtualParameterizedUtil;
 
@@ -185,7 +185,6 @@ public class VirtualServiceController {
         : new HashMap<>();
   }
 
-
   /**
    * List all mock load requests response entity.
    *
@@ -220,29 +219,27 @@ public class VirtualServiceController {
     return new ResponseEntity<>(mockLoadRequest, HttpStatus.OK);
   }
 
-  @Autowired
-  private static ConfigurableApplicationContext context;
-
-
   /**
    * Create mock request response entity.
    *
    * @return the response entity
    */
   @PostMapping(value = "/virtualservices/load")
-  public Map<String, Class> createVirtualanApis(@ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl, @ApiParam(value = "Skip the  validation of yaml.", defaultValue="true") @Valid @RequestPart(value = "skipValidation", required = false)  String skipValidation)
+  public Map<String, Class> createVirtualanApis(
+      @ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl,
+      @ApiParam(value = "Skip the  validation of yaml.", defaultValue = "true") @Valid @RequestPart(value = "skipValidation", required = false) String skipValidation)
       throws IOException {
     String dataload = openApiUrl.getOriginalFilename();
     String fileName = dataload.substring(0, dataload.lastIndexOf("."));
-    File newFile = new File(yamlFolder + File.separator+ fileName);
-    if(!newFile.exists()){
+    File newFile = new File(yamlFolder + File.separator + fileName);
+    if (!newFile.exists()) {
       newFile.mkdir();
     }
-    writeYaml( newFile+File.separator+dataload, openApiUrl.getInputStream());
+    writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
     return openApiGeneratorUtil.generateRestApi(dataload, null);
   }
 
-  private  void writeYaml(String filename, InputStream in) throws IOException {
+  private void writeYaml(String filename, InputStream in) throws IOException {
     File targetFile = new File(filename);
     InputStream initialStream = in;
     java.nio.file.Files.copy(
@@ -254,12 +251,12 @@ public class VirtualServiceController {
   }
 
 
-    /**
-     * Create mock request response entity.
-     *
-     * @param virtualServiceRequest the virtual service request
-     * @return the response entity
-     */
+  /**
+   * Create mock request response entity.
+   *
+   * @param virtualServiceRequest the virtual service request
+   * @return the response entity
+   */
   @PostMapping(value = "/virtualservices")
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
@@ -270,18 +267,17 @@ public class VirtualServiceController {
       // find the operationId for the given Request. It required for the Automation test cases
       virtualServiceUtil.findOperationIdForService(virtualServiceRequest);
 
-
       if ("PARAMS".equalsIgnoreCase(virtualServiceRequest.getType())) {
-          Map response = virtualParameterizedUtil.handleParameterizedRequest(virtualServiceRequest);
-          if(!response.isEmpty()) {
-            final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
-                messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));
-            virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
-            virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
-            virtualServiceStatus.setResponseParam( response);
-            return new ResponseEntity<>(virtualServiceStatus,
-                HttpStatus.BAD_REQUEST);
-          }
+        Map response = virtualParameterizedUtil.handleParameterizedRequest(virtualServiceRequest);
+        if (!response.isEmpty()) {
+          final VirtualServiceStatus virtualServiceStatus = new VirtualServiceStatus(
+              messageSource.getMessage("VS_PARAMS_DATA_ALREADY_EXISTS", null, locale));
+          virtualServiceRequest = converter.convertAsJson(virtualServiceRequest);
+          virtualServiceStatus.setVirtualServiceRequest(virtualServiceRequest);
+          virtualServiceStatus.setResponseParam(response);
+          return new ResponseEntity<>(virtualServiceStatus,
+              HttpStatus.BAD_REQUEST);
+        }
       } else {
         ResponseEntity responseEntity = validateRequestBody(virtualServiceRequest);
         if (responseEntity != null) {
@@ -327,8 +323,14 @@ public class VirtualServiceController {
 
   private ResponseEntity validateRequestBody(VirtualServiceRequest virtualServiceRequest) {
     if (virtualServiceUtil.getVirtualServiceInfo() != null) {
-      final Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo()
+
+      Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo()
           .getInputType(virtualServiceRequest);
+      if (VirtualanConfiguration.isValidJson(virtualServiceRequest.getInput().toString()) &&
+          inputObjectType.isAssignableFrom(String.class)) {
+        virtualServiceRequest.setInputObjectType(JsonObject.class);
+        inputObjectType = JsonObject.class;
+      }
       if (inputObjectType == null && (virtualServiceRequest.getInput() == null
           || virtualServiceRequest.getInput().toString().length() == 0)) {
         return null;
@@ -551,6 +553,7 @@ public class VirtualServiceController {
     return resolver
         .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
   }
+
   private Resource[] getCatalogList(String path) throws IOException {
     final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
 

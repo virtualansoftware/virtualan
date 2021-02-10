@@ -14,6 +14,7 @@
 
 package io.virtualan.core;
 
+import com.cedarsoftware.util.io.JsonObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
@@ -45,7 +46,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.jeasy.random.EasyRandom;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.http.HttpStatus;
 
 
@@ -204,6 +209,15 @@ public interface VirtualServiceInfo {
     return mockAPILoadChoice;
   }
 
+
+  default boolean isValidJson(String jsonStr) {
+    Object json = new JSONTokener(jsonStr).nextValue();
+    if (json instanceof JSONObject || json instanceof JSONArray) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   default Class getInputType(VirtualServiceRequest mockTransferInput) {
     Class inputType = null;
 
@@ -214,7 +228,13 @@ public interface VirtualServiceInfo {
       VirtualServiceRequest mockTransferActual = getMockLoadChoice()
           .get(mockTransferInput.getResource()).get(mockTransferInput.getOperationId());
       if (mockTransferActual != null) {
-        inputType = mockTransferActual.getInputObjectType();
+        if (mockTransferInput.getInput() != null && isValidJson(mockTransferInput.getInput().toString()) &&
+            mockTransferActual
+                .getInputObjectType().isAssignableFrom(String.class)) {
+          inputType = JsonObject.class;
+        } else {
+          inputType = mockTransferActual.getInputObjectType();
+        }
       }
     } else {
       String resourceUrl =

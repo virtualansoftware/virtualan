@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * The type Application configuration.
@@ -15,6 +18,19 @@ public class VirtualanConfiguration {
   static {
     reload();
   }
+  public static boolean isValidJson(String jsonStr) {
+    try {
+      Object json = new JSONTokener(jsonStr).nextValue();
+      if (json instanceof JSONObject || json instanceof JSONArray) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch (Exception e){
+      return false;
+    }
+  }
+
 
   public static  void reload(){
     try {

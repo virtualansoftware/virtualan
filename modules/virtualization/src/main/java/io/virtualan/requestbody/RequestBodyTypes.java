@@ -14,7 +14,9 @@
 
 package io.virtualan.requestbody;
 
+import com.cedarsoftware.util.io.JsonObject;
 import io.virtualan.core.model.ContentType;
+import io.virtualan.core.util.VirtualanConfiguration;
 import io.virtualan.core.util.XMLConverter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -184,10 +186,27 @@ public enum RequestBodyTypes {
                         requestBody.getExcludeList());
 
             } else {
-                return EqualsBuilder.reflectionEquals(
+                if(requestBody.getInputObjectType().isAssignableFrom(JsonObject.class)){
+                    if(VirtualanConfiguration.isValidJson(requestBody.getExpectedInput())
+                    && VirtualanConfiguration.isValidJson(requestBody.getActualInput().toString())) {
+                        return requestBody.getObjectMapper()
+                            .readValue(requestBody.getExpectedInput(),
+                                requestBody.getInputObjectType()).equals(
+                                requestBody.getObjectMapper()
+                                    .readValue(requestBody.getActualInput().toString(),
+                                        requestBody.getInputObjectType()));
+                    } else {
+                        return requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
+                                requestBody.getInputObjectType()).equals(
+                                requestBody.getActualInput());
+
+                    }
+                } else {
+                    return EqualsBuilder.reflectionEquals(
                         requestBody.getObjectMapper().readValue(requestBody.getExpectedInput(),
-                                requestBody.getInputObjectType()),
+                            requestBody.getInputObjectType()),
                         requestBody.getActualInput(), requestBody.getExcludeList());
+                }
 
             }
         }
