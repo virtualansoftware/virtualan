@@ -1,7 +1,9 @@
 package io.virtualan.core.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Properties;
 import org.json.JSONArray;
@@ -29,6 +31,17 @@ public class VirtualanConfiguration {
     }catch (Exception e){
       return false;
     }
+  }
+
+  public static void writeYaml(String filename, InputStream in) throws IOException {
+    File targetFile = new File(filename);
+    InputStream initialStream = in;
+    java.nio.file.Files.copy(
+        initialStream,
+        targetFile.toPath(),
+        StandardCopyOption.REPLACE_EXISTING);
+
+    initialStream.close();
   }
 
 

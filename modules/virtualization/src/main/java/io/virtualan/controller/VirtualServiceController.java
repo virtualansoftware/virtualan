@@ -235,19 +235,8 @@ public class VirtualServiceController {
     if (!newFile.exists()) {
       newFile.mkdir();
     }
-    writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
+    VirtualanConfiguration.writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
     return openApiGeneratorUtil.generateRestApi(dataload, null);
-  }
-
-  private void writeYaml(String filename, InputStream in) throws IOException {
-    File targetFile = new File(filename);
-    InputStream initialStream = in;
-    java.nio.file.Files.copy(
-        initialStream,
-        targetFile.toPath(),
-        StandardCopyOption.REPLACE_EXISTING);
-
-    initialStream.close();
   }
 
 

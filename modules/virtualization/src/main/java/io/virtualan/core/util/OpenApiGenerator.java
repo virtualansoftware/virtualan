@@ -27,6 +27,10 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +63,7 @@ public class OpenApiGenerator {
     return null;
   }
 
-  public static OpenAPI generateAPI(VirtualServiceRequest request) {
+  public static OpenAPI generateAPI(VirtualServiceRequest request) throws IOException {
     OpenAPI openAPI1 = new OpenAPI();
     Contact contact =
         new Contact()
@@ -148,6 +152,14 @@ public class OpenApiGenerator {
     openAPI1.setPaths(paths);
     String yaml = SerializerUtils.toYamlString(openAPI1);
     System.out.println(yaml);
+    File newFile = new File(VirtualanConfiguration.getYamlPath()
+        + File.separator + operation.getOperationId());
+    if(!newFile.exists()){
+      newFile.mkdir();
+    }
+    VirtualanConfiguration.writeYaml(VirtualanConfiguration.getYamlPath()
+          + File.separator + operation.getOperationId() + File.separator + operation.getOperationId() +".yaml",
+        new ByteArrayInputStream(yaml.getBytes()));
     return openAPI1;
   }
 
