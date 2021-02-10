@@ -483,7 +483,8 @@ public class VirtualServiceUtil {
     } else {
       mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
     }
-    if (VirtualanConfiguration.isValidJson(mockTransferObject.getInput().toString()) &&
+    if (mockTransferObject.getInput() != null &&
+        VirtualanConfiguration.isValidJson(mockTransferObject.getInput().toString()) &&
         mockServiceRequest.getInputObjectType().isAssignableFrom(String.class)) {
       mockServiceRequest.setInputObjectType(JsonObject.class);
       mockTransferObject.setInputObjectType(JsonObject.class);
