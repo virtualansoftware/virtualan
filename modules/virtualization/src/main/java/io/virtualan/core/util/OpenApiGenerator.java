@@ -2,9 +2,7 @@ package io.virtualan.core.util;
 
 import com.cedarsoftware.util.io.JsonObject;
 import com.cedarsoftware.util.io.JsonReader;
-import com.ibm.disthub2.impl.formats.OldEnvelop.payload.normal;
-import com.ibm.disthub2.impl.formats.OldEnvelop.payload.normal.body;
-import com.ibm.disthub2.impl.formats.Schema;
+import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -13,9 +11,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
-import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -25,22 +21,25 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.ParseOptions;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.openapitools.codegen.serializer.SerializerUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpenApiGenerator {
 
+  private static Logger logger = LoggerFactory.getLogger(OpenApiGenerator.class);
 
   private static Parameter getType(String type) {
     if ("PATH_PARAM".equalsIgnoreCase(type)) {
@@ -52,6 +51,7 @@ public class OpenApiGenerator {
     }
     return null;
   }
+
   private static String getTypeValue(String type) {
     if ("PATH_PARAM".equalsIgnoreCase(type)) {
       return "path";
@@ -64,35 +64,40 @@ public class OpenApiGenerator {
   }
 
   public static OpenAPI generateAPI(VirtualServiceRequest request) throws IOException {
-    OpenAPI openAPI1 = new OpenAPI();
-    Contact contact =
-        new Contact()
-            .email("info@virtualan.io")
-            .name(
-                Stream.of(
-                    "Elan Thangamani",
-                    "Virtualan Software")
-                    .filter(s -> s != null)
-                    .collect(Collectors.joining(" - ")))
-            .url("https://virtualan.io");
-    String title = "Virtualan OnDemand Contract";
-    String version = "3.0.1";
-    Info info =
-        new Info()
-            .contact(contact)
-            .title(title)
-            .description("On demand Open Api standard")
-            .version(version);
-    openAPI1.info(info);
-    // the external documentation
-    openAPI1.externalDocs(
-        new ExternalDocumentation()
-            .description("Virtualan On demand Open Api specification")
-            .url("https://github.com/virtualansoftware"));
-
-    // the servers
-    openAPI1.servers(Arrays.asList(new Server().description("Virtualan API Mock server").url("/")));
-    Paths paths = new Paths();
+    String resource = getResource(request);
+    OpenAPI openAPI = new OpenAPIParser()
+        .readLocation(
+            VirtualanConfiguration.getYamlPath().getAbsolutePath() + File.separator + resource
+                + File.separator + resource + ".yaml",
+            null,
+            new ParseOptions()).getOpenAPI();
+    Paths paths = openAPI != null ? openAPI.getPaths() : null;
+    if (openAPI == null) {
+      openAPI = new OpenAPI();
+      Contact contact =
+          new Contact()
+              .email("info@virtualan.io")
+              .name(
+                  Stream.of(
+                      "Elan Thangamani",
+                      "Virtualan Software")
+                      .filter(s -> s != null)
+                      .collect(Collectors.joining(" - ")))
+              .url("https://virtualan.io");
+      String title = "Virtualan OnDemand Contract";
+      String version = "3.0.0";
+      Info info =
+          new Info()
+              .contact(contact)
+              .title(title)
+              .description("Virtualan generated Contract")
+              .version(version);
+      openAPI.info(info);
+      // the servers
+      openAPI
+          .servers(Arrays.asList(new Server().url("http://localhost:8080/api/")));
+      paths = new Paths();
+    }
     PathItem pathItem = new PathItem();
     Operation operation = new Operation();
     ApiResponse apiResponse = new ApiResponse();
@@ -101,6 +106,7 @@ public class OpenApiGenerator {
     mediaType.schema(new StringSchema());
     content.addMediaType("application/json", mediaType);
     apiResponse.setContent(content);
+    apiResponse.setDescription(request.getHttpStatusCode() + "  response object generated.");
     ApiResponses apiResponses = new ApiResponses();
     apiResponses.addApiResponse(request.getHttpStatusCode(), apiResponse);
     operation.setResponses(apiResponses);
@@ -114,7 +120,7 @@ public class OpenApiGenerator {
       parameterList.add(parameter);
     }
     operation.setParameters(parameterList);
-    if(request.getInput() != null) {
+    if (request.getInput() != null) {
       JsonObject object = (JsonObject) JsonReader.jsonToJava(request.getInput().toString());
       RequestBody body = new RequestBody();
       Content content1 = new Content();
@@ -149,18 +155,31 @@ public class OpenApiGenerator {
       pathItem.setPatch(operation);
     }
     paths.addPathItem(request.getUrl(), pathItem);
-    openAPI1.setPaths(paths);
-    String yaml = SerializerUtils.toYamlString(openAPI1);
-    System.out.println(yaml);
+    openAPI.setPaths(paths);
+    String yaml = SerializerUtils.toYamlString(openAPI);
+    logger.info(yaml);
     File newFile = new File(VirtualanConfiguration.getYamlPath()
-        + File.separator + operation.getOperationId());
-    if(!newFile.exists()){
+        + File.separator + resource);
+    if (!newFile.exists()) {
       newFile.mkdir();
     }
-    VirtualanConfiguration.writeYaml(VirtualanConfiguration.getYamlPath()
-          + File.separator + operation.getOperationId() + File.separator + operation.getOperationId() +".yaml",
+    VirtualanConfiguration.writeYaml(newFile+ File.separator + resource + ".yaml",
         new ByteArrayInputStream(yaml.getBytes()));
-    return openAPI1;
+    return openAPI;
+  }
+
+  public static String getResource(VirtualServiceRequest request) {
+    String resource = "default";
+    if (request.getUrl().length() > 1) {
+      if (request.getUrl().indexOf("/") == -1 ) {
+        resource = request.getUrl();
+      } else if (request.getUrl().indexOf("/", 1) != -1) {
+        resource = request.getUrl().substring(1, request.getUrl().indexOf("/", 1));
+      } else {
+        resource = request.getUrl().substring(1);
+      }
+    }
+    return resource;
   }
 
 }

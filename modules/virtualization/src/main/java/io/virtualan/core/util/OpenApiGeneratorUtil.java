@@ -99,7 +99,7 @@ public class OpenApiGeneratorUtil {
     }
   }
 
-  private void compile(File dest) throws IOException {
+  private void compile(File src, File dest) throws IOException {
     StringBuilder sb = new StringBuilder();
     File[] listOfFiles = dependencyFolder.listFiles();
     for (File file : listOfFiles) {
@@ -115,7 +115,7 @@ public class OpenApiGeneratorUtil {
     fileManager.setLocation(StandardLocation.CLASS_PATH, Arrays.asList(listOfFiles));
 
     fileManager.setLocation(StandardLocation.CLASS_OUTPUT, fileList);
-    Collection allFiles = FileUtils.listFiles(srcFolder, new String[]{"java"}, true);
+    Collection allFiles = FileUtils.listFiles(src, new String[]{"java"}, true);
     Iterable<? extends JavaFileObject> compilationUnits = fileManager
         .getJavaFileObjectsFromFiles(allFiles);
     JavaCompiler.CompilationTask task = compiler
@@ -161,7 +161,7 @@ public class OpenApiGeneratorUtil {
       }
     } else {
       openAPI = OpenApiGenerator.generateAPI(request);
-      fileName = request.getOperationId();
+      fileName = OpenApiGenerator.getResource(request);
     }
     File newFile = new File(srcFolder.getAbsolutePath() + File.separator + fileName);
     SpringCodegen codegen = new SpringCodegen();
@@ -195,26 +195,30 @@ public class OpenApiGeneratorUtil {
       Map<String, Class> currentController = new HashMap<>();
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
-      File newFile = null;
+      File destFile = null;
+      File srcFile = null;
       if (yamlFile != null){
-        newFile = new File(destFolder.getAbsolutePath() + File.separator + yamlFile
+        destFile = new File(destFolder.getAbsolutePath() + File.separator + yamlFile
+            .substring(0, yamlFile.lastIndexOf(".")));
+        srcFile = new File(srcFolder.getAbsolutePath() + File.separator + yamlFile
             .substring(0, yamlFile.lastIndexOf(".")));
       }else {
-        newFile = new File(destFolder.getAbsolutePath() + File.separator + request.getOperationId());
+        destFile = new File(destFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+        srcFile = new File(srcFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
       }
-      if(!newFile.exists()){
-        newFile.mkdir();
+      if(!destFile.exists()){
+        destFile.mkdir();
       } else {
-        deleteFolder(newFile);
+        deleteFolder(destFile);
       }
-      compile(newFile);
-      collectFiles(newFile, fileNames, ".class");
+      compile(srcFile, destFile);
+      collectFiles(destFile, fileNames, ".class");
       ClassLoader classLoader = applicationContext.getClassLoader();
       Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
       method.setAccessible(true);
-      method.invoke(classLoader, new Object[]{newFile.toURI().toURL()});
+      method.invoke(classLoader, new Object[]{destFile.toURI().toURL()});
       for (String className : fileNames) {
-        className = className.replace(newFile.getAbsolutePath(), "");
+        className = className.replace(destFile.getAbsolutePath(), "");
         className = className.replace('/', '.');
         className = className.replace('\\', '.');
         className = className.startsWith(".") ? className.substring(1) : className;
@@ -255,7 +259,7 @@ public class OpenApiGeneratorUtil {
           }
         }
       }
-      getVirtualServiceInfo().loadVirtualServices(applicationContext.getClassLoader());
+        virtualServiceUtil.init();
       return getVirtualServiceInfo().findVirtualServices(applicationContext.getClassLoader());
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());

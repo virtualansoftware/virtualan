@@ -316,7 +316,7 @@ public class VirtualServiceController {
       Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo()
           .getInputType(virtualServiceRequest);
       if (VirtualanConfiguration.isValidJson(virtualServiceRequest.getInput().toString()) &&
-          inputObjectType.isAssignableFrom(String.class)) {
+          (inputObjectType == null || inputObjectType.isAssignableFrom(String.class))) {
         virtualServiceRequest.setInputObjectType(JsonObject.class);
         inputObjectType = JsonObject.class;
       }
