@@ -8,8 +8,11 @@ import io.virtualan.autoconfig.ApplicationContextProvider;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.VirtualServiceRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -29,6 +32,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -38,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -183,6 +188,21 @@ public class OpenApiGeneratorUtil {
     input.config(codegen);
     generator.opts(input).generate();
   }
+  public byte[] toByteArray(InputStream in) throws IOException {
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+    byte[] buffer = new byte[1024];
+    int len;
+
+    // read bytes from the input stream and store them in buffer
+    while ((len = in.read(buffer)) != -1) {
+      // write bytes from the buffer into output stream
+      os.write(buffer, 0, len);
+    }
+
+    return os.toByteArray();
+  }
 
   public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request) {
     try {
@@ -217,18 +237,32 @@ public class OpenApiGeneratorUtil {
       Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
       method.setAccessible(true);
       method.invoke(classLoader, new Object[]{destFile.toURI().toURL()});
-      for (String className : fileNames) {
-        className = className.replace(destFile.getAbsolutePath(), "");
+      for (String classNameRaw : fileNames) {
+        String className = classNameRaw.replace(destFile.getAbsolutePath(), "");
+        String originalClassName = className.substring(1);
         className = className.replace('/', '.');
         className = className.replace('\\', '.');
         className = className.startsWith(".") ? className.substring(1) : className;
         className = className.substring(0, className.lastIndexOf("."));
+        String name = className;
+        name = name.substring(name.lastIndexOf('.') + 1);
+        name = name.substring(0, 1).toLowerCase() + name.substring(1);
         Class myController = classLoader.loadClass(className);
-        String interfaceName = myController.getTypeName();
-        if (interfaceName.endsWith("Controller")) {
-          String name = myController.getTypeName();
-          name = name.substring(name.lastIndexOf('.') + 1);
-          name = name.substring(0, 1).toLowerCase() + name.substring(1);
+        if (applicationContext.containsBean(name)) {
+          Class myControllerInterface= classLoader.loadClass(className.replace("Controller", ""));
+          URL[] urlsIn={ myControllerInterface.getProtectionDomain().getCodeSource().getLocation() };
+          ClassLoader delegateParentInf = classLoader.getParent();
+          try(URLClassLoader cl=new URLClassLoader(urlsIn, delegateParentInf)) {
+            Class<?> reloaded=cl.loadClass(myControllerInterface.getName());
+          }
+          URL[] urls={ myController.getProtectionDomain().getCodeSource().getLocation() };
+          ClassLoader delegateParent = classLoader;
+          try(URLClassLoader cl=new URLClassLoader(urls, delegateParent)) {
+            Class<?> reloaded=cl.loadClass(myController.getName());
+          }
+        }
+
+        if (name.endsWith("Controller")) {
           GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
           beanDefinition.setBeanClass(myController);
           beanDefinition.setAutowireCandidate(true);
