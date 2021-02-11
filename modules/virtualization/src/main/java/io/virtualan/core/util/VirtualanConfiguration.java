@@ -1,9 +1,11 @@
 package io.virtualan.core.util;
 
+import io.virtualan.core.model.VirtualServiceRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.json.JSONArray;
@@ -20,6 +22,18 @@ public class VirtualanConfiguration {
   static {
     reload();
   }
+
+  private static  Map<String, Map<String, VirtualServiceRequest>> virtualServiceRequestMap = new HashMap<>();
+
+  public static Map<String, Map<String, VirtualServiceRequest>> getVirtualServiceRequestMap() {
+    return virtualServiceRequestMap;
+  }
+
+  public static  void setVirtualServiceRequestMap(
+      Map<String, Map<String, VirtualServiceRequest>> virtualServiceRequestMap1) {
+    virtualServiceRequestMap = virtualServiceRequestMap1;
+  }
+
   public static boolean isValidJson(String jsonStr) {
     try {
       Object json = new JSONTokener(jsonStr).nextValue();

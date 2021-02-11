@@ -55,7 +55,6 @@ public class OpenApiGeneratorUtil {
   private File dependencyFolder = VirtualanConfiguration.getDependencyPath();
   private File yamlFolder = VirtualanConfiguration.getYamlPath();
 
-  @PostConstruct
   public void loadInitialYamlFiles() {
     File file = VirtualanConfiguration.getYamlPath();
     getYaml(file);
@@ -181,15 +180,17 @@ public class OpenApiGeneratorUtil {
   }
 
   public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request) {
+    VirtualanClassLoader classLoader = new VirtualanClassLoader(applicationContext.getClassLoader());
     try {
       Map<String, Class> loadedController = new HashMap<>();
       if(virtualServiceUtil != null && getVirtualServiceInfo() != null) {
          loadedController = getVirtualServiceInfo()
-            .findVirtualServices(applicationContext.getClassLoader());
+            .findVirtualServices(classLoader);
       }
       Map<String, Class> currentController = new HashMap<>();
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
+      List<String> fileNameAll = new ArrayList<String>();
       File destFile = null;
       File srcFile = null;
       if (yamlFile != null){
@@ -207,32 +208,26 @@ public class OpenApiGeneratorUtil {
         deleteFolder(destFile);
       }
       compile(srcFile, destFile);
-      collectFiles(destFile, fileNames, ".class");
-      VirtualanClassLoader classLoader = new VirtualanClassLoader(applicationContext.getClassLoader());
-//      Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
-//      method.setAccessible(true);
-//      method.invoke(classLoader, new Object[]{destFile.toURI().toURL()});
+      collectFiles(destFile, fileNameAll, ".class");
+      collectFiles(destFolder, fileNames, ".class");
       for (String classNameRaw : fileNames) {
-        String className = classNameRaw.replace(destFile.getAbsolutePath(), "");
-        String originalClassName = className.substring(1);
-        className = className.replace('/', '.');
-        className = className.replace('\\', '.');
-        className = className.startsWith(".") ? className.substring(1) : className;
+        String className = classNameRaw.replace(destFolder.getAbsolutePath(), "");
+        className = className.substring(className.indexOf(File.separator, 1)+1);
+        className = className.replaceAll("/", ".");
+        className = className.replaceAll("\\\\", ".");
         className = className.substring(0, className.lastIndexOf("."));
         String name = className;
         name = name.substring(name.lastIndexOf('.') + 1);
         name = name.substring(0, 1).toLowerCase() + name.substring(1);
         Class myController = classLoader.loadClass(className);
-        if (name.endsWith("Controller")) {
+        if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
           GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
           beanDefinition.setBeanClass(myController);
           beanDefinition.setAutowireCandidate(true);
           beanDefinition.setLazyInit(false);
           beanDefinition.setAbstract(false);
           for (Class classssss : myController.getInterfaces()) {
-            //Class reloaded = classLoader.loadClass(myController.getInterfaces()[0].getName());
             if (classssss.isAnnotationPresent(VirtualService.class)) {
-              //currentController.put(name, reloaded);
               if (applicationContext.containsBean(name)) {
                 removeMapping(classssss);
                 applicationContext.removeBean(name);
@@ -253,8 +248,10 @@ public class OpenApiGeneratorUtil {
           }
         }
       }
-        virtualServiceUtil.init();
-      return getVirtualServiceInfo().findVirtualServices(applicationContext.getClassLoader());
+
+      getVirtualServiceInfo().loadVirtualServices(classLoader);
+      getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
+      return  getVirtualServiceInfo().findVirtualServices(classLoader);
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }

@@ -59,9 +59,7 @@ public class VirtualanClassLoader extends ClassLoader {
       } catch (IOException e) {
         log.warn("MYClassloader : " + e.getMessage());
       }
-    } else {
-      return super.loadClass(name);
     }
-    return null;
+    return super.loadClass(name);
   }
 }

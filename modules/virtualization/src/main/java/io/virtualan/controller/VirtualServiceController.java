@@ -32,6 +32,7 @@ import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.OpenApiGeneratorUtil;
+import io.virtualan.core.util.VirtualanClassLoader;
 import io.virtualan.core.util.VirtualanConfiguration;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
@@ -180,9 +181,7 @@ public class VirtualServiceController {
   public Map<String, Map<String, VirtualServiceRequest>> listAllMockLoadRequest()
       throws InstantiationException, IllegalAccessException, ClassNotFoundException,
       IOException {
-    return virtualServiceUtil.getVirtualServiceInfo() != null ? virtualServiceUtil
-        .getVirtualServiceInfo().loadVirtualServices(applicationContext.getClassLoader())
-        : new HashMap<>();
+    return VirtualanConfiguration.getVirtualServiceRequestMap();
   }
 
   /**

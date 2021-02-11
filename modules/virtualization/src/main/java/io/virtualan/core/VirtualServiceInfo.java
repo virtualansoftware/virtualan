@@ -29,6 +29,7 @@ import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceApiResponse;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
+import io.virtualan.core.util.VirtualanConfiguration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -173,8 +174,7 @@ public interface VirtualServiceInfo {
   default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices(ClassLoader loader)
       throws ClassNotFoundException, JsonProcessingException, InstantiationException,
       IllegalAccessException {
-    Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice = getMockLoadChoice();
-    mockLoadChoice = new TreeMap<>();
+    Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice = new TreeMap<>();
     for (Map.Entry<String, Class> virtualServiceEntry : findVirtualServices(loader).entrySet()) {
       Map<String, VirtualServiceRequest> mockAPILoadChoice =
           buildVirtualServiceInfo(virtualServiceEntry);
@@ -188,7 +188,8 @@ public interface VirtualServiceInfo {
       }
     }
     setMockLoadChoice(mockLoadChoice);
-    return mockLoadChoice;
+    VirtualanConfiguration.setVirtualServiceRequestMap(mockLoadChoice);
+    return VirtualanConfiguration.getVirtualServiceRequestMap();
   }
 
 
@@ -334,7 +335,7 @@ public interface VirtualServiceInfo {
     Set<ResourceMapper> resourceMapperList = new LinkedHashSet<>();
     ResourceMapper resourceParent = new ResourceMapper(VirtualServiceConstants.PARENT_ROOT,
         resourceMapperList);
-    for (Entry<String, Map<String, VirtualServiceRequest>> obj : getMockLoadChoice()
+    for (Entry<String, Map<String, VirtualServiceRequest>> obj : VirtualanConfiguration.getVirtualServiceRequestMap()
         .entrySet()) {
       for (Entry<String, VirtualServiceRequest> requestMockObject : obj.getValue()
           .entrySet()) {
