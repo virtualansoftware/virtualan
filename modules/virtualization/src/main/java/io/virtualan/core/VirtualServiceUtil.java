@@ -479,7 +479,12 @@ public class VirtualServiceUtil {
 
     if (mockTransferObject.getInputObjectType() == null) {
       Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
-      mockServiceRequest.setInputObjectType(inputObjectType);
+      if(inputObjectType == null) {
+        mockServiceRequest.setInputObjectType(JsonObject.class);
+        mockTransferObject.setInputObjectType(JsonObject.class);
+      }else {
+        mockServiceRequest.setInputObjectType(inputObjectType);
+      }
     } else {
       mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
     }

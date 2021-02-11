@@ -128,7 +128,6 @@ public class OpenApiGenerator {
     }
     operation.setParameters(parameterList);
     if (request.getInput() != null) {
-      JsonObject object = (JsonObject) JsonReader.jsonToJava(request.getInput().toString());
       RequestBody body = new RequestBody();
       Content content1 = new Content();
       MediaType mediaType1 = new MediaType();
