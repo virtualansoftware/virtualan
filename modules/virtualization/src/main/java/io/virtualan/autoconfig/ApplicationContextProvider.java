@@ -33,15 +33,6 @@ public class ApplicationContextProvider {
     return virtualanClassLoader;
   }
 
-  private void addToClasspath(ClassLoader virtualanClassLoader)
-      throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-    for (URL url : VirtualanConfiguration.getUrls()) {
-      Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
-      method.setAccessible(true);
-      method.invoke(genericApplicationContext.getClassLoader(), new Object[]{url});
-    }
-  }
-
   public void classLoader(ClassLoader classLoader) {
     genericApplicationContext.setClassLoader(classLoader);
   }
