@@ -225,7 +225,8 @@ public interface VirtualServiceInfo {
     if (mockTransferInput.getResource() == null) {
       mockTransferInput.setResource(ApiResource.getResourceByURL(mockTransferInput.getUrl()));
     }
-    if (mockTransferInput.getOperationId() != null) {
+    if (mockTransferInput.getOperationId() != null &&  getMockLoadChoice()
+        .get(mockTransferInput.getResource()) != null) {
       VirtualServiceRequest mockTransferActual = getMockLoadChoice()
           .get(mockTransferInput.getResource()).get(mockTransferInput.getOperationId());
       if (mockTransferActual != null) {
@@ -316,7 +317,8 @@ public interface VirtualServiceInfo {
         mockTransferInput.setResource(mockTransferInput.getUrl().substring(1, index));
       }
     }
-    if (mockTransferInput != null && mockTransferInput.getOperationId() != null) {
+    if (mockTransferInput != null && mockTransferInput.getOperationId() != null
+        && getMockLoadChoice().get(mockTransferInput.getResource()) != null) {
       return getMockLoadChoice().get(mockTransferInput.getResource())
           .get(mockTransferInput.getOperationId());
     }

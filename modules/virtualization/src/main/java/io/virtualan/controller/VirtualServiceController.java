@@ -225,7 +225,7 @@ public class VirtualServiceController {
    * @return the response entity
    */
   @PostMapping(value = "/virtualservices/load")
-  public Map<String, Class> createVirtualanApis(
+  public Map<String, Map<String, VirtualServiceRequest>> createVirtualanApis(
       @ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl,
       @ApiParam(value = "Skip the  validation of yaml.", defaultValue = "true") @Valid @RequestPart(value = "skipValidation", required = false) String skipValidation)
       throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {

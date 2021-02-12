@@ -162,7 +162,7 @@ public class VirtualServiceUtil {
     setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
       virtualServiceInfo = getVirtualServiceInfo();
-      virtualServiceInfo.loadVirtualServices(applicationContext.getVirtualanClassLoader());
+      virtualServiceInfo.loadVirtualServices(applicationContext.getClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
     } else if (getVirtualServiceType() == null) {
       setVirtualServiceType(VirtualServiceType.NON_REST);

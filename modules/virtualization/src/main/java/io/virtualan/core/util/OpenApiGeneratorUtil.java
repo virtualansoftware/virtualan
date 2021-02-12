@@ -9,17 +9,19 @@ import io.virtualan.autoconfig.ApplicationContextProvider;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.VirtualServiceRequest;
+import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
+import java.util.Random;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -55,32 +57,10 @@ public class OpenApiGeneratorUtil {
   private File destFolder = VirtualanConfiguration.getDestPath();
   private File dependencyFolder = VirtualanConfiguration.getDependencyPath();
   private File yamlFolder = VirtualanConfiguration.getYamlPath();
-
-  public void loadInitialYamlFiles()
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
-    File file = VirtualanConfiguration.getYamlPath();
-    getYaml(file);
-  }
-
-  public void getYaml(File file)
-      throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
-    if (file != null &&  file.listFiles() != null &&file.listFiles().length > 0) {
-      for (File subFile : file.listFiles()) {
-        if (subFile.isDirectory()) {
-          getYaml(subFile);
-        } else {
-          generateRestApi(subFile.getName(), null);
-        }
-      }
-    }
-  }
-
   @Autowired
   private ApplicationContextProvider applicationContext;
-
   @Autowired
   private VirtualServiceUtil virtualServiceUtil;
-
   @Autowired
   private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
@@ -92,6 +72,25 @@ public class OpenApiGeneratorUtil {
           subFile.delete();
         } else {
           subFile.delete();
+        }
+      }
+    }
+  }
+
+  public void loadInitialYamlFiles()
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
+    File file = VirtualanConfiguration.getYamlPath();
+    getYaml(file);
+  }
+
+  public void getYaml(File file)
+      throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
+    if (file != null && file.listFiles() != null && file.listFiles().length > 0) {
+      for (File subFile : file.listFiles()) {
+        if (subFile.isDirectory()) {
+          getYaml(subFile);
+        } else {
+          generateRestApi(subFile.getName(), null);
         }
       }
     }
@@ -144,24 +143,23 @@ public class OpenApiGeneratorUtil {
   private void openApiGenerator(String apiFile, VirtualServiceRequest request) throws IOException {
     OpenAPI openAPI = null;
     String fileName = null;
-    if(apiFile != null) {
+    if (apiFile != null) {
       fileName = apiFile.substring(0, apiFile.lastIndexOf("."));
       openAPI = new OpenAPIParser()
           .readLocation(
               yamlFolder.getAbsolutePath() + File.separator + fileName + File.separator + apiFile,
               null,
               new ParseOptions()).getOpenAPI();
-      File newFile = new File(srcFolder.getAbsolutePath() + File.separator + fileName);
-      if (!newFile.exists()) {
-        newFile.mkdir();
-      } else {
-        deleteFolder(newFile);
-      }
-    } else {
+     } else {
       openAPI = OpenApiGenerator.generateAPI(request);
       fileName = OpenApiGenerator.getResource(request);
     }
     File newFile = new File(srcFolder.getAbsolutePath() + File.separator + fileName);
+    if (!newFile.exists()) {
+      newFile.mkdir();
+    } else {
+      deleteFolder(newFile);
+    }
     SpringCodegen codegen = new SpringCodegen();
     codegen.setOutputDir(newFile.getAbsolutePath());
     ClientOptInput input = new ClientOptInput();
@@ -171,8 +169,11 @@ public class OpenApiGeneratorUtil {
     generator.setGeneratorPropertyDefault(CodegenConstants.MODEL_DOCS, "false");
     generator.setGeneratorPropertyDefault(CodegenConstants.APIS, "true");
     generator.setGeneratorPropertyDefault(CodegenConstants.SUPPORTING_FILES, "true");
-    codegen.setApiPackage("io.virtualan.api."+fileName);
-    codegen.setModelPackage("io.virtualan.model."+fileName);
+    Random rand = new Random(); //instance of random class
+    int upperbound = 5000;
+    int int_random = rand.nextInt(upperbound);
+    codegen.setApiPackage("io.virtualan.api." + fileName + int_random);
+    codegen.setModelPackage("io.virtualan.model." + fileName + int_random);
     codegen.additionalProperties().put(SpringCodegen.VIRTUAL_SERVICE, true);
     codegen.additionalProperties().put(SpringCodegen.JAVA_8, true);
     codegen.additionalProperties().put(SpringCodegen.SKIP_DEFAULT_INTERFACE, false);
@@ -182,31 +183,38 @@ public class OpenApiGeneratorUtil {
     generator.opts(input).generate();
   }
 
-  public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request)
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
-    VirtualanClassLoader classLoader = new VirtualanClassLoader(ClassLoader.getSystemClassLoader());
+  public void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
+    URLClassLoader systemClassLoader = (URLClassLoader) classLoader;
+    Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
     try {
-      Map<String, Class> loadedController = new HashMap<>();
-      if(virtualServiceUtil != null && getVirtualServiceInfo() != null) {
-         loadedController = getVirtualServiceInfo()
-            .findVirtualServices(classLoader);
-      }
-      Map<String, Class> currentController = new HashMap<>();
+      Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+      method.setAccessible(true);
+      method.invoke(systemClassLoader, new Object[]{url});
+    } catch (Throwable t) {
+      throw new IntrospectionException("Error when adding url to system ClassLoader ");
+    }
+  }
+  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(String yamlFile, VirtualServiceRequest request)
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
+    ClassLoader classLoader = new VirtualanClassLoader(applicationContext.getClassLoader());
+    try {
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
       List<String> fileNameAll = new ArrayList<String>();
       File destFile = null;
       File srcFile = null;
-      if (yamlFile != null){
+      if (yamlFile != null) {
         destFile = new File(destFolder.getAbsolutePath() + File.separator + yamlFile
             .substring(0, yamlFile.lastIndexOf(".")));
         srcFile = new File(srcFolder.getAbsolutePath() + File.separator + yamlFile
             .substring(0, yamlFile.lastIndexOf(".")));
-      }else {
-        destFile = new File(destFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
-        srcFile = new File(srcFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+      } else {
+        destFile = new File(
+            destFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+        srcFile = new File(
+            srcFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
       }
-      if(!destFile.exists()){
+      if (!destFile.exists()) {
         destFile.mkdir();
       } else {
         deleteFolder(destFile);
@@ -214,50 +222,43 @@ public class OpenApiGeneratorUtil {
       compile(srcFile, destFile);
       collectFiles(destFile, fileNameAll, ".class");
       collectFiles(destFolder, fileNames, ".class");
+      addURLToClassLoader(destFile.toURI().toURL(), classLoader.getParent());
       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(destFolder.getAbsolutePath(), "");
-          className = className.substring(className.indexOf(File.separator, 1) + 1);
-          className = className.replaceAll("/", ".");
-          className = className.replaceAll("\\\\", ".");
-          className = className.substring(0, className.lastIndexOf("."));
-          String name = className;
-          name = name.substring(name.lastIndexOf('.') + 1);
-          name = name.substring(0, 1).toLowerCase() + name.substring(1);
-          Class myController = classLoader.loadClass(className);
-          if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
-            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-            beanDefinition.setBeanClass(myController);
-            beanDefinition.setAutowireCandidate(true);
-            beanDefinition.setLazyInit(false);
-            beanDefinition.setAbstract(false);
-            for (Class classssss : myController.getInterfaces()) {
-              if (classssss.isAnnotationPresent(VirtualService.class)) {
-                if (applicationContext.containsBean(name)) {
-                  removeMapping(classssss);
-                  applicationContext.removeBean(name);
-                }
-                applicationContext.addBean(name, beanDefinition);
-                addMapping(name, classssss);
+        className = className.substring(className.indexOf(File.separator, 1) + 1);
+        className = className.replaceAll("/", ".");
+        className = className.replaceAll("\\\\", ".");
+        className = className.substring(0, className.lastIndexOf("."));
+        String name = className;
+        name = name.substring(name.lastIndexOf('.') + 1);
+        name = name.substring(0, 1).toLowerCase() + name.substring(1);
+        Class myController = classLoader.loadClass(className);
+        if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
+          GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+          beanDefinition.setBeanClass(myController);
+          beanDefinition.setAutowireCandidate(true);
+          beanDefinition.setLazyInit(false);
+          beanDefinition.setAbstract(false);
+          for (Class classssss : myController.getInterfaces()) {
+            if (classssss.isAnnotationPresent(VirtualService.class)) {
+              if (applicationContext.containsBean(name)) {
+                removeMapping(classssss);
+                applicationContext.removeBean(name);
               }
+              applicationContext.addBean(name, beanDefinition);
+              addMapping(name, classssss);
             }
-          }
-      }
-      for (Map.Entry<String, Class> entry : loadedController.entrySet()) {
-        if (entry.getValue().isAnnotationPresent(VirtualService.class)) {
-          String controllerName = entry.getKey().replace("api", "Api")+"Controller";
-          if (!currentController.containsKey(controllerName)) {
-            removeMapping(entry.getValue());
-            applicationContext.removeBean(controllerName);
           }
         }
       }
+
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-    applicationContext.setVirtualanClassLoader(classLoader);
-    getVirtualServiceInfo().loadVirtualServices(applicationContext.getVirtualanClassLoader());
+
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(classLoader.getParent());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-    return  getVirtualServiceInfo().findVirtualServices(applicationContext.getVirtualanClassLoader());
+    return map;
   }
 
   private void removeMapping(Class myControllerClzzz) throws IOException, ClassNotFoundException {
@@ -323,69 +324,68 @@ public class OpenApiGeneratorUtil {
   }
 
 
-
   private void addMapping(String name, Class myControllerClzzz)
       throws IOException, ClassNotFoundException {
     for (Method method : myControllerClzzz.getDeclaredMethods()) {
-       boolean isPost = method.isAnnotationPresent(PostMapping.class);
-        if (isPost) {
-          PostMapping annotation = method.getAnnotation(PostMapping.class);
-          Builder requestMappingInfo = RequestMappingInfo
-              .paths(annotation.value()[0])
-              .methods(RequestMethod.POST);
-          if (annotation.consumes().length > 0) {
-            requestMappingInfo = requestMappingInfo.consumes(annotation.consumes()[0]);
-          }
+      boolean isPost = method.isAnnotationPresent(PostMapping.class);
+      if (isPost) {
+        PostMapping annotation = method.getAnnotation(PostMapping.class);
+        Builder requestMappingInfo = RequestMappingInfo
+            .paths(annotation.value()[0])
+            .methods(RequestMethod.POST);
+        if (annotation.consumes().length > 0) {
+          requestMappingInfo = requestMappingInfo.consumes(annotation.consumes()[0]);
+        }
 
-          if (annotation.produces().length > 0) {
-            requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
-          }
+        if (annotation.produces().length > 0) {
+          requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
+        }
         requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
         logger.info("Registered: " + requestMappingInfo.build().toString());
+      }
+      boolean isGet = method.isAnnotationPresent(GetMapping.class);
+      if (isGet) {
+        GetMapping annotation = method.getAnnotation(GetMapping.class);
+        Builder requestMappingInfo = RequestMappingInfo
+            .paths(annotation.value()[0])
+            .methods(RequestMethod.GET);
+        if (annotation.produces().length > 0) {
+          requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
         }
-        boolean isGet = method.isAnnotationPresent(GetMapping.class);
-        if (isGet) {
-          GetMapping annotation = method.getAnnotation(GetMapping.class);
-          Builder requestMappingInfo = RequestMappingInfo
-              .paths(annotation.value()[0])
-              .methods(RequestMethod.GET);
-          if (annotation.produces().length > 0) {
-            requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
-          }
-          requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
-          logger.info("Registered: " + requestMappingInfo.build().toString());
-        }
+        requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
+        logger.info("Registered: " + requestMappingInfo.build().toString());
+      }
 
-        boolean isPut = method.isAnnotationPresent(PutMapping.class);
-        if (isPut) {
-          PutMapping annotation = method.getAnnotation(PutMapping.class);
-          Builder requestMappingInfo = RequestMappingInfo
-              .paths(annotation.value()[0])
-              .methods(RequestMethod.PUT);
-          if (annotation.produces().length > 0) {
-            requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
-          }
-          if (annotation.consumes().length > 0) {
-            requestMappingInfo = requestMappingInfo.consumes(annotation.consumes()[0]);
-          }
-          requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
-          logger.info("Registered: " + requestMappingInfo.build().toString());
+      boolean isPut = method.isAnnotationPresent(PutMapping.class);
+      if (isPut) {
+        PutMapping annotation = method.getAnnotation(PutMapping.class);
+        Builder requestMappingInfo = RequestMappingInfo
+            .paths(annotation.value()[0])
+            .methods(RequestMethod.PUT);
+        if (annotation.produces().length > 0) {
+          requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
         }
+        if (annotation.consumes().length > 0) {
+          requestMappingInfo = requestMappingInfo.consumes(annotation.consumes()[0]);
+        }
+        requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
+        logger.info("Registered: " + requestMappingInfo.build().toString());
+      }
 
-        boolean isDelete = method.isAnnotationPresent(DeleteMapping.class);
-        if (isDelete) {
-          DeleteMapping annotation = method.getAnnotation(DeleteMapping.class);
-          Builder requestMappingInfo = RequestMappingInfo
-              .paths(annotation.value()[0])
-              .methods(RequestMethod.DELETE);
-          if (annotation.produces().length > 0) {
-            requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
-          }
-          requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
-          logger.info("Registered: " + requestMappingInfo.build().toString());
+      boolean isDelete = method.isAnnotationPresent(DeleteMapping.class);
+      if (isDelete) {
+        DeleteMapping annotation = method.getAnnotation(DeleteMapping.class);
+        Builder requestMappingInfo = RequestMappingInfo
+            .paths(annotation.value()[0])
+            .methods(RequestMethod.DELETE);
+        if (annotation.produces().length > 0) {
+          requestMappingInfo = requestMappingInfo.produces(annotation.produces()[0]);
         }
+        requestMappingHandlerMapping.registerMapping(requestMappingInfo.build(), name, method);
+        logger.info("Registered: " + requestMappingInfo.build().toString());
       }
     }
+  }
 
   private String getName(Class classzz) {
     String interfaceName = classzz.getTypeName();

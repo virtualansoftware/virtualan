@@ -1,37 +1,45 @@
 package io.virtualan.autoconfig;
 
 import io.virtualan.core.util.VirtualanClassLoader;
-import org.springframework.beans.BeansException;
+import io.virtualan.core.util.VirtualanConfiguration;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.DescriptiveResource;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Component
-public class ApplicationContextProvider  {
+public class ApplicationContextProvider {
 
+  VirtualanClassLoader virtualanClassLoader;
   @Autowired
   private GenericApplicationContext genericApplicationContext;
-  VirtualanClassLoader virtualanClassLoader;
 
   public VirtualanClassLoader getVirtualanClassLoader() {
-    if(virtualanClassLoader == null){
+    if (virtualanClassLoader == null) {
       return new VirtualanClassLoader(genericApplicationContext.getClassLoader());
     }
     return virtualanClassLoader;
   }
 
-  public void setVirtualanClassLoader(VirtualanClassLoader virtualanClassLoader) {
-    this.virtualanClassLoader = virtualanClassLoader;
-    genericApplicationContext.setClassLoader(virtualanClassLoader);
+  private void addToClasspath(ClassLoader virtualanClassLoader)
+      throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    for (URL url : VirtualanConfiguration.getUrls()) {
+      Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
+      method.setAccessible(true);
+      method.invoke(genericApplicationContext.getClassLoader(), new Object[]{url});
+    }
   }
 
   public void classLoader(ClassLoader classLoader) {
@@ -46,8 +54,8 @@ public class ApplicationContextProvider  {
     return genericApplicationContext.containsBean(beanName);
   }
 
-  public void addBean(String beanName, GenericBeanDefinition beanObject) {
-    genericApplicationContext.registerBeanDefinition(beanName, beanObject);
+  public void addBean(String beanName, GenericBeanDefinition beanDefinition) {
+    genericApplicationContext.registerBeanDefinition(beanName, beanDefinition);
   }
 
   public void removeBean(String beanName) {

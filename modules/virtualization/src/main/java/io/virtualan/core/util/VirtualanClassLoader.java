@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 public class VirtualanClassLoader extends ClassLoader {
 

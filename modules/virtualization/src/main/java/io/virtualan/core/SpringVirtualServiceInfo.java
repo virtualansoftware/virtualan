@@ -123,7 +123,7 @@ public class SpringVirtualServiceInfo implements VirtualServiceInfo {
                     requestBody.setInputObjectTypeName(parameterType.getName());
                     requestBody.setInputObjectType(parameterType);
                     requestBody.setObjectMapper(objectMapper);
-                    mockLoadRequest.setInputObjectType(applicationContext.getVirtualanClassLoader().loadClass(parameterType.getName()));
+                    mockLoadRequest.setInputObjectType(applicationContext.getClassLoader().loadClass(parameterType.getName()));
                     try {
                         mockLoadRequest.setInput(
                                 RequestBodyTypes.fromString(requestBody.getInputObjectTypeName())
