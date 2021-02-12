@@ -1,5 +1,6 @@
 package io.virtualan.core.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -55,12 +56,14 @@ public class OpenApiGeneratorUtil {
   private File dependencyFolder = VirtualanConfiguration.getDependencyPath();
   private File yamlFolder = VirtualanConfiguration.getYamlPath();
 
-  public void loadInitialYamlFiles() {
+  public void loadInitialYamlFiles()
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
     File file = VirtualanConfiguration.getYamlPath();
     getYaml(file);
   }
 
-  public void getYaml(File file) {
+  public void getYaml(File file)
+      throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
     if (file != null &&  file.listFiles() != null &&file.listFiles().length > 0) {
       for (File subFile : file.listFiles()) {
         if (subFile.isDirectory()) {
@@ -179,8 +182,9 @@ public class OpenApiGeneratorUtil {
     generator.opts(input).generate();
   }
 
-  public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request) {
-    VirtualanClassLoader classLoader = new VirtualanClassLoader(applicationContext.getClassLoader());
+  public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request)
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
+    ClassLoader classLoader = applicationContext.getVirtualanClassLoader();
     try {
       Map<String, Class> loadedController = new HashMap<>();
       if(virtualServiceUtil != null && getVirtualServiceInfo() != null) {
@@ -212,33 +216,34 @@ public class OpenApiGeneratorUtil {
       collectFiles(destFolder, fileNames, ".class");
       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(destFolder.getAbsolutePath(), "");
-        className = className.substring(className.indexOf(File.separator, 1)+1);
-        className = className.replaceAll("/", ".");
-        className = className.replaceAll("\\\\", ".");
-        className = className.substring(0, className.lastIndexOf("."));
-        String name = className;
-        name = name.substring(name.lastIndexOf('.') + 1);
-        name = name.substring(0, 1).toLowerCase() + name.substring(1);
-        Class myController = classLoader.loadClass(className);
-        if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
-          GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-          beanDefinition.setBeanClass(myController);
-          beanDefinition.setAutowireCandidate(true);
-          beanDefinition.setLazyInit(false);
-          beanDefinition.setAbstract(false);
-          for (Class classssss : myController.getInterfaces()) {
-            if (classssss.isAnnotationPresent(VirtualService.class)) {
-              if (applicationContext.containsBean(name)) {
-                removeMapping(classssss);
-                applicationContext.removeBean(name);
+          className = className.substring(className.indexOf(File.separator, 1) + 1);
+          className = className.replaceAll("/", ".");
+          className = className.replaceAll("\\\\", ".");
+        //if (!className.contains("io.virtualan.model")) {
+          className = className.substring(0, className.lastIndexOf("."));
+          String name = className;
+          name = name.substring(name.lastIndexOf('.') + 1);
+          name = name.substring(0, 1).toLowerCase() + name.substring(1);
+          Class myController = classLoader.loadClass(className);
+          if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
+            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+            beanDefinition.setBeanClass(myController);
+            beanDefinition.setAutowireCandidate(true);
+            beanDefinition.setLazyInit(false);
+            beanDefinition.setAbstract(false);
+            for (Class classssss : myController.getInterfaces()) {
+              if (classssss.isAnnotationPresent(VirtualService.class)) {
+                if (applicationContext.containsBean(name)) {
+                  removeMapping(classssss);
+                  applicationContext.removeBean(name);
+                }
+                applicationContext.addBean(name, beanDefinition);
+                addMapping(name, classssss);
               }
-              applicationContext.addBean(name, beanDefinition);
-              addMapping(name, classssss);
             }
           }
-        }
+      //  }
       }
-
       for (Map.Entry<String, Class> entry : loadedController.entrySet()) {
         if (entry.getValue().isAnnotationPresent(VirtualService.class)) {
           String controllerName = entry.getKey().replace("api", "Api")+"Controller";
@@ -248,14 +253,12 @@ public class OpenApiGeneratorUtil {
           }
         }
       }
-
-      getVirtualServiceInfo().loadVirtualServices(classLoader);
-      getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-      return  getVirtualServiceInfo().findVirtualServices(classLoader);
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-    return null;
+    getVirtualServiceInfo().loadVirtualServices(classLoader);
+    getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
+    return  getVirtualServiceInfo().findVirtualServices(classLoader);
   }
 
   private void removeMapping(Class myControllerClzzz) throws IOException, ClassNotFoundException {

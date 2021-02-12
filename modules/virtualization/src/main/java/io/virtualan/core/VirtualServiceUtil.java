@@ -40,6 +40,7 @@ import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.ScriptErrorException;
 import io.virtualan.core.util.VirtualServiceParamComparator;
 import io.virtualan.core.util.VirtualServiceValidRequest;
+import io.virtualan.core.util.VirtualanClassLoader;
 import io.virtualan.core.util.VirtualanConfiguration;
 import io.virtualan.core.util.XMLConverter;
 import io.virtualan.core.util.rule.ScriptExecutor;
@@ -158,10 +159,12 @@ public class VirtualServiceUtil {
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public void init() throws ClassNotFoundException, JsonProcessingException,
       InstantiationException, IllegalAccessException {
+    VirtualanClassLoader classLoader = new VirtualanClassLoader(ClassLoader.getSystemClassLoader());
+    applicationContext.setVirtualanClassLoader(classLoader);
     setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
       virtualServiceInfo = getVirtualServiceInfo();
-      virtualServiceInfo.loadVirtualServices(applicationContext.getClassLoader());
+      virtualServiceInfo.loadVirtualServices(applicationContext.getVirtualanClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
     } else if (getVirtualServiceType() == null) {
       setVirtualServiceType(VirtualServiceType.NON_REST);
@@ -238,7 +241,8 @@ public class VirtualServiceUtil {
     return mockResponseMap;
   }
 
-  public void findOperationIdForService(VirtualServiceRequest mockLoadRequest) {
+  public void findOperationIdForService(VirtualServiceRequest mockLoadRequest)
+      throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
     if (mockLoadRequest.getOperationId() == null && virtualServiceInfo != null) {
       final String resourceUrl = mockLoadRequest.getUrl().substring(1);
       final List<String> resouceSplitterList =

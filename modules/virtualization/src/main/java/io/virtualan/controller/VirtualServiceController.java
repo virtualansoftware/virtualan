@@ -17,6 +17,7 @@ package io.virtualan.controller;
 
 import com.cedarsoftware.util.io.JsonObject;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
@@ -227,7 +228,7 @@ public class VirtualServiceController {
   public Map<String, Class> createVirtualanApis(
       @ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl,
       @ApiParam(value = "Skip the  validation of yaml.", defaultValue = "true") @Valid @RequestPart(value = "skipValidation", required = false) String skipValidation)
-      throws IOException {
+      throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
     String dataload = openApiUrl.getOriginalFilename();
     String fileName = dataload.substring(0, dataload.lastIndexOf("."));
     File newFile = new File(yamlFolder + File.separator + fileName);
@@ -436,7 +437,8 @@ public class VirtualServiceController {
    */
   @PutMapping(value = "/virtualservices/{id}")
   public ResponseEntity<VirtualServiceRequest> updateMockRequest(@PathVariable("id") long id,
-      @RequestBody VirtualServiceRequest mockLoadRequest) {
+      @RequestBody VirtualServiceRequest mockLoadRequest)
+      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
 
     final VirtualServiceRequest currentMockLoadRequest = virtualService.findById(id);
     if (currentMockLoadRequest == null) {

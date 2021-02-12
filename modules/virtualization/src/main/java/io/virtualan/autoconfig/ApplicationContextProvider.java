@@ -1,5 +1,6 @@
 package io.virtualan.autoconfig;
 
+import io.virtualan.core.util.VirtualanClassLoader;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -19,6 +20,17 @@ public class ApplicationContextProvider  {
 
   @Autowired
   private GenericApplicationContext genericApplicationContext;
+
+  VirtualanClassLoader virtualanClassLoader;
+
+  public VirtualanClassLoader getVirtualanClassLoader() {
+    return virtualanClassLoader;
+  }
+
+  public void setVirtualanClassLoader(VirtualanClassLoader virtualanClassLoader) {
+    this.virtualanClassLoader = virtualanClassLoader;
+    genericApplicationContext.setClassLoader(virtualanClassLoader);
+  }
 
   public void classLoader(ClassLoader classLoader) {
     genericApplicationContext.setClassLoader(classLoader);
