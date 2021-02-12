@@ -159,8 +159,6 @@ public class VirtualServiceUtil {
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public void init() throws ClassNotFoundException, JsonProcessingException,
       InstantiationException, IllegalAccessException {
-    VirtualanClassLoader classLoader = new VirtualanClassLoader(ClassLoader.getSystemClassLoader());
-    applicationContext.setVirtualanClassLoader(classLoader);
     setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
       virtualServiceInfo = getVirtualServiceInfo();

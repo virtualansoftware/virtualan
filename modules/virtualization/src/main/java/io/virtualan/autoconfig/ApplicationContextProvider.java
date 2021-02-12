@@ -20,10 +20,12 @@ public class ApplicationContextProvider  {
 
   @Autowired
   private GenericApplicationContext genericApplicationContext;
-
   VirtualanClassLoader virtualanClassLoader;
 
   public VirtualanClassLoader getVirtualanClassLoader() {
+    if(virtualanClassLoader == null){
+      return new VirtualanClassLoader(genericApplicationContext.getClassLoader());
+    }
     return virtualanClassLoader;
   }
 

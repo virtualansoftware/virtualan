@@ -184,7 +184,7 @@ public class OpenApiGeneratorUtil {
 
   public Map<String, Class> generateRestApi(String yamlFile, VirtualServiceRequest request)
       throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
-    ClassLoader classLoader = applicationContext.getVirtualanClassLoader();
+    VirtualanClassLoader classLoader = new VirtualanClassLoader(ClassLoader.getSystemClassLoader());
     try {
       Map<String, Class> loadedController = new HashMap<>();
       if(virtualServiceUtil != null && getVirtualServiceInfo() != null) {
@@ -219,7 +219,6 @@ public class OpenApiGeneratorUtil {
           className = className.substring(className.indexOf(File.separator, 1) + 1);
           className = className.replaceAll("/", ".");
           className = className.replaceAll("\\\\", ".");
-        //if (!className.contains("io.virtualan.model")) {
           className = className.substring(0, className.lastIndexOf("."));
           String name = className;
           name = name.substring(name.lastIndexOf('.') + 1);
@@ -242,7 +241,6 @@ public class OpenApiGeneratorUtil {
               }
             }
           }
-      //  }
       }
       for (Map.Entry<String, Class> entry : loadedController.entrySet()) {
         if (entry.getValue().isAnnotationPresent(VirtualService.class)) {
@@ -256,9 +254,10 @@ public class OpenApiGeneratorUtil {
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-    getVirtualServiceInfo().loadVirtualServices(classLoader);
+    applicationContext.setVirtualanClassLoader(classLoader);
+    getVirtualServiceInfo().loadVirtualServices(applicationContext.getVirtualanClassLoader());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-    return  getVirtualServiceInfo().findVirtualServices(classLoader);
+    return  getVirtualServiceInfo().findVirtualServices(applicationContext.getVirtualanClassLoader());
   }
 
   private void removeMapping(Class myControllerClzzz) throws IOException, ClassNotFoundException {

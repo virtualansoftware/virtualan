@@ -49,16 +49,13 @@ public class VirtualanClassLoader extends ClassLoader {
         }
         input.close();
         byte[] classData = buffer.toByteArray();
-
         try {
-          super.loadClass(name);
           return super.loadClass(name);
-        }catch (ClassNotFoundException e) {
-          log.warn("loaded....");
-           //ignore and load
+        } catch (ClassNotFoundException e) {
+          //ignore and load
         }
         return defineClass(name,
-              classData, 0, classData.length);
+            classData, 0, classData.length);
       } catch (MalformedURLException e) {
         log.warn("MYClassloader : " + e.getMessage());
       } catch (IOException e) {
