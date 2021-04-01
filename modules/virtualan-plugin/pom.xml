@@ -19,8 +19,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.3.2</hsqldb.version>
-		<spring.boot.version>2.3.0.RELEASE</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
+		<spring.boot.version>2.4.4</spring.boot.version>
 		<spring.version>5.0.3.RELEASE</spring.version>
 		<groovy.version>2.5.14</groovy.version>
 		<junit.version>4.13.1</junit.version>
@@ -35,7 +35,7 @@
 		<rs-api.version>2.1.1</rs-api.version>
 		<commons-lang3.version>3.7</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
-		<jackson-databind.version>2.10.4</jackson-databind.version>
+		<jackson-databind.version>2.10.5.1</jackson-databind.version>
 	</properties>
 	<developers>
 		<!-- original author of the project -->
