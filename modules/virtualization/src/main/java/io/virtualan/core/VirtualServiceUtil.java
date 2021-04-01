@@ -15,13 +15,14 @@
 package io.virtualan.core;
 
 
+import com.cedarsoftware.util.io.JsonObject;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.virtualan.api.ApiType;
 import io.virtualan.api.VirtualServiceType;
 import io.virtualan.api.WSResource;
+import io.virtualan.autoconfig.ApplicationContextProvider;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.MockRequest;
 import io.virtualan.core.model.MockResponse;
@@ -34,10 +35,13 @@ import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.soap.SoapFaultException;
 import io.virtualan.core.util.BestMatchComparator;
 import io.virtualan.core.util.Converter;
+import io.virtualan.core.util.OpenApiGeneratorUtil;
 import io.virtualan.core.util.ReturnMockResponse;
 import io.virtualan.core.util.ScriptErrorException;
 import io.virtualan.core.util.VirtualServiceParamComparator;
 import io.virtualan.core.util.VirtualServiceValidRequest;
+import io.virtualan.core.util.VirtualanClassLoader;
+import io.virtualan.core.util.VirtualanConfiguration;
 import io.virtualan.core.util.XMLConverter;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
@@ -64,9 +68,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -84,6 +92,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class VirtualServiceUtil {
 
+  static {
+    log.info("start the loading");
+  }
+
   private final Locale locale = LocaleContextHolder.getLocale();
   @Autowired
   private VirtualServiceValidRequest virtualServiceValidRequest;
@@ -97,19 +109,18 @@ public class VirtualServiceUtil {
   private MessageSource messageSource;
   @Autowired
   private VirtualServiceParamComparator virtualServiceParamComparator;
-
+  @Autowired
+  private OpenApiGeneratorUtil openApiGeneratorUtil;
+  @Autowired
+  private ApplicationContextProvider applicationContext;
   @Autowired
   private MessageUtil messageUtil;
-
   @Autowired
   private VirtualParameterizedUtil virtualParameterizedUtil;
-
   @Autowired
   private XMLConverter xmlConverter;
-
   @Autowired
   private ObjectMapper objectMapper;
-
   private VirtualServiceType virtualServiceType;
   @Autowired
   private VirtualServiceInfoFactory virtualServiceInfoFactory;
@@ -127,7 +138,6 @@ public class VirtualServiceUtil {
     return object;
   }
 
-
   public VirtualServiceType getVirtualServiceType() {
     return virtualServiceType;
   }
@@ -137,23 +147,28 @@ public class VirtualServiceUtil {
       setVirtualServiceInfo(
           virtualServiceInfoFactory.getVirtualServiceInfo(virtualServiceType.getType()));
       this.virtualServiceType = virtualServiceType;
+    } else {
+      setVirtualServiceInfo(
+          virtualServiceInfoFactory.getVirtualServiceInfo(VirtualServiceType.SPRING.getType()));
+      this.virtualServiceType = VirtualServiceType.SPRING;
     }
 
   }
 
   @PostConstruct
-  @Order(1)
+  @Order(Ordered.HIGHEST_PRECEDENCE)
   public void init() throws ClassNotFoundException, JsonProcessingException,
       InstantiationException, IllegalAccessException {
-    setVirtualServiceType(ApiType.findApiType());
+    setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
       virtualServiceInfo = getVirtualServiceInfo();
-      virtualServiceInfo.loadVirtualServices();
+      virtualServiceInfo.loadVirtualServices(applicationContext.getClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
     } else if (getVirtualServiceType() == null) {
       setVirtualServiceType(VirtualServiceType.NON_REST);
       virtualServiceInfo = getVirtualServiceInfo();
     }
+    openApiGeneratorUtil.loadInitialYamlFiles();
   }
 
   public VirtualServiceInfo getVirtualServiceInfo() {
@@ -224,7 +239,8 @@ public class VirtualServiceUtil {
     return mockResponseMap;
   }
 
-  public void findOperationIdForService(VirtualServiceRequest mockLoadRequest) {
+  public void findOperationIdForService(VirtualServiceRequest mockLoadRequest)
+      throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
     if (mockLoadRequest.getOperationId() == null && virtualServiceInfo != null) {
       final String resourceUrl = mockLoadRequest.getUrl().substring(1);
       final List<String> resouceSplitterList =
@@ -233,10 +249,16 @@ public class VirtualServiceUtil {
         final String operationId =
             virtualServiceInfo.getOperationId(mockLoadRequest.getMethod(),
                 virtualServiceInfo.getResourceParent(), resouceSplitterList);
-        mockLoadRequest.setOperationId(operationId);
-        mockLoadRequest.setResource(resouceSplitterList.get(0));
+        if (operationId != null) {
+          mockLoadRequest.setOperationId(operationId);
+          mockLoadRequest.setResource(resouceSplitterList.get(0));
+        } else {
+          openApiGeneratorUtil.generateRestApi(null, mockLoadRequest);
+          log.warn(" Manually Resource registered " + mockLoadRequest.getMethod());
+        }
       }
     }
+
   }
 
   public ResponseEntity<VirtualServiceStatus> checkIfServiceDataAlreadyExists(
@@ -266,6 +288,15 @@ public class VirtualServiceUtil {
     return null;
   }
 
+  public boolean isValidJson(String jsonStr) {
+    Object json = new JSONTokener(jsonStr).nextValue();
+    if (json instanceof JSONObject || json instanceof JSONArray) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public Object isMockAlreadyExists(VirtualServiceRequest mockTransferObject)
       throws IOException, JAXBException {
 
@@ -282,9 +313,14 @@ public class VirtualServiceUtil {
 
       if (mockServiceRequest.getInputObjectType() != null
           && mockTransferObject.getInput() != null) {
+        if (isValidJson(mockTransferObject.getInput().toString()) && mockServiceRequest
+            .getInputObjectType().isAssignableFrom(String.class)) {
+          mockTransferObject.setInputObjectType(JsonObject.class);
+        }
         mockServiceRequest.setInput(getObjectMapper()
             .readValue(mockTransferObject.getInput().toString(),
                 mockServiceRequest.getInputObjectType()));
+
       } else if (mockTransferObject.getInput() != null) {
         mockServiceRequest.setInput(mockTransferObject.getInput().toString());
       }
@@ -386,11 +422,12 @@ public class VirtualServiceUtil {
   public boolean isMockResponseBodyValid(VirtualServiceRequest mockTransferObject)
       throws InvalidMockResponseException {
     try {
-      if(ContentType.XML.equals(mockTransferObject.getContentType())) {
-        XMLConverter.xmlToObject(mockTransferObject.getResponseObjectType(),mockTransferObject.getOutput().toString());
+      if (ContentType.XML.equals(mockTransferObject.getContentType())) {
+        XMLConverter.xmlToObject(mockTransferObject.getResponseObjectType(),
+            mockTransferObject.getOutput().toString());
       } else {
         VirtualServiceRequest
-          mockTransferObjectActual = virtualServiceInfo.getResponseType(mockTransferObject);
+            mockTransferObjectActual = virtualServiceInfo.getResponseType(mockTransferObject);
         if (mockTransferObjectActual != null && mockTransferObjectActual.getResponseType() != null
             &&
             !mockTransferObjectActual.getResponseType().isEmpty()) {
@@ -419,14 +456,21 @@ public class VirtualServiceUtil {
         && mockServiceRequest.getInput() == null) {
       return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
           mockServiceRequest);
-    } else if((mockServiceRequest.getParams() == null
-            || mockServiceRequest.getParams().isEmpty())
-            && mockServiceRequest.getInput() != null) {
+    } else if ((mockServiceRequest.getParams() == null
+        || mockServiceRequest.getParams().isEmpty())
+        && mockServiceRequest.getInput() != null) {
       return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
           mockServiceRequest);
     } else if (mockServiceRequest.getParams() != null
-        && !mockServiceRequest.getParams().isEmpty()) {
+        && !mockServiceRequest.getParams().isEmpty()
+        && mockServiceRequest.getInput() == null ) {
       return virtualServiceValidRequest.validForParam(mockDataSetupMap,
+          mockServiceRequest);
+    }
+    else if (mockServiceRequest.getParams() != null
+        && !mockServiceRequest.getParams().isEmpty()
+      && mockServiceRequest.getInput() != null) {
+      return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
           mockServiceRequest);
     }
     return null;
@@ -436,11 +480,22 @@ public class VirtualServiceUtil {
 
     MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
-    if(mockTransferObject.getInputObjectType() == null){
+    if (mockTransferObject.getInputObjectType() == null) {
       Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
-      mockServiceRequest.setInputObjectType(inputObjectType);
+      if(inputObjectType == null) {
+        mockServiceRequest.setInputObjectType(JsonObject.class);
+        mockTransferObject.setInputObjectType(JsonObject.class);
+      }else {
+        mockServiceRequest.setInputObjectType(inputObjectType);
+      }
     } else {
       mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
+    }
+    if (mockTransferObject.getInput() != null &&
+        VirtualanConfiguration.isValidJson(mockTransferObject.getInput().toString()) &&
+        mockServiceRequest.getInputObjectType().isAssignableFrom(String.class)) {
+      mockServiceRequest.setInputObjectType(JsonObject.class);
+      mockTransferObject.setInputObjectType(JsonObject.class);
     }
     mockServiceRequest.setResponseObjectType(mockTransferObject.getResponseObjectType());
     mockServiceRequest
@@ -469,7 +524,8 @@ public class VirtualServiceUtil {
     Map<Integer, ReturnMockResponse> returnMockResponseMap =
         validateBusinessRules(mockDataSetupMap, mockServiceRequest);
 
-    returnMockResponseMap = virtualParameterizedUtil.getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
+    returnMockResponseMap = virtualParameterizedUtil
+        .getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
 
     //No Rule conditions exists/met then run the script
     if (returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
@@ -586,7 +642,7 @@ public class VirtualServiceUtil {
           .setResponse(Response.status(responseEntity.getStatusCode().value())
               .entity(responseEntity.getBody()).build());
       throw new WebApplicationException(responseException.getResponse());
-    } else if (VirtualServiceType.SPRING.compareTo(getVirtualServiceType()) == 0) {
+    } else if (VirtualServiceType.SPRING.compareTo(getVirtualServiceType()) == 0 || true) {
       responseException.setResponseEntity(responseEntity);
       throw responseException;
     }

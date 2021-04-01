@@ -19,6 +19,8 @@ import io.virtualan.core.VirtualServiceInfoFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.context.annotation.*;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -33,10 +35,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  **/
 
 @Configuration
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableSwagger2
 @EnableAsync
 @ComponentScan(basePackages = {"io.virtualan"})
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class VirtualServiceConfig {
 
     @Bean

@@ -63,7 +63,7 @@ import org.springframework.util.SystemPropertyUtils;
 @ConditionalOnProperty(name = {"virtualan.soap.package"}, matchIfMissing = true)
 public class SoapEndpointCodeGenerator {
 
-  static Logger log = LoggerFactory.getLogger(SoapEndpointCodeGenerator.class);
+  private static Logger log = LoggerFactory.getLogger(SoapEndpointCodeGenerator.class);
 
 
   public static Class buildEndpointClass(Map<String, SoapService> soapWsServices)

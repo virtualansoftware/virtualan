@@ -14,6 +14,8 @@
 
 package io.virtualan.core;
 
+import io.virtualan.autoconfig.ApplicationContextProvider;
+import io.virtualan.core.util.VirtualanClassLoader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -56,6 +58,8 @@ public class SpringVirtualServiceInfo implements VirtualServiceInfo {
     @Autowired
     private ApiType apiType;
 
+    @Autowired
+    ApplicationContextProvider applicationContext;
 
     public ApiType getApiType() {
         return apiType;
@@ -116,11 +120,10 @@ public class SpringVirtualServiceInfo implements VirtualServiceInfo {
                 } else if (paramAnnotation.annotationType().equals(RequestBody.class)) {
                     io.virtualan.requestbody.RequestBody requestBody =
                             new io.virtualan.requestbody.RequestBody();
-                    requestBody.setInputObjectTypeName(
-                            Class.forName(parameterType.getName()).getTypeName());
+                    requestBody.setInputObjectTypeName(parameterType.getName());
                     requestBody.setInputObjectType(parameterType);
                     requestBody.setObjectMapper(objectMapper);
-                    mockLoadRequest.setInputObjectType(Class.forName(parameterType.getName()));
+                    mockLoadRequest.setInputObjectType(applicationContext.getClassLoader().loadClass(parameterType.getName()));
                     try {
                         mockLoadRequest.setInput(
                                 RequestBodyTypes.fromString(requestBody.getInputObjectTypeName())

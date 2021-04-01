@@ -70,6 +70,7 @@
 	<modules>
 		<module>modules/virtualan-plugin</module>
 		<module>modules/virtualization</module>
+		<module>samples/virtualan-openapi-spring</module>
 	</modules>
 	<repositories>
 		<repository>
