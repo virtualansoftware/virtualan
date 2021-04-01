@@ -19,8 +19,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.3.2</hsqldb.version>
-		<spring.boot.version>2.4.4</spring.boot.version>
-		<springfox.version>2.10.0</springfox.version>
+		<spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+		<springfox.version>2.9.2</springfox.version>
 		<spring.version>5.0.3.RELEASE</spring.version>
 		<groovy.version>2.5.14</groovy.version>
 		<junit.version>4.13.1</junit.version>
