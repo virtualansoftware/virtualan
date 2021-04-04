@@ -57,19 +57,19 @@
 			</activation>
 			<modules>
 				<module>samples/virtualan-sv-all</module>
-				<module>samples/virtualan-openapi-rest</module>
 				<module>samples/virtualan-openapi-all</module>
 				<module>samples/virtualan-wsdl-soap</module>
 				<module>samples/virtualan-kafka</module>
 				<module>samples/virtualan-amq</module>
 				<module>samples/virtualan-openapi-spring</module>
 				<module>samples/virtualan-openapi-mongo</module>
+				<module>samples/virtualan-openapi-rest</module>
 			</modules>
 		</profile>
 	</profiles>
 	<modules>
 		<module>modules/virtualan-plugin</module>
-		<module>modules/virtualization</module>
+<!--		<module>modules/virtualization</module>-->
 	</modules>
 	<repositories>
 		<repository>
