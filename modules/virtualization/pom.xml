@@ -32,7 +32,7 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<javax.jws-api.version>1.1</javax.jws-api.version>
 		<jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
-		<mapson.version>1.0.1</mapson.version>
+		<mapson.version>1.1.4</mapson.version>
 		<swagger-annotations.version>1.5.18</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
@@ -363,6 +363,12 @@
 			<groupId>io.virtualan</groupId>
 			<artifactId>mapson</artifactId>
 			<version>${mapson.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.skyscreamer</groupId>
+					<artifactId>jsonassert</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

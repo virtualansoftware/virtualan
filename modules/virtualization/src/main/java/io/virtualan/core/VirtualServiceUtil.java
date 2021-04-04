@@ -524,8 +524,10 @@ public class VirtualServiceUtil {
     Map<Integer, ReturnMockResponse> returnMockResponseMap =
         validateBusinessRules(mockDataSetupMap, mockServiceRequest);
 
-    returnMockResponseMap = virtualParameterizedUtil
-        .getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
+    if(returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
+      returnMockResponseMap = virtualParameterizedUtil
+          .getParameterizedResponse(mockDataSetupMap, mockServiceRequest);
+    }
 
     //No Rule conditions exists/met then run the script
     if (returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {

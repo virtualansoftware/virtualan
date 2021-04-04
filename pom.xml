@@ -69,7 +69,7 @@
 	</profiles>
 	<modules>
 		<module>modules/virtualan-plugin</module>
-<!--		<module>modules/virtualization</module>-->
+		<module>modules/virtualization</module>
 	</modules>
 	<repositories>
 		<repository>
