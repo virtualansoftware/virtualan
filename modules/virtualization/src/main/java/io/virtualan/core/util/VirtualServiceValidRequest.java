@@ -369,7 +369,8 @@ public class VirtualServiceValidRequest {
         requestBody.setExpectedInput(mockRequestResponse.getKey().getInput());
         if (mockServiceRequest.getInput() !=null &&
             VirtualanConfiguration.isValidJson(mockServiceRequest.getInput().toString()) &&
-            mockServiceRequest.getInputObjectType().isAssignableFrom(String.class) ) {
+            mockServiceRequest.getInputObjectType() != null
+            && mockServiceRequest.getInputObjectType().isAssignableFrom(String.class) ) {
             mockServiceRequest.setInputObjectType(JsonObject.class);
         }
         requestBody.setInputObjectType(mockServiceRequest.getInputObjectType());
