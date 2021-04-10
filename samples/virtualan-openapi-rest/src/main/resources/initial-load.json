@@ -1,179 +1,246 @@
 [
   {
-    "url": "/pets/{petId}",
+    "id": 1,
     "operationId": "getPetById",
     "httpStatusCode": "200",
-    "resource": "pets",
+    "url": "/pets/{petId}",
+    "type": "",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "GET",
+    "input": "",
+    "rule": "",
     "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": 101,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
     "availableParams": [
       {
         "key": "petId",
-        "value": "101",
-        "parameterType": "PATH_PARAM"
+        "value": "101"
       }
-    ]
+    ],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 2,
+    "operationId": "getPetById",
     "httpStatusCode": "400",
     "url": "/pets/{petId}",
     "type": "Rule",
     "requestType": "REST",
+    "usageCount": 0,
+    "priority": 0,
     "method": "GET",
     "rule": "parameters['petId'] == 0",
-    "output": { "code": "PET_1000",  "message": "Pet identifier is not valid"},
+    "output": {
+      "code": "PET_1000",
+      "message": "Pet identifier is not valid"
+    },
     "availableParams": [
       {
         "key": "petId",
         "value": "100"
       }
     ],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000",
     "contentType": "JSON"
   },
   {
+    "id": 3,
     "operationId": "addPet",
     "httpStatusCode": "200",
     "url": "/pets",
     "type": "Response",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
     "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "rule": "",
     "output": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 100,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
     "availableParams": [],
     "headerParams": [],
-    "resource": "pets"
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 4,
     "operationId": "addPet",
     "httpStatusCode": "200",
     "url": "/pets",
     "type": "Response",
     "requestType": "REST",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
     "input": {
-      "category": {
-        "id": 10,
-        "name": "string"
-      },
-      "name": "doggie",
       "photoUrls": [
         "string"
       ],
+      "name": "doggie",
+      "category": {
+        "name": "string",
+        "id": 10
+      },
       "status": "available",
       "tags": [
         {
-          "id": 0,
-          "name": "string"
+          "name": "string",
+          "id": 0
         }
       ]
     },
+    "rule": "",
     "output": {
-      "category": {
-        "id": 10,
-        "name": "string"
-      },
-      "name": "doggie",
       "photoUrls": [
         "string"
       ],
+      "name": "doggie",
+      "category": {
+        "name": "string",
+        "id": 10
+      },
       "status": "available",
       "tags": [
         {
-          "id": 0,
-          "name": "string"
+          "name": "string",
+          "id": 0
         }
       ]
     },
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": "",
     "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000",
     "contentType": "JSON"
   },
   {
+    "id": 5,
     "operationId": "addPet",
     "httpStatusCode": "200",
     "url": "/pets",
     "type": "Response",
     "requestType": "REST",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
     "input": {
-      "category": {
-        "id": 100,
-        "name": "string"
-      },
-      "name": "doggie",
       "photoUrls": [
         "string"
       ],
+      "name": "doggie",
+      "category": {
+        "name": "string",
+        "id": 100
+      },
       "status": "available",
       "tags": [
         {
-          "id": 0,
-          "name": "string"
+          "name": "string",
+          "id": 0
         }
       ]
     },
+    "rule": "",
     "output": {
-      "category": {
-        "id": 10,
-        "name": "string"
-      },
-      "name": "doggie",
       "photoUrls": [
         "string"
       ],
+      "name": "doggie",
+      "category": {
+        "name": "string",
+        "id": 10
+      },
       "status": "available",
       "tags": [
         {
-          "id": 0,
-          "name": "string"
+          "name": "string",
+          "id": 0
         }
       ]
     },
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": "",
     "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000",
     "contentType": "JSON"
   },
   {
+    "id": 6,
     "operationId": "addPet",
     "httpStatusCode": "400",
     "url": "/pets",
     "type": "Rule",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
-    "rule": "input.id == 0",
     "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": 0,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "rule": "input.id == 0",
     "output": "{\n  \"code\": \"PET_1000\",\n  \"message\": \"Should not be 0\"\n}",
     "availableParams": [],
     "headerParams": [],
-    "excludeList": null,
-    "resource": "pets"
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 7,
+    "operationId": "riskfactor",
     "httpStatusCode": "200",
     "url": "/riskfactor/compute",
     "type": "Script",
+    "requestType": "",
+    "usageCount": 0,
     "priority": 0,
     "method": "POST",
     "input": "{\n  \"birthday\" : \"1918-10-24\",\n  \"postalCode\" : \"60563\"\n}",
     "rule": "import java.time.*\n\ndef executeScript(mockServiceRequest, responseObject) {\n    int age = getAge(mockServiceRequest.getInput().getBirthday());\n    String postalCode = mockServiceRequest.getInput().getPostalCode();\n    int riskFactor = computeRiskFactor(age, postalCode);\n    responseObject.setHttpStatusCode(\"200\");\n    responseObject.setOutput(String.valueOf(riskFactor));\n    return responseObject.builder();\n}\n\ndef getAge(birthday) {\n    LocalDate now = LocalDate.now();\n    return Period.between(birthday, now).getYears();\n}\n\ndef computeRiskFactor(age, postalCode) {\n    int ageGroupRiskFactor = computeAgeGroupRiskFactor(age);\n    int localityRiskFactor = computeLocalityRiskFactor(postalCode);\n    return (ageGroupRiskFactor + localityRiskFactor) / 2;\n}\n\ndef computeAgeGroupRiskFactor(age) {\n    if(age > 90) {\n        return 100;\n    } else if(age > 70) {\n        return 90;\n    } else if(age > 60) {\n        return 70;\n    } else if(age > 50) {\n        return 60;\n    } else if(age > 40) {\n        return 50;\n    } else if(age > 25) {\n        return 20;\n    } else {\n        return 40;\n    }\n}\n\ndef  computeLocalityRiskFactor( postalCodeStr) {\n    try{\n\t\tint postalCode = Integer.parseInt(postalCodeStr);\n\t\tif ((postalCode >= 8000 && postalCode < 9000) || (postalCode >= 1000 && postalCode < 2000)) {\n\t\t\treturn 80;\n\t\t} else if (postalCode >= 5000 && postalCode < 6000) {\n\t\t\treturn 10;\n\t\t} else {\n\t\t\treturn 30;\n\t\t}\n\t} catch(NumberFormatException e) {\n\t\t\treturn 0;\n\t\t}\n}",
     "output": "40",
     "availableParams": [],
-    "headerParams": []
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "riskfactor",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 8,
+    "operationId": "personsPost",
     "httpStatusCode": "400",
     "url": "/persons",
     "type": "Rule",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
     "input": "{\n  \"dateOfBirth\": \"2008-04-07\",\n  \"firstName\": \"Mani\",\n  \"lastName\": \"Elan\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\"\n  },\n  \"username\": \"elanmathi\"\n}",
     "rule": "T(java.time.Period).between(input.dateOfBirth, T(java.time.LocalDate).now()).getYears() < 22",
     "output": "{\n  \"code\": \"DBERR\",\n  \"message\": \"Age Restricted\"\n}",
     "availableParams": [],
     "headerParams": [],
-    "resource": "persons"
+    "excludeList": "",
+    "resource": "persons",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 9,
+    "operationId": "personsUsernameGet",
     "httpStatusCode": "200",
     "url": "/persons/{username}",
     "type": "Script",
     "requestType": "REST",
+    "usageCount": 0,
+    "priority": 0,
     "method": "GET",
+    "input": "",
     "rule": "def executeScript(mockServiceRequest, responseObject) { \n    String userName = mockServiceRequest.getParam(\"username\").get(); \n    responseObject.setHttpStatusCode('200'); \n    responseObject.setOutput( \"{   \\\"dateOfBirth\\\": \\\"1955-10-28\\\",   \\\"firstName\\\": \\\"Bill\\\",   \\\"lastName\\\": \\\"Gates\\\",   \\\"lastTimeOnline\\\": \\\"2020-08-30T20:28:36.267Z\\\",   \\\"spokenLanguages\\\": {     \\\"additionalProp1\\\": \\\"Tamil\\\",     \\\"additionalProp2\\\": \\\"English\\\",     \\\"additionalProp3\\\": \\\"Spanish\\\"   },   \\\"username\\\": \\\"bgates\\\" }\"); \n    return responseObject.builder(); \n }",
     "output": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
     "availableParams": [
@@ -181,86 +248,161 @@
         "key": "username",
         "value": "bgates"
       }
-    ]
+    ],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "persons",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
-    "resource": "persons",
+    "id": 10,
+    "operationId": "personsPost",
+    "httpStatusCode": "201",
     "url": "/persons",
     "type": "Script",
-    "rule": "def executeScript(mockServiceRequest, responseObject) { \n    responseObject.setHttpStatusCode('204');\n  \n    return responseObject.builder(); \n }",
-    "operationId": "personsPost",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
+    "method": "POST",
     "input": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
+    "rule": "def executeScript(mockServiceRequest, responseObject) { \n    responseObject.setHttpStatusCode('204');\n  \n    return responseObject.builder(); \n }",
     "output": "{\n  \"dateOfBirth\": \"1955-10-28\",\n  \"firstName\": \"Bill\",\n  \"lastName\": \"Gates\",\n  \"lastTimeOnline\": \"2020-08-30T20:28:36.267Z\",\n  \"spokenLanguages\": {\n    \"additionalProp1\": \"Tamil\",\n    \"additionalProp2\": \"English\",\n    \"additionalProp3\": \"Spanish\"\n  },\n  \"username\": \"bgates\"\n}",
-    "httpStatusCode": "201",
-    "method": "POST"
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "persons",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 11,
     "operationId": "addPet",
     "httpStatusCode": "200",
     "url": "/pets",
     "type": "PARAMS",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
-    "rule" : "[   { \"id\":\"104\", \"name\":\"doggie\"     } ]",
     "input": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "rule": "[   { \"id\":\"104\", \"name\":\"doggie\"     } ]",
     "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
-    "resource": "pets"
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 12,
     "operationId": "addPet",
     "httpStatusCode": "201",
     "url": "/pets",
     "type": "PARAMS",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "POST",
-    "rule" : "[   { \"id\":\"105\", \"name\":\"doggie\"     } ]",
     "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "rule": "[   { \"id\":\"105\", \"name\":\"doggie\"     } ]",
     "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
-    "resource": "pets"
+    "availableParams": [],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
   },
   {
+    "id": 13,
     "operationId": "updatePet",
     "httpStatusCode": "200",
     "url": "/pets/{petId}",
     "type": "PARAMS",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
     "method": "PUT",
-    "rule" : "[     {         \"petId\": \"6003\", \"id\": \"6003\",         \"name\": \"None-PUT\"     },     {         \"petId\": \"6007\",\"id\": \"6007\",         \"name\": \"Sugar-PUT\"     } ]",
     "input": "{\n  \"category\": {\n    \"id\": 100,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "rule": "[     {         \"petId\": \"6003\", \"id\": \"6003\",         \"name\": \"None-PUT\"     },     {         \"petId\": \"6007\",\"id\": \"6007\",         \"name\": \"Sugar-PUT\"     } ]",
     "output": "{\n  \"category\": {\n    \"id\": <id>,\n    \"name\": \"string\"\n  },\n  \"id\": <id>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
-    "availableParams":[{"key":"petId","value":"<petId>","type":null,"serviceType":null,"parameterType":"PATH_PARAM"}],
-    "resource": "pets"
-  },
-  {
-    "resource": "user",
-    "url": "/user/{username}",
-    "type": "Params",
-    "rule": "[{\"username\":\"John\",\"password\":\"pass4321\",\"firstName\":\"Biden\",\"id\":\"111985\",\"lastName\":\"John\",\"phone\":\"323-839-3225\",\"status\":\"2\",\"email\":\"john.biden@gmail.com\"},{\"username\":\"Rick\",\"password\":\"pass4321\",\"firstName\":\"Rick\",\"id\":\"8876811\",\"lastName\":\"Copper\",\"phone\":\"672-321-9876\",\"status\":\"2\",\"email\":\"rick.copper@gmail.com\"}]",
-    "operationId": "getUserByName",
-    "output": "{\n  \"email\": \"<email>\",\n  \"firstName\": \"<firstName>\",\n  \"id\": <id>,\n  \"lastName\": \"<lastName>\",\n  \"password\": \"<password>\",\n  \"phone\": \"<phone>\",\n  \"userStatus\": <status>,\n  \"username\": \"<username>\"\n}",
-    "httpStatusCode": "200",
-    "method": "GET",
-    "availableParams": [
-      {
-        "key": "username",
-        "value": "<username>",
-        "parameterType": "PATH_PARAM"
-      }
-    ]
-  },
-  {
-    "resource": "pets",
-    "url": "/pets/{petId}",
-    "type": "Params",
-    "rule": "[{\"petId\":\"10000\",\"name\":\"Doggie\"}]",
-    "operationId": "getPetById",
-    "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": <petId>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
-    "httpStatusCode": "200",
-    "method": "GET",
     "availableParams": [
       {
         "key": "petId",
-        "value": "<petId>",
-        "parameterType": "PATH_PARAM"
+        "value": "<petId>"
       }
-    ]
+    ],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
+  },
+  {
+    "id": 14,
+    "operationId": "getUserByName",
+    "httpStatusCode": "200",
+    "url": "/user/{username}",
+    "type": "Params",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
+    "method": "GET",
+    "input": "",
+    "rule": "[{\"username\":\"John\",\"password\":\"pass4321\",\"firstName\":\"Biden\",\"id\":\"111985\",\"lastName\":\"John\",\"phone\":\"323-839-3225\",\"status\":\"2\",\"email\":\"john.biden@gmail.com\"},{\"username\":\"Rick\",\"password\":\"pass4321\",\"firstName\":\"Rick\",\"id\":\"8876811\",\"lastName\":\"Copper\",\"phone\":\"672-321-9876\",\"status\":\"2\",\"email\":\"rick.copper@gmail.com\"}]",
+    "output": "{\n  \"email\": \"<email>\",\n  \"firstName\": \"<firstName>\",\n  \"id\": <id>,\n  \"lastName\": \"<lastName>\",\n  \"password\": \"<password>\",\n  \"phone\": \"<phone>\",\n  \"userStatus\": <status>,\n  \"username\": \"<username>\"\n}",
+    "availableParams": [
+      {
+        "key": "username",
+        "value": "<username>"
+      }
+    ],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "user",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
+  },
+  {
+    "id": 15,
+    "operationId": "getPetById",
+    "httpStatusCode": "200",
+    "url": "/pets/{petId}",
+    "type": "Params",
+    "requestType": "",
+    "usageCount": 0,
+    "priority": 0,
+    "method": "GET",
+    "input": "",
+    "rule": "[{\"petId\":\"10000\",\"name\":\"Doggie\"}]",
+    "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": <petId>,\n  \"name\": \"<name>\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "availableParams": [
+      {
+        "key": "petId",
+        "value": "<petId>"
+      }
+    ],
+    "headerParams": [],
+    "excludeList": "",
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:51:52.456+0000"
+  },
+  {
+    "id": 16,
+    "operationId": "patchPet",
+    "httpStatusCode": "200",
+    "url": "/pets/{petId}",
+    "type": "Response",
+    "requestType": "REST",
+    "usageCount": 1,
+    "priority": 0,
+    "method": "PATCH",
+    "input": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": 0,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "output": "{\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"id\": 0,\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"status\": \"available\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+    "availableParams": [
+      {
+        "key": "petId",
+        "value": "101"
+      }
+    ],
+    "headerParams": [],
+    "resource": "pets",
+    "lastUsedDateTime": "2021-04-09T23:52:26.326+0000"
   }
-
 ]

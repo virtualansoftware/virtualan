@@ -58,6 +58,11 @@ public class ApiMethod {
         if (virtualServiceKeyValue != null) {
             return virtualServiceKeyValue;
         }
+        virtualServiceKeyValue = getPatchMethod(method);
+        if (virtualServiceKeyValue != null) {
+            return virtualServiceKeyValue;
+        }
+
         return new VirtualServiceKeyValue("GET", null);
     }
 
@@ -123,6 +128,31 @@ public class ApiMethod {
         }
         return virtualServiceKeyValue;
     }
+
+    private static VirtualServiceKeyValue getPatchMethod(Method method) {
+        String key = "PATCH";
+        VirtualServiceKeyValue virtualServiceKeyValue = null;
+        PATCH[] annotInstance = method.getAnnotationsByType(PATCH.class);
+        if (annotInstance != null && annotInstance.length > 0) {
+            virtualServiceKeyValue = new VirtualServiceKeyValue();
+            virtualServiceKeyValue.setKey(key);
+            virtualServiceKeyValue.setValue(getURL(method));
+            virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
+        } else {
+            PatchMapping[] annotInstanceMapping = method.getAnnotationsByType(PatchMapping.class);
+            if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
+                virtualServiceKeyValue = new VirtualServiceKeyValue();
+                virtualServiceKeyValue.setKey(key);
+                virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
+                if (annotInstanceMapping[0].value().length > 0) {
+                    virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
+            }
+        }
+        return virtualServiceKeyValue;
+    }
+
+
 
     private static VirtualServiceKeyValue getDeleteMethod(Method method) {
         String key = "DELETE";

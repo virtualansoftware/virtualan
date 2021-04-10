@@ -58,6 +58,11 @@ public class ApiMethod {
         if (virtualServiceKeyValue != null) {
             return virtualServiceKeyValue;
         }
+        virtualServiceKeyValue = getPatchMethod(method);
+        if (virtualServiceKeyValue != null) {
+            return virtualServiceKeyValue;
+        }
+
         return new VirtualServiceKeyValue("GET", null);
     }
 
@@ -112,6 +117,123 @@ public class ApiMethod {
             virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
         } else {
             PostMapping[] annotInstanceMapping = method.getAnnotationsByType(PostMapping.class);
+            if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
+                virtualServiceKeyValue = new VirtualServiceKeyValue();
+                virtualServiceKeyValue.setKey(key);
+                virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
+                if (annotInstanceMapping[0].value().length > 0) {
+                    virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
+            }
+        }
+        return virtualServiceKeyValue;
+    }
+
+    private static VirtualServiceKeyValue getPatchMethod(Method method) {
+        String key = "PATCH";
+        VirtualServiceKeyValue virtualServiceKeyValue = null;
+        PATCH[] annotInstance = method.getAnnotationsByType(PATCH.class);
+        if (annotInstance != null && annotInstance.length > 0) {
+            virtualServiceKeyValue = new VirtualServiceKeyValue();
+            virtualServiceKeyValue.setKey(key);
+            virtualServiceKeyValue.setValue(getURL(method));
+            virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
+        } else {
+            PatchMapping[] annotInstanceMapping = method.getAnnotationsByType(PatchMapping.class);
+            if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
+                virtualServiceKeyValue = new VirtualServiceKeyValue();
+                virtualServiceKeyValue.setKey(key);
+                virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
+                if (annotInstanceMapping[0].value().length > 0) {
+                    virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
+            }
+        }
+        return virtualServiceKeyValue;
+    }
+
+    private static VirtualServiceKeyValue getHeadMethod(Method method) {
+        String key = "HEAD";
+        VirtualServiceKeyValue virtualServiceKeyValue = null;
+        HEAD[] annotInstance = method.getAnnotationsByType(HEAD.class);
+        if (annotInstance != null && annotInstance.length > 0) {
+            virtualServiceKeyValue = new VirtualServiceKeyValue();
+            virtualServiceKeyValue.setKey(key);
+            virtualServiceKeyValue.setValue(getURL(method));
+            virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
+        } else {
+            HeadMapping[] annotInstanceMapping = method.getAnnotationsByType(HeadMapping.class);
+            if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
+                virtualServiceKeyValue = new VirtualServiceKeyValue();
+                virtualServiceKeyValue.setKey(key);
+                virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
+                if (annotInstanceMapping[0].value().length > 0) {
+                    virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
+            }
+        }
+        return virtualServiceKeyValue;
+    }
+
+
+    private static VirtualServiceKeyValue getOptionsMethod(Method method) {
+        String key = "OPTIONS";
+        VirtualServiceKeyValue virtualServiceKeyValue = null;
+        OPTIONS[] annotInstance = method.getAnnotationsByType(OPTIONS.class);
+        if (annotInstance != null && annotInstance.length > 0) {
+            virtualServiceKeyValue = new VirtualServiceKeyValue();
+            virtualServiceKeyValue.setKey(key);
+            virtualServiceKeyValue.setValue(getURL(method));
+            virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
+        } else {
+            OptionsMapping[] annotInstanceMapping = method.getAnnotationsByType(OptionsMapping.class);
+            if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
+                virtualServiceKeyValue = new VirtualServiceKeyValue();
+                virtualServiceKeyValue.setKey(key);
+                virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
+                if (annotInstanceMapping[0].value().length > 0) {
+                    virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
+            }
+        }
+        return virtualServiceKeyValue;
+    }
+
+
+    private static VirtualServiceKeyValue getTraceMethod(Method method) {
+        String key = "TRACE";
+        VirtualServiceKeyValue virtualServiceKeyValue = null;
+        TRACE[] annotInstance = method.getAnnotationsByType(TRACT.class);
+        if (annotInstance != null && annotInstance.length > 0) {
+            virtualServiceKeyValue = new VirtualServiceKeyValue();
+            virtualServiceKeyValue.setKey(key);
+            virtualServiceKeyValue.setValue(getURL(method));
+            virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
+        } else {
+            TraceMapping[] annotInstanceMapping = method.getAnnotationsByType(TraceMapping.class);
+            if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
+                virtualServiceKeyValue = new VirtualServiceKeyValue();
+                virtualServiceKeyValue.setKey(key);
+                virtualServiceKeyValue.setServiceType(VirtualServiceType.SPRING);
+                if (annotInstanceMapping[0].value().length > 0) {
+                    virtualServiceKeyValue.setValue(annotInstanceMapping[0].value()[0]);
+                }
+            }
+        }
+        return virtualServiceKeyValue;
+    }
+
+    private static VirtualServiceKeyValue getConnectMethod(Method method) {
+        String key = "CONNECT";
+        VirtualServiceKeyValue virtualServiceKeyValue = null;
+        CONNECT[] annotInstance = method.getAnnotationsByType(CONNECT.class);
+        if (annotInstance != null && annotInstance.length > 0) {
+            virtualServiceKeyValue = new VirtualServiceKeyValue();
+            virtualServiceKeyValue.setKey(key);
+            virtualServiceKeyValue.setValue(getURL(method));
+            virtualServiceKeyValue.setServiceType(VirtualServiceType.CXF_JAX_RS);
+        } else {
+            ConnectMapping[] annotInstanceMapping = method.getAnnotationsByType(ConnectMapping.class);
             if (annotInstanceMapping != null && annotInstanceMapping.length > 0) {
                 virtualServiceKeyValue = new VirtualServiceKeyValue();
                 virtualServiceKeyValue.setKey(key);
