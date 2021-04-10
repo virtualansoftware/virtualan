@@ -3,9 +3,9 @@ info:
   version: 1.0.0
   title: Simple API
   description: A simple API to learn how to write OpenAPI Specification
-
 schemes:
-  - http
+  - https
+host: live.virtualandemo.com
 basePath: /api
 
 paths:
@@ -135,6 +135,7 @@ definitions:
       dateOfBirth:
         type: string
         format: date
+
       lastTimeOnline:
         type: string
         format: date-time

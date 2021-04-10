@@ -451,29 +451,13 @@ public class VirtualServiceUtil {
   public Map<Integer, ReturnMockResponse> isResponseExists(
       final Map<MockRequest, MockResponse> mockDataSetupMap,
       MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
-
-    if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
-        && mockServiceRequest.getInput() == null) {
-      return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
-          mockServiceRequest);
-    } else if ((mockServiceRequest.getParams() == null
-        || mockServiceRequest.getParams().isEmpty())
-        && mockServiceRequest.getInput() != null) {
-      return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
-          mockServiceRequest);
-    } else if (mockServiceRequest.getParams() != null
-        && !mockServiceRequest.getParams().isEmpty()
-        && mockServiceRequest.getInput() == null ) {
-      return virtualServiceValidRequest.validForParam(mockDataSetupMap,
-          mockServiceRequest);
+    if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty()) && mockServiceRequest.getInput() == null) {
+      return this.virtualServiceValidRequest.validForNoParam(mockDataSetupMap, mockServiceRequest);
+    } else if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty()) && mockServiceRequest.getInput() != null) {
+      return this.virtualServiceValidRequest.validForInputObject(mockDataSetupMap, mockServiceRequest);
+    } else {
+      return mockServiceRequest.getParams() != null && !mockServiceRequest.getParams().isEmpty() ? this.virtualServiceValidRequest.validForParam(mockDataSetupMap, mockServiceRequest) : null;
     }
-    else if (mockServiceRequest.getParams() != null
-        && !mockServiceRequest.getParams().isEmpty()
-      && mockServiceRequest.getInput() != null) {
-      return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
-          mockServiceRequest);
-    }
-    return null;
   }
 
   MockServiceRequest buildMockServiceRequest(VirtualServiceRequest mockTransferObject) {

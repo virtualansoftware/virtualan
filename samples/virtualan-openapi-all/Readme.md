@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/virtualan-plugin.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22virtualan-plugin%22)  [![Build Status](https://travis-ci.com/virtualansoftware/service-virtualization-openapi.svg?branch=master)](https://travis-ci.com/virtualansoftware/service-virtualization-openapi)
+
 *I. Prerequisites:* (If you have already done set up JDK and Maven - skip this step)
 - JDK(Mandatory) -  http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
     - JDK Installation:(Refer following Video and Article
@@ -37,7 +39,7 @@
 			<goal>generate</goal>
 		</goals>
 		<configuration>
-			<inputSpec>${project.basedir}/src/main/resources/external/petstore.yaml</inputSpec>
+			<inputSpec>${project.basedir}/src/main/resources/META-INF/resources/yaml/PetStore/petstore.yaml</inputSpec>
 			<output>${project.basedir}/target/external/</output>
 			<apiPackage>org.openapitools.virtualan.api</apiPackage>
 			<modelPackage>org.openapitools.virtualan.to</modelPackage>
@@ -61,15 +63,20 @@
 	
 	- java -jar target/virtualan-pet.jar         
 
-- To set up mock data:
+- To set up  data:
       
       - Using Virtualan-UI:       
-      	https://github.com/elan-venture/virtualan/wiki/Test-Data-Set-up-using-Virtualan
+      	https://github.com/virtualansoftware/virtualan/wiki/Test-Data-Set-up-using-Virtualan
       
-      - Using Virtualan-Rest service:
-      	https://github.com/elan-venture/virtualan/blob/master/test/virtualan-test-data/src/main/resources/features/pet/pet.feature
-	  	https://github.com/elan-venture/virtualan/tree/master/samples/virtualan-openapi-spring-mapping/src/test/java/io/virtualan/test
-
+      - open API Contract: 
+        https://github.com/virtualansoftware/virtualan/blob/master/modules/virtualan-plugin/src/main/resources/virtualservices.yaml
+	
+    
+      - Using Virtualan-Rest service: for automation usecases
+        https://github.com/virtualansoftware/virtualan-openapi-demo/blob/master/src/test/resources/features/demo/demo.feature
+	
+	
+	
 - Invoke Virtualan UI:  			
 	- Navigate to http://localhost:8080/virtualan-ui.html 
-	- More details about the user interface refer: https://github.com/elan-venture/virtualan/wiki 
+	- More details about the user interface refer: https://github.com/virtualansoftware/virtualan/wiki 

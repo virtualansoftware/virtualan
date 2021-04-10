@@ -1,0 +1,118 @@
+openapi: "3.0.3"
+info:
+  version: 0.0.2
+  title: XXXX Sample specification
+  description: Sample API
+  contact:
+    name: Test User
+    url: http://api.localhost
+    email: abcd.xyz-xxxxxx@xxxx.ac
+  license:
+    name: No license
+servers:
+  - url: https://live.virtualandemo.com
+    description: Production server (uses live data)
+  - url: http://localhost:8800
+    description: Sandbox server (uses test data)
+paths:
+  /sample:
+    post:
+      summary: Create a sample
+      description: Create a new sample object.
+      operationId: createSample
+      tags:
+        - sample
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Sample"
+      responses:
+        '201':
+          description: Sample created
+        '400':
+          description: Sample exists already. Choose another name.
+        '405':
+          description: Invalid input.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /sample/validate/{sampleId}:
+    get:
+      summary: The GET sample
+      operationId: validateById
+      description: Sample path
+      tags:
+        - sample
+      parameters:
+        - name: sampleId
+          in: path
+          required: true
+          description: The id of the sample
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Validation"
+        '400':
+          description: Invalid ID
+        '404':
+          description: Sample not found
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Sample:
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Sample
+        filename:
+          type: string
+          example: Sample.yaml
+        version:
+          type: string
+          example: 0.0.1
+    Validation:
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 001
+        sample1:
+          type: string
+          example: one
+          description: Sample one
+        sample2:
+          type: string
+          example: two
+          description: Sample two
+        sample3:
+          type: string
+          example: three
+          description: Sample three
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 404
+        message:
+          type: string
+          example: Unexpected error.
