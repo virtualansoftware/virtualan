@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import io.virtualan.message.core.MessagingApplication;
+
 
 @EnableKafka
 @SpringBootApplication
@@ -19,14 +21,13 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 @EmbeddedKafka(partitions = 1, controlledShutdown = false, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 public class Kafka2SpringBoot {
 
-    private static final String TEST_EMBEDDED = "testEmbedded";
-
     @Autowired
     private Config config;
 
     public static void main(String[] args) {
         new SpringApplication(Kafka2SpringBoot.class).run(args);
     }
+
 
     @Autowired
     private EmbeddedKafkaBroker broker;
@@ -44,12 +45,8 @@ public class Kafka2SpringBoot {
             ServerSocket ss = ServerSocketFactory.getDefault().createServerSocket(9092);
             this.kafkaPort = ss.getLocalPort();
             ss.close();
-//            ss = ServerSocketFactory.getDefault().createServerSocket(0);
-//            this.zkPort = ss.getLocalPort();
-//            ss.close();
 
             EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(1, false) ;
-            //embeddedKafkaBroker.zkPort(this.zkPort);
             embeddedKafkaBroker.kafkaPorts(this.kafkaPort);
             return embeddedKafkaBroker;
 
