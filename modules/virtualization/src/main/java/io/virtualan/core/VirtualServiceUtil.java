@@ -209,7 +209,7 @@ public class VirtualServiceUtil {
                 : null;
 
         Set<String> excludeSet = null;
-        if (mockTransferObject.getExcludeList() != null) {
+        if (mockTransferObject.getExcludeList() != null && !mockTransferObject.getExcludeList().isEmpty() ) {
           excludeSet = new HashSet<>(
               Arrays.asList(mockTransferObject.getExcludeList().split(",")));
         }

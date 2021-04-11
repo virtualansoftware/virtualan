@@ -7,7 +7,7 @@
   <version>1.0.3-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
   <properties>
-    <virtualan.version>1.0.7-SNAPSHOT</virtualan.version>
+    <virtualan.version>1.0.7</virtualan.version>
     <cucumber.version>1.2.5</cucumber.version>
     <java.version>1.8</java.version>
     <maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
@@ -122,6 +122,12 @@
       </exclusions>
       <groupId>org.springframework.boot</groupId>
       <version>2.2.12.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>5.2.12.RELEASE</version>
     </dependency>
 
     <dependency>

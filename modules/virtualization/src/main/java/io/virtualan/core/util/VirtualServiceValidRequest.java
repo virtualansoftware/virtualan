@@ -238,7 +238,10 @@ public class VirtualServiceValidRequest {
         if (first.size() != second.size()) {
             return false;
         }
-        first.entrySet().removeIf(e -> excludeFields.stream().anyMatch(x -> e.getKey().contains(x)));
+        if(excludeFields != null) {
+            first.entrySet()
+                .removeIf(e -> excludeFields.stream().anyMatch(x -> e.getKey().contains(x)));
+        }
         return first.entrySet().stream().allMatch(e -> e.getValue().equals(second.get(e.getKey())));
     }
     
