@@ -42,6 +42,15 @@ public class MockServiceRequest {
     private Object output = null;
     private Object rule = null;
     private ContentType contentType;
+    private String excludeFields;
+
+    public String getExcludeFields() {
+        return excludeFields;
+    }
+
+    public void setExcludeFields(String excludeFields) {
+        this.excludeFields = excludeFields;
+    }
 
     public Object getHeaderParam(String param) {
         return getHeaderParams().entrySet().stream()

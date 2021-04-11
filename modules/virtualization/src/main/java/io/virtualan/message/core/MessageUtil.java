@@ -68,7 +68,6 @@ public class MessageUtil {
 			mockServiceRequest.setContentType(mockTransferObject.getContentType());
 			mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
 
-
 			//Rule Execution
 			Map<Integer, ReturnMockResponse> returnMockResponseMap =
 					virtualServiceUtil.validateBusinessRules(mockDataSetupMap, mockServiceRequest);

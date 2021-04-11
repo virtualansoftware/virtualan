@@ -18,6 +18,8 @@ import com.cedarsoftware.util.io.JsonObject;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.ResponseProcessType;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.mapson.Mapson;
 import java.util.Map.Entry;
+import java.util.Set;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -214,7 +217,7 @@ public class VirtualServiceValidRequest {
                 }
                 Map<String, String> expectedMap = Mapson
                     .buildMAPsonFromJson(expectedJSON);
-                if (areEqual(actualMap, expectedMap)) {
+                if (areEqual(actualMap, expectedMap, mockRequestResponse.getKey().getExcludeSet())) {
                     count++;
                     final ReturnMockResponse returnMockResponse = returnMockResponse(
                         mockServiceRequest,
@@ -231,10 +234,11 @@ public class VirtualServiceValidRequest {
     }
     
 
-    private boolean areEqual(Map<String, String> first, Map<String, String> second) {
+    private boolean areEqual(Map<String, String> first, Map<String, String> second, Set<String> excludeFields) {
         if (first.size() != second.size()) {
             return false;
         }
+        first.entrySet().removeIf(e -> excludeFields.stream().anyMatch(x -> e.getKey().contains(x)));
         return first.entrySet().stream().allMatch(e -> e.getValue().equals(second.get(e.getKey())));
     }
     

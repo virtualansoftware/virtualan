@@ -6,6 +6,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
@@ -37,13 +43,15 @@ import org.springframework.integration.kafka.dsl.Kafka;
 import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
 import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.*;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-
-import java.util.*;
 import org.springframework.stereotype.Service;
 
 @ConditionalOnClass(IntegrationFlows.class)
@@ -64,11 +72,35 @@ public class MessagingApplication {
   @Autowired
   private MessageUtil messageUtil;
 
+  private static JSONArray getJsonObject() throws IOException {
+    InputStream stream = MessagingApplication.class.getClassLoader()
+        .getResourceAsStream("conf/kafka.json");
+    if (stream != null) {
+      String jmsConfigJson = readString(stream);
+      JSONObject jsonObject = new JSONObject(jmsConfigJson);
+      return jsonObject.optJSONArray("Kafka");
+    }
+    return null;
+  }
+
+  public static String readString(InputStream inputStream) throws IOException {
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+      return br.lines().collect(Collectors.joining(System.lineSeparator()));
+    }
+  }
+
+  private static NewTopic addNewTopic(String topic) {
+    Map<String, String> configs = new HashMap<>();
+    int partitions = 5;
+    Short replication = 1;
+    return new NewTopic(topic, partitions, replication).configs(configs);
+  }
+
   @PostConstruct
   public void init() {
     try {
       JSONArray jsonArray = getJsonObject();
-      if(jsonArray != null) {
+      if (jsonArray != null) {
         JSONObject obj = jsonArray.optJSONObject(0);
         if (obj != null) {
           bootstrapServers = obj.getString("broker");
@@ -80,8 +112,9 @@ public class MessagingApplication {
           bootstrapServers = obj.getString("broker");
           getConfigMap(obj, "consumer", consumerConfigs);
           getConfigMap(obj, "producer", producerConfig);
-          if (topicList != null)
+          if (topicList != null) {
             addTopic(topicList);
+          }
         }
       }
     } catch (Exception e) {
@@ -108,7 +141,7 @@ public class MessagingApplication {
     }
   }
 
-  private Map<String, String> loadProperties(String propFileName){
+  private Map<String, String> loadProperties(String propFileName) {
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
     Map<String, String> mapList = new HashMap<>();
     Properties properties = new Properties();
@@ -122,31 +155,15 @@ public class MessagingApplication {
         });
         return mapList;
       } catch (IOException e) {
-        log.warn("property file '{}' not found in the classpath.. loading default setting {}" ,propFileName, e.getMessage());
+        log.warn("property file '{}' not found in the classpath.. loading default setting {}",
+            propFileName, e.getMessage());
       }
     } else {
-      log.warn("property file '{}' not found in the classpath.. loading default setting", propFileName);
+      log.warn("property file '{}' not found in the classpath.. loading default setting",
+          propFileName);
     }
     return null;
   }
-
-  private static JSONArray getJsonObject() throws IOException {
-    InputStream stream = MessagingApplication.class.getClassLoader()
-        .getResourceAsStream("conf/kafka.json");
-    if (stream != null) {
-      String jmsConfigJson = readString(stream);
-      JSONObject jsonObject = new JSONObject(jmsConfigJson);
-      return jsonObject.optJSONArray("Kafka");
-    }
-    return null;
-  }
-
-  public static String readString(InputStream inputStream) throws IOException {
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-      return br.lines().collect(Collectors.joining(System.lineSeparator()));
-    }
-  }
-
 
   private AdminClient getAdminClient() {
     Properties config = new Properties();
@@ -154,24 +171,16 @@ public class MessagingApplication {
     return AdminClient.create(config);
   }
 
-  public  void addTopic(List<NewTopic> topicList) {
+  public void addTopic(List<NewTopic> topicList) {
     AdminClient admin = getAdminClient();
     admin.createTopics(topicList);
   }
 
-
-  public  boolean isTopicExists(String topic) throws ExecutionException, InterruptedException {
+  public boolean isTopicExists(String topic) throws ExecutionException, InterruptedException {
     return getTopics().contains(topic);
   }
 
-  private static NewTopic addNewTopic(String topic) {
-    Map<String, String> configs = new HashMap<>();
-    int partitions = 5;
-    Short replication = 1;
-    return new NewTopic(topic, partitions, replication).configs(configs);
-  }
-
-  private  Set<String> getTopics() throws ExecutionException, InterruptedException {
+  private Set<String> getTopics() throws ExecutionException, InterruptedException {
     AdminClient admin = getAdminClient();
     ListTopicsResult listTopics = admin.listTopics();
     return listTopics.names().get();
@@ -186,7 +195,7 @@ public class MessagingApplication {
   @Bean
   private Map<String, Object> producerConfigs() {
     producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-    if( producerConfig.size() == 1) {
+    if (producerConfig.size() == 1) {
       producerConfig.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
       producerConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
       producerConfig.put(ProducerConfig.LINGER_MS_CONFIG, 1);
@@ -199,7 +208,7 @@ public class MessagingApplication {
   @Bean
   public Map<String, Object> consumerConfigs() {
     consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-    if(consumerConfigs.size() == 1) {
+    if (consumerConfigs.size() == 1) {
       consumerConfigs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
       consumerConfigs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
       consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, "virtualan-consumer-1");
@@ -213,7 +222,7 @@ public class MessagingApplication {
   }
 
   @Bean
-  private ConsumerFactory<?,?> consumerFactory() {
+  private ConsumerFactory<?, ?> consumerFactory() {
     return new DefaultKafkaConsumerFactory<>(consumerConfigs());
   }
 
@@ -225,20 +234,19 @@ public class MessagingApplication {
 
   @Bean("listenerFromKafkaFlow")
   public IntegrationFlow listenerFromKafkaFlow() {
-
-    IntegrationFlowBuilder flows = IntegrationFlows
+    return IntegrationFlows
         .from(Kafka.messageDrivenChannelAdapter(consumerFactory(),
-            KafkaMessageDrivenChannelAdapter.ListenerMode.record,  topics.toArray(new String[topics.size()]))
+            KafkaMessageDrivenChannelAdapter.ListenerMode.record,
+            topics.toArray(new String[topics.size()]))
             .configureListenerContainer(c ->
                 c.ackMode(ContainerProperties.AckMode.RECORD)
                     .ackOnError(true)
                     .idleEventInterval(100L)
                     .id("messageListenerContainer"))
-          ).<Message<?>>channel(sentToTransformer())
-        . <Message<?>, MessageObject>transform(transformer())
-        .<MessageObject> handle(getResponseMessage())
-        .handle(postMessage()) ;
-        return flows.get();
+        ).<Message<?>>channel(sentToTransformer())
+        .<Message<?>, MessageObject>transform(transformer())
+        .<MessageObject>handle(getResponseMessage())
+        .handle(postMessage()).get();
   }
 
   @Bean
@@ -246,7 +254,7 @@ public class MessagingApplication {
     return new GenericTransformer<Message<?>, MessageObject>() {
       @Override
       public MessageObject transform(Message<?> message) {
-        return parse( message);
+        return parse(message);
       }
 
     };
@@ -256,11 +264,13 @@ public class MessagingApplication {
   public MessageObject parse(Message<?> message) {
     MessageObject messageObject = new MessageObject();
     try {
-      messageObject.setJsonObject((JSONObject) new JSONTokener((message.getPayload().toString())).nextValue());
-      messageObject.setInboundTopic(message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString());
+      messageObject.setJsonObject(
+          (JSONObject) new JSONTokener((message.getPayload().toString())).nextValue());
+      messageObject
+          .setInboundTopic(message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString());
       return messageObject;
     } catch (JSONException e) {
-      log.warn("parse {}",e.getCause());
+      log.warn("parse {}", e.getCause());
     }
     return messageObject;
   }
@@ -269,37 +279,33 @@ public class MessagingApplication {
   private KafkaTemplate<String, Object> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
   }
-//
-//  @Bean("outboundGateFlow")
-//  public IntegrationFlow outboundGateFlow() {
-//    return IntegrationFlows.from(listeningFromTransformer()).handle(getResponseMessage())
-//        .handle(postMessage())
-//        .get();
-//  }
 
   @Bean
   private ResponseMessage getResponseMessage() {
     return messageObject -> {
-      VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
-      virtualServiceRequest.setInput(messageObject.getJsonObject().toString());
-      virtualServiceRequest.setOperationId(messageObject.getInboundTopic());
-      virtualServiceRequest.setResource(messageObject.getInboundTopic());
-      ReturnMockResponse response  = messageUtil.getMatchingRecord(virtualServiceRequest);
-      if(response != null && response.getMockResponse() != null) {
-        messageObject.setOutputMessage(response.getMockResponse().getOutput());
-        messageObject.setOutboundTopic(response.getMockRequest().getMethod());
-        if (messageObject.getOutputMessage() == null || messageObject.getOutboundTopic() == null) {
-          log.info("No outputMessage response configured..");
-          return null;
-        } else {
-          log.info("Response configured.. with ({}) : {}", messageObject.getOutboundTopic(),
-              messageObject.getOutputMessage());
-          return messageObject;
+      if (messageObject.getJsonObject() != null) {
+        VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
+        virtualServiceRequest.setInput(messageObject.getJsonObject().toString());
+        virtualServiceRequest.setOperationId(messageObject.getInboundTopic());
+        virtualServiceRequest.setResource(messageObject.getInboundTopic());
+        ReturnMockResponse response = messageUtil.getMatchingRecord(virtualServiceRequest);
+        if (response != null && response.getMockResponse() != null) {
+          messageObject.setOutputMessage(response.getMockResponse().getOutput());
+          messageObject.setOutboundTopic(response.getMockRequest().getMethod());
+          if (messageObject.getOutputMessage() == null
+              || messageObject.getOutboundTopic() == null) {
+            log.info("No outputMessage response configured..");
+            return null;
+          } else {
+            log.info("Response configured.. with ({}) : {}", messageObject.getOutboundTopic(),
+                messageObject.getOutputMessage());
+            return messageObject;
+          }
         }
-      } else {
-        log.info("No response configured for the given input");
-        return null;
       }
+      log.info("No response configured for the given input");
+      return null;
+
     };
   }
 
@@ -321,10 +327,12 @@ public class MessagingApplication {
   }
 
   interface ResponseMessage {
+
     MessageObject readResponseMessage(MessageObject messageObject);
   }
 
   interface SendMessage {
+
     String send(MessageObject messageObject);
   }
 
