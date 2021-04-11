@@ -55,6 +55,7 @@
 					<value>samples</value>
 				</property>
 			</activation>
+
 			<modules>
 				<module>samples/virtualan-sv-all</module>
 				<module>samples/virtualan-openapi-all</module>
