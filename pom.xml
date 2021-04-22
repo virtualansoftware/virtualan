@@ -61,7 +61,7 @@
 				<module>samples/virtualan-wsdl-soap</module>
 				<module>samples/virtualan-kafka</module>
 				<module>samples/virtualan-amq</module>
-				<module>samples/virtualan-openapi-spring</module>
+				<module>samples/virtualan-spring-boot</module>
 				<module>samples/virtualan-openapi-mongo</module>
 				<module>samples/virtualan-openapi-rest</module>
 			</modules>

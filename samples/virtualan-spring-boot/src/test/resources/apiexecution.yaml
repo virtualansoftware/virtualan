@@ -1,0 +1,15 @@
+parallelExecution: 4
+timeout:  3000
+apiExecutor:
+  - reportTitle: "Integration testcase with env Localhost"
+    env: localhost
+    outputDir: target/localhost
+    inputExcel: virtualan_bdd_testcase_run_manager.xlsx
+    cucumblanProperies:
+      service.api.api: http://localhost:8080
+#  - reportTitle: "Integration testcase with env live.virtualandemo.com"
+#    env: live.virtualandemo
+#    outputDir: target/live
+#    inputExcel: virtualan_bdd_testcase_run_manager.xlsx
+#    cucumblanProperies:
+#      service.api.api: https://live.virtualandemo.com
