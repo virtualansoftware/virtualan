@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class BDD_API_E2E_With_Lowcode_IntegrationTestingTest {
+public class BDD_API_E2E_With_Lowcode_IntegrationTest {
 
     @Before
     public void testBeforeClass(){
