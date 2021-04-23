@@ -268,10 +268,10 @@ public class VirtualServiceUtil {
                 mockTransferObject.getResource(), mockTransferObject.getOperationId());
             MockServiceRequest mockServiceRequest = buildMockServiceRequest(mockTransferObject);
 
-            //validate if it is a valid script
+            //No used via UI or API validate if it is a valid script
             if (mockServiceRequest.getRule() != null) {
-                scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
-                    mockServiceRequest.getRule().toString());
+                //scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
+                 //   mockServiceRequest.getRule().toString());
             }
 
             if (mockServiceRequest.getInputObjectType() != null

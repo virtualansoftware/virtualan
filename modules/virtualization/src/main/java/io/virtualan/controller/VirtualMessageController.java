@@ -1,9 +1,6 @@
 package io.virtualan.controller;
 
-import io.virtualan.core.model.RequestType;
-import io.virtualan.core.model.VirtualServiceMessageRequest;
-import io.virtualan.core.model.VirtualServiceRequest;
-import io.virtualan.core.model.VirtualServiceStatus;
+import io.virtualan.core.model.*;
 import io.virtualan.core.util.Converter;
 import io.virtualan.message.core.MessageUtil;
 import io.virtualan.service.VirtualService;
@@ -116,6 +113,12 @@ public class VirtualMessageController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceMessageRequest virtualServiceMessageRequest) {
     try {
+      if(ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())
+              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())) {
+        return new ResponseEntity<>(
+                "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
+                null, HttpStatus.BAD_REQUEST);
+      }
       VirtualServiceRequest request = new VirtualServiceRequest();
       BeanUtils.copyProperties(virtualServiceMessageRequest, request);
       converter.convertJsonAsString(request);

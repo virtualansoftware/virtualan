@@ -362,7 +362,7 @@ json-tree .branch-preview::after {
 				</li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li ><a href="#" class="impact"><h4><font color="#004080">{{ctrl.appName}} REST-SV - v2.1.10 </font>
+					<li ><a href="#" class="impact"><h4><font color="#004080">{{ctrl.appName}} REST-SV - v2.1.11 </font>
 							</h4></a></li>
 				</ul>
 			</div>
@@ -576,8 +576,6 @@ json-tree .branch-preview::after {
 																			required>
 																		<option id="PARAMS">Params</option>
 																		<option id="RESPONSE" selected>Response</option>
-																		<option id="RULE">Rule</option>
-																		<option id="SCRIPT">Script</option>
 																	</select>
 																	<div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm.httpStatus.$error.required">This
@@ -666,17 +664,6 @@ json-tree .branch-preview::after {
 															<div class="col-md-7">
 																<textarea type="text" ng-model="mockRequest.rule" name="rule"
 																					class="form-control input-sm bk-textarea"> </textarea>
-															</div>
-														</div>
-													</div>
-													<div ng-show="mockRequest.type.toUpperCase() === 'SCRIPT' "
-														 class="row">
-														<div class="form-group col-md-12">
-															<label class="head-text-black col-md-2 control-lable"
-																   for="file">Groovy Script: </label>
-															<div class="col-md-7">
-														<textarea type="text" ng-model="mockRequest.rule" name="rule"
-																  class="form-control input-sm bk-textarea"></textarea>
 															</div>
 														</div>
 													</div>
