@@ -38,7 +38,7 @@ public class BDDAPIE2EWithLowcodeIntegrationTest {
     @Test
     public void executeEnd2EndTesting() throws InterruptedException {
         try {
-            IdaithalamConfiguration.setProperty("SPECIAL_SKIP_CHAR", "\\|=\\\\\\\\|;\\\\n=\\\\\\\\n;");
+            //IdaithalamConfiguration.setProperty("SPECIAL_SKIP_CHAR", "\\|=\\\\\\\\|;\\\\n=\\\\\\\\n;");
             boolean isSuccess = MassApiExecutor.invoke("apiexecution.yaml");
             if (!isSuccess) {
                 Assert.assertTrue("Integration testcases are Failed", false);
