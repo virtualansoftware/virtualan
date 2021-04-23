@@ -113,8 +113,8 @@ public class VirtualMessageController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceMessageRequest virtualServiceMessageRequest) {
     try {
-      if(ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())
-              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())) {
+      if(virtualServiceMessageRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())
+              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString()))) {
         return new ResponseEntity<>(
                 "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
                 null, HttpStatus.BAD_REQUEST);

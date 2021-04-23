@@ -1,12 +1,12 @@
 [
   {
-    "resource": "virtualan.input",
     "brokerUrl": "localhost:9092",
+    "input": "{   \"category\": {     \"id\": 100,     \"name\": \"Fish-POST\"   },   \"id\": 100,   \"name\": \"GoldFish-POST\",   \"photoUrls\": [     \"/fish/\"   ],   \"status\": \"available\",   \"tags\": [     {       \"id\": 100,       \"name\": \"Fish-POST\"     }   ] }      |",
+    "output": "{   \"category\": {     \"id\": 100,     \"name\": \"Fish-POST\"   },   \"id\": 100,   \"name\": \"GoldFish-POST\",   \"photoUrls\": [     \"/fish/\"   ],   \"status\": \"available\",   \"tags\": [     {       \"id\": 100,       \"name\": \"Fish-POST\"     }   ] }      |",
     "requestTopicOrQueueName": "virtualan.input",
-    "input": "{\n    \"category\": {\n        \"id\": 100,\n        \"name\": \"German Shepherd\"\n    },\n    \"id\": 101,\n    \"name\": \"Rocky\",\n    \"photoUrls\": [\n        \"string\"\n    ],\n    \"status\": \"available\",\n    \"tags\": [\n        {\n            \"id\": 101,\n            \"name\": \"brown\"\n        }\n    ]\n}",
-    "output": "{\n    \"category\": {\n        \"id\": 100,\n        \"name\": \"German Shepherd\"\n    },\n    \"id\": 101,\n    \"name\": \"Rocky\",\n    \"photoUrls\": [\n        \"string\"\n    ],\n    \"status\": \"available\",\n    \"tags\": [\n        {\n            \"id\": 101,\n            \"name\": \"brown\"\n        }\n    ]\n}",
     "responseTopicOrQueueName": "virtualan.output",
-    "availableParams": [],
-    "headerParams": []
+    "type": "Response",
+    "resource": "virtualan.input",
+    "requestType": "KAFKA"
   }
 ]

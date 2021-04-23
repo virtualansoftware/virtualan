@@ -124,11 +124,13 @@ public class VirtualSoapController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
     try {
-      if(ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
-              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())) {
+      if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
         return new ResponseEntity<>(
                 "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
                 null, HttpStatus.BAD_REQUEST);
+      } else if (virtualServiceRequest.getType() == null) {
+        virtualServiceRequest.setType(ResponseProcessType.RESPONSE.toString());
       }
       wsEndpointConfiguration.getWsServiceMockList().entrySet()
           .stream()

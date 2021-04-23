@@ -12,10 +12,10 @@
     <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
     <cucumber-spring.version>6.7.0</cucumber-spring.version>
 
-    <virtualan.version>2.1.10</virtualan.version>
+    <virtualan.version>2.1.11-SNAPSHOT</virtualan.version>
     <hsqldb.version>2.3.2</hsqldb.version>
 
-    <idaithalam.version>1.2.7-SNAPSHOT</idaithalam.version>
+    <idaithalam.version>1.2.7</idaithalam.version>
     <testng.ver>7.4.0</testng.ver>
     <slf4j.version>1.7.30</slf4j.version>
 
