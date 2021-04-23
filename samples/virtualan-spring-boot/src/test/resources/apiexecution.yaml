@@ -4,9 +4,10 @@ apiExecutor:
   - reportTitle: "Integration testcase with env Localhost"
     env: localhost
     outputDir: target/localhost
-    inputExcel: virtualan_bdd_testcase_run_manager.xlsx
+    inputExcel: virtualan_bdd_testcase_run_manager_1.xlsx
     cucumblanProperies:
       service.api.api: http://localhost:8080
+      service.api.virtualservices: http://localhost:8080
 #  - reportTitle: "Integration testcase with env live.virtualandemo.com"
 #    env: live.virtualandemo
 #    outputDir: target/live

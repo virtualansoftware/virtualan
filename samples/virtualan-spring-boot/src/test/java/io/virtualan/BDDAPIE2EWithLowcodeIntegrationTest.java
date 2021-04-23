@@ -1,15 +1,23 @@
 package io.virtualan;
 
 
+import io.virtualan.idaithalam.config.IdaithalamConfiguration;
 import io.virtualan.idaithalam.core.api.MassApiExecutor;
 import lombok.SneakyThrows;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
-public class BDD_API_E2E_With_Lowcode_IntegrationTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+    (classes = {VirtualanOpenAPI2SpringBoot.class},webEnvironment = WebEnvironment.DEFINED_PORT)
+public class BDDAPIE2EWithLowcodeIntegrationTest {
 
     @Before
     public void testBeforeClass(){
@@ -30,6 +38,7 @@ public class BDD_API_E2E_With_Lowcode_IntegrationTest {
     @Test
     public void executeEnd2EndTesting() throws InterruptedException {
         try {
+            IdaithalamConfiguration.setProperty("SPECIAL_SKIP_CHAR", "\\|=\\\\\\\\|;\\\\n=\\\\\\\\n;");
             boolean isSuccess = MassApiExecutor.invoke("apiexecution.yaml");
             if (!isSuccess) {
                 Assert.assertTrue("Integration testcases are Failed", false);
