@@ -17,7 +17,8 @@ package io.virtualan.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.virtualan.core.VirtualParameterizedUtil;
-import io.virtualan.core.model.RequestType;
+import io.virtualan.core.model.*;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -30,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 
-import io.virtualan.core.model.MockResponse;
-import io.virtualan.core.model.MockServiceRequest;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
@@ -62,8 +61,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.InvalidMockResponseException;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
-import io.virtualan.core.model.VirtualServiceRequest;
-import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
 
@@ -175,6 +172,15 @@ public class VirtualServiceController {
     public ResponseEntity createMockRequest(
         @RequestBody VirtualServiceRequest virtualServiceRequest) {
         try {
+            if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+                    || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
+                return new ResponseEntity<>(
+                        "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
+                        null, HttpStatus.BAD_REQUEST);
+            } else if (virtualServiceRequest.getType() == null) {
+                virtualServiceRequest.setType(ResponseProcessType.RESPONSE.toString());
+            }
+
             converter.convertJsonAsString(virtualServiceRequest);
             virtualServiceRequest.setRequestType(RequestType.REST.toString());
             validateExpectedInput(virtualServiceRequest);
@@ -239,6 +245,7 @@ public class VirtualServiceController {
     }
 
     private ResponseEntity validateRequestBody(VirtualServiceRequest virtualServiceRequest) {
+
         if (virtualServiceUtil.getVirtualServiceInfo() != null) {
             final Class inputObjectType = virtualServiceUtil.getVirtualServiceInfo().getInputType(virtualServiceRequest);
             if (inputObjectType == null && (virtualServiceRequest.getInput() == null
@@ -249,6 +256,8 @@ public class VirtualServiceController {
                 return getResponseEntity(virtualServiceRequest, inputObjectType);
             }
         }
+
+
         return null;
     }
 

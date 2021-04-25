@@ -26,11 +26,7 @@ import io.virtualan.core.InvalidMockResponseException;
 import io.virtualan.core.VirtualParameterizedUtil;
 import io.virtualan.core.VirtualServiceInfo;
 import io.virtualan.core.VirtualServiceUtil;
-import io.virtualan.core.model.MockResponse;
-import io.virtualan.core.model.MockServiceRequest;
-import io.virtualan.core.model.RequestType;
-import io.virtualan.core.model.VirtualServiceRequest;
-import io.virtualan.core.model.VirtualServiceStatus;
+import io.virtualan.core.model.*;
 import io.virtualan.core.util.Converter;
 import io.virtualan.core.util.OpenApiGeneratorUtil;
 import io.virtualan.core.util.VirtualanClassLoader;
@@ -250,6 +246,15 @@ public class VirtualServiceController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
     try {
+
+      if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
+        return new ResponseEntity<>(
+                "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
+                null, HttpStatus.BAD_REQUEST);
+      } else if (virtualServiceRequest.getType() == null) {
+        virtualServiceRequest.setType(ResponseProcessType.RESPONSE.toString());
+      }
       converter.convertJsonAsString(virtualServiceRequest);
       virtualServiceRequest.setRequestType(RequestType.REST.toString());
       validateExpectedInput(virtualServiceRequest);

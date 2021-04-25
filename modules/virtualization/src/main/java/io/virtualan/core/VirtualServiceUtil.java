@@ -307,8 +307,8 @@ public class VirtualServiceUtil {
 
       //validate if it is a valid script
       if (mockServiceRequest.getRule() != null) {
-        scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
-            mockServiceRequest.getRule().toString());
+//        scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
+//            mockServiceRequest.getRule().toString());
       }
 
       if (mockServiceRequest.getInputObjectType() != null

@@ -2,10 +2,7 @@ package io.virtualan.controller;
 
 import io.virtualan.core.VirtualParameterizedUtil;
 import io.virtualan.core.VirtualServiceUtil;
-import io.virtualan.core.model.RequestType;
-import io.virtualan.core.model.SoapService;
-import io.virtualan.core.model.VirtualServiceRequest;
-import io.virtualan.core.model.VirtualServiceStatus;
+import io.virtualan.core.model.*;
 import io.virtualan.core.soap.WSEndpointConfiguration;
 import io.virtualan.core.util.Converter;
 import io.virtualan.message.core.MessageUtil;
@@ -127,7 +124,15 @@ public class VirtualSoapController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
     try {
-        wsEndpointConfiguration.getWsServiceMockList().entrySet()
+      if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+              || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
+        return new ResponseEntity<>(
+                "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
+                null, HttpStatus.BAD_REQUEST);
+      } else if (virtualServiceRequest.getType() == null) {
+        virtualServiceRequest.setType(ResponseProcessType.RESPONSE.toString());
+      }
+      wsEndpointConfiguration.getWsServiceMockList().entrySet()
           .stream()
           .filter(
               x  -> (x.getValue().getMethod().equalsIgnoreCase(virtualServiceRequest.getMethod()) &&
