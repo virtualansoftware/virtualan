@@ -84,46 +84,55 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 			log.warn("Unable to load the file ({}) initial load -{}", dataLoadFileLocation,  e.getMessage());
 		}
 	}
-	
+
+
+	private String hasValue(String value){
+		if(value == null || value.trim().isEmpty()){
+			return null;
+		} else {
+			return value;
+		}
+	}
+
 	private VirtualServiceRequest createRequest(JSONObject jsonObject) {
 		VirtualServiceRequest virtualServiceRequest = new VirtualServiceRequest();
 		try {
-			virtualServiceRequest.setResource(jsonObject.optString("resource"));
-			virtualServiceRequest.setInput(jsonObject.optString("input"));
-			virtualServiceRequest.setOutput(jsonObject.optString("output"));
-			virtualServiceRequest.setHttpStatusCode(jsonObject.optString("httpStatusCode"));
+			virtualServiceRequest.setResource(hasValue(jsonObject.optString("resource")));
+			virtualServiceRequest.setInput(hasValue(jsonObject.optString("input")));
+			virtualServiceRequest.setOutput(hasValue(jsonObject.optString("output")));
+			virtualServiceRequest.setHttpStatusCode(hasValue(jsonObject.optString("httpStatusCode")));
 			if (!"".equalsIgnoreCase(jsonObject.optString("method"))) {
-				virtualServiceRequest.setMethod(jsonObject.optString("method"));
+				virtualServiceRequest.setMethod(hasValue(jsonObject.optString("method")));
 			} else if (!"".equalsIgnoreCase(jsonObject.optString("responseTopicOrQueueName"))) {
-				virtualServiceRequest.setMethod(jsonObject.optString("responseTopicOrQueueName"));
+				virtualServiceRequest.setMethod(hasValue(jsonObject.optString("responseTopicOrQueueName")));
 			}
-			virtualServiceRequest.setType(jsonObject.optString("type"));
-			virtualServiceRequest.setRequestType(jsonObject.optString("requestType"));
+			virtualServiceRequest.setType(hasValue(jsonObject.optString("type")));
+			virtualServiceRequest.setRequestType(hasValue(jsonObject.optString("requestType")));
 			if(!jsonObject.optString("contentType").equalsIgnoreCase("")) {
 				virtualServiceRequest
 						.setContentType(ContentType.valueOf(jsonObject.optString("contentType")));
 			}
-			virtualServiceRequest.setRule(jsonObject.optString("rule"));
+			virtualServiceRequest.setRule(hasValue(jsonObject.optString("rule")));
 			if (!"".equalsIgnoreCase(jsonObject.optString("url"))) {
-				virtualServiceRequest.setUrl(jsonObject.optString("url"));
+				virtualServiceRequest.setUrl(hasValue(jsonObject.optString("url")));
 				if(jsonObject.optString("resource").equalsIgnoreCase("")) {
-					virtualServiceRequest.setResource(jsonObject.optString("url"));
+					virtualServiceRequest.setResource(hasValue(jsonObject.optString("url")));
 				}
 			}
 			if (!"".equalsIgnoreCase(jsonObject.optString("brokerUrl"))) {
-					virtualServiceRequest.setUrl(jsonObject.optString("brokerUrl"));
+					virtualServiceRequest.setUrl(hasValue(jsonObject.optString("brokerUrl")));
 			}
 
 			virtualServiceRequest
 					.setAvailableParams(getParams(jsonObject.optJSONArray("availableParams")));
 			virtualServiceRequest.setHeaderParams(getParams(jsonObject.optJSONArray("headerParams")));
-			virtualServiceRequest.setExcludeList(jsonObject.optString("excludeList"));
+			virtualServiceRequest.setExcludeList(hasValue(jsonObject.optString("excludeList")));
 			if (!"".equalsIgnoreCase(jsonObject.optString("requestTopicOrQueueName"))) {
 				virtualServiceRequest.setOperationId(jsonObject.optString("requestTopicOrQueueName"));
 			} else if (jsonObject.optString("operationId").equals("")) {
 				virtualServiceUtil.findOperationIdForService(virtualServiceRequest);
 			} else {
-				virtualServiceRequest.setOperationId(jsonObject.optString("operationId"));
+				virtualServiceRequest.setOperationId(hasValue(jsonObject.optString("operationId")));
 			}
 		} catch (Exception e) {
 			log.info(" unable to load the following data ({}) : Failed due to :: {}",jsonObject, e.getMessage());

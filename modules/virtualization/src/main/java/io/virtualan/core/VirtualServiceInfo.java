@@ -150,14 +150,14 @@ public interface VirtualServiceInfo {
     }
   }
 
-  default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices()
+  default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices(boolean scriptEnabled)
       throws ClassNotFoundException, JsonProcessingException, InstantiationException,
       IllegalAccessException {
     Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice = getMockLoadChoice();
       mockLoadChoice = new TreeMap<>();
       for (Map.Entry<String, Class> virtualServiceEntry : findVirtualServices().entrySet()) {
         Map<String, VirtualServiceRequest> mockAPILoadChoice =
-            buildVirtualServiceInfo(virtualServiceEntry);
+            buildVirtualServiceInfo(scriptEnabled, virtualServiceEntry);
         if (!mockAPILoadChoice.isEmpty()) {
           Map<String, Map<String, VirtualServiceRequest>> resourceGroup =
               mockAPILoadChoice.entrySet().stream()
@@ -171,13 +171,13 @@ public interface VirtualServiceInfo {
     return mockLoadChoice;
   }
 
-  default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices(ClassLoader loader)
+  default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices(boolean scriptEnabled, ClassLoader loader)
       throws ClassNotFoundException, JsonProcessingException, InstantiationException,
       IllegalAccessException {
     Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice = new TreeMap<>();
     for (Map.Entry<String, Class> virtualServiceEntry : findVirtualServices(loader).entrySet()) {
       Map<String, VirtualServiceRequest> mockAPILoadChoice =
-          buildVirtualServiceInfo(virtualServiceEntry);
+          buildVirtualServiceInfo(scriptEnabled, virtualServiceEntry);
       if (!mockAPILoadChoice.isEmpty()) {
         Map<String, Map<String, VirtualServiceRequest>> resourceGroup =
             mockAPILoadChoice.entrySet().stream()
@@ -193,7 +193,18 @@ public interface VirtualServiceInfo {
   }
 
 
-  default Map<String, VirtualServiceRequest> buildVirtualServiceInfo(
+  default Map<String, String> getTypes(boolean scriptEnabled) {
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("RESPONSE", "Response");
+    map.put("PARAMS", "Params");
+    if(scriptEnabled) {
+      map.put("RULE", "Rule");
+      map.put("SCRIPT", "Script");
+    }
+    return map;
+  }
+
+  default Map<String, VirtualServiceRequest> buildVirtualServiceInfo(boolean scriptEnabled,
       Map.Entry<String, Class> virtualServiceEntry) throws JsonProcessingException,
       InstantiationException, IllegalAccessException, ClassNotFoundException {
     Map<String, VirtualServiceRequest> mockAPILoadChoice =
@@ -201,7 +212,7 @@ public interface VirtualServiceInfo {
     for (Method method : virtualServiceEntry.getValue().getDeclaredMethods()) {
       ApiVirtual[] annotInstance = method.getAnnotationsByType(ApiVirtual.class);
       if (annotInstance != null && annotInstance.length > 0) {
-        VirtualServiceRequest mockReturn = buildServiceDetails(virtualServiceEntry, method);
+        VirtualServiceRequest mockReturn = buildServiceDetails(scriptEnabled, virtualServiceEntry, method);
         if (mockReturn != null) {
           mockAPILoadChoice.put(method.getName(), mockReturn);
         }
@@ -418,7 +429,7 @@ public interface VirtualServiceInfo {
     return responseType;
   }
 
-  default VirtualServiceRequest buildServiceDetails(Entry<String, Class> virtualServiceEntry,
+  default VirtualServiceRequest buildServiceDetails(boolean scriptEnabled, Entry<String, Class> virtualServiceEntry,
       Method method) throws JsonProcessingException, InstantiationException,
       IllegalAccessException, ClassNotFoundException {
 
@@ -427,6 +438,7 @@ public interface VirtualServiceInfo {
     virtualServiceRequest.setDesc(getResourceDesc(method));
     virtualServiceRequest.setResponseType(buildResponseType(method));
     virtualServiceRequest.setOperationId(method.getName());
+    virtualServiceRequest.setTypes(getTypes(scriptEnabled));
     virtualServiceRequest.setHttpStatusMap(getHttpStatusMap());
     VirtualServiceKeyValue virtualServiceKeyValue = ApiMethod.getApiMethodParamAndURL(method);
     if (rootResource != null) {

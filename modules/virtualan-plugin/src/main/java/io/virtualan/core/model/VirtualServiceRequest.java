@@ -45,7 +45,7 @@ public class VirtualServiceRequest {
     private Class inputObjectType;
     private String outputObjectType;
     private Class responseObjectType;
-
+    private Map<String, String> types;
     private Object input;
     private String rule;
     private Object output;

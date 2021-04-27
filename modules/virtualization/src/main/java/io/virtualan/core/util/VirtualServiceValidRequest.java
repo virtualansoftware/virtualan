@@ -322,8 +322,8 @@ public class VirtualServiceValidRequest {
                 final RequestBody requestBody =
                     buildRequestBody(mockServiceRequest, mockRequestResponse);
                 if (RequestBodyTypes.fromString("NO_REQUEST_PARAM").compareRequestBody(requestBody)
-                    && (mockServiceRequest.getHeaderParams() == null
-                    || mockServiceRequest.getHeaderParams().isEmpty())) {
+                    && (mockServiceRequest.getParams() == null
+                    || mockServiceRequest.getParams().isEmpty())) {
                     count = getNoParamMatch(mockServiceRequest, matchMap, count,
                         mockRequestResponse);
 

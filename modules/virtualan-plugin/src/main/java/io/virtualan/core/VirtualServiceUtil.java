@@ -62,6 +62,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.annotation.Order;
@@ -104,9 +105,13 @@ public class VirtualServiceUtil {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Value("${virtualan.script.enabled:false}")
+    private boolean scriptEnabled;
+
     private VirtualServiceType virtualServiceType;
     @Autowired
     private VirtualServiceInfoFactory virtualServiceInfoFactory;
+
     private VirtualServiceInfo virtualServiceInfo;
 
     public static Object getActualValue(Object object, Map<String, Object> contextObject) {
@@ -142,7 +147,7 @@ public class VirtualServiceUtil {
         setVirtualServiceType(ApiType.findApiType());
         if (getVirtualServiceType() != null) {
             virtualServiceInfo = getVirtualServiceInfo();
-            virtualServiceInfo.loadVirtualServices();
+            virtualServiceInfo.loadVirtualServices(scriptEnabled);
             virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
         } else if (getVirtualServiceType() == null) {
             setVirtualServiceType(VirtualServiceType.NON_REST);
@@ -268,10 +273,10 @@ public class VirtualServiceUtil {
                 mockTransferObject.getResource(), mockTransferObject.getOperationId());
             MockServiceRequest mockServiceRequest = buildMockServiceRequest(mockTransferObject);
 
-            //No used via UI or API validate if it is a valid script
+            //User should enable - UI or API validate if it is a valid script
             if (mockServiceRequest.getRule() != null) {
-                //scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
-                 //   mockServiceRequest.getRule().toString());
+                scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
+                    mockServiceRequest.getRule().toString());
             }
 
             if (mockServiceRequest.getInputObjectType() != null

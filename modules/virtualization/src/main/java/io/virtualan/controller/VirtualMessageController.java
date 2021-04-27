@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,9 @@ public class VirtualMessageController {
 
   @Autowired
   private MessageUtil messageUtil;
+
+  @Value("${virtualan.script.enabled:false}")
+  private boolean scriptEnabled;
 
   @Autowired
   private MessageSource messageSource;
@@ -113,7 +117,7 @@ public class VirtualMessageController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceMessageRequest virtualServiceMessageRequest) {
     try {
-      if(virtualServiceMessageRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())
+      if(!scriptEnabled && virtualServiceMessageRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString())
               || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceMessageRequest.getType().toString()))) {
         return new ResponseEntity<>(
                 "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",

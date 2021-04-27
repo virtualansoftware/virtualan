@@ -119,6 +119,10 @@ public class VirtualServiceController {
   @Autowired
   private VirtualParameterizedUtil virtualParameterizedUtil;
 
+  @Value("${virtualan.script.enabled:false}")
+  private boolean scriptEnabled;
+
+
   private ObjectMapper getObjectMapper() {
     objectMapper.findAndRegisterModules();
     objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -232,7 +236,7 @@ public class VirtualServiceController {
       newFile.mkdir();
     }
     VirtualanConfiguration.writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
-    return openApiGeneratorUtil.generateRestApi(dataload, null);
+    return openApiGeneratorUtil.generateRestApi(scriptEnabled, dataload, null);
   }
 
 
@@ -247,7 +251,7 @@ public class VirtualServiceController {
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
     try {
 
-      if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+      if(!scriptEnabled && virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
               || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
         return new ResponseEntity<>(
                 "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",

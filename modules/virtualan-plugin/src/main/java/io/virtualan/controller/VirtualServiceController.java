@@ -79,6 +79,10 @@ public class VirtualServiceController {
     private static final Logger log = LoggerFactory.getLogger(VirtualServiceController.class);
     public static final String VS_REQUEST_BODY_MISMATCH = "VS_REQUEST_BODY_MISMATCH";
 
+    @Value("${virtualan.script.enabled:false}")
+    private boolean scriptEnabled;
+
+
     @Autowired
     private RuleEvaluator ruleEvaluator;
 
@@ -141,7 +145,7 @@ public class VirtualServiceController {
     public Map<String, Map<String, VirtualServiceRequest>> listAllMockLoadRequest()
         throws InstantiationException, IllegalAccessException, ClassNotFoundException,
         IOException {
-        return virtualServiceUtil.getVirtualServiceInfo() != null ? virtualServiceUtil.getVirtualServiceInfo().loadVirtualServices()
+        return virtualServiceUtil.getVirtualServiceInfo() != null ? virtualServiceUtil.getVirtualServiceInfo().loadVirtualServices(scriptEnabled)
             : new HashMap<>();
     }
 
@@ -172,7 +176,7 @@ public class VirtualServiceController {
     public ResponseEntity createMockRequest(
         @RequestBody VirtualServiceRequest virtualServiceRequest) {
         try {
-            if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+            if( !scriptEnabled && virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
                     || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
                 return new ResponseEntity<>(
                         "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",
