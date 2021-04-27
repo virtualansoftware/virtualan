@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>io.virtualan</groupId>
 		<artifactId>virtualan-project</artifactId>
-		<version>2.2.1</version>
+		<version>2.2.2-SNAPSHOT</version>
 		<relativePath>../..</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -10,7 +10,7 @@
 	<artifactId>virtualan-plugin</artifactId>
 	<packaging>jar</packaging>
 	<name>virtualan-plugin</name>
-	<version>2.2.1</version>
+	<version>2.2.2-SNAPSHOT</version>
 	<description>
 		Virtualan is an open source-based Open API Interface driven Service virtualization tool. Virtualan - Mock service developed on top of the spring boot framework. Any Rest API can be converted as Virtual service in minutes using annotations. Annotations: VirtualService and ApiVirtual
 	</description>
