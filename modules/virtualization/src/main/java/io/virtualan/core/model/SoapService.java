@@ -1,5 +1,6 @@
 package io.virtualan.core.model;
 
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,6 @@ public class SoapService {
   private String requestClassName;
   private String responseClassName;
   private String description;
+  private Map<String, String> types;
 
 }

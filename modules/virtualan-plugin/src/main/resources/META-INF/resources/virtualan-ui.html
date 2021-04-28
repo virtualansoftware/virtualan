@@ -573,9 +573,8 @@ json-tree .branch-preview::after {
 																		required></select>  &nbsp;&nbsp;&nbsp;&nbsp;
 
 																	<select ng-model="mockRequest.type" ng-click="mockRequest.rule = ctrl.loadDefaultRule(mockRequest.type, mockRequest.rule)"
+																					ng-options="name for (type, name) in mockRequest.types"
 																			required>
-																		<option id="PARAMS">Params</option>
-																		<option id="RESPONSE" selected>Response</option>
 																	</select>
 																	<div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm.httpStatus.$error.required">This
@@ -664,6 +663,17 @@ json-tree .branch-preview::after {
 															<div class="col-md-7">
 																<textarea type="text" ng-model="mockRequest.rule" name="rule"
 																					class="form-control input-sm bk-textarea"> </textarea>
+															</div>
+														</div>
+													</div>
+													<div ng-show="mockRequest.type.toUpperCase() === 'SCRIPT' "
+														 class="row">
+														<div class="form-group col-md-12">
+															<label class="head-text-black col-md-2 control-lable"
+																   for="file">Groovy Script: </label>
+															<div class="col-md-7">
+														<textarea type="text" ng-model="mockRequest.rule" name="rule"
+																  class="form-control input-sm bk-textarea"></textarea>
 															</div>
 														</div>
 													</div>

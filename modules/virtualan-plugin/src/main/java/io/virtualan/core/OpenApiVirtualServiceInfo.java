@@ -103,7 +103,7 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
 
 
     @Override
-    public VirtualServiceRequest buildServiceDetails(Entry<String, Class> virtualServiceEntry,
+    public VirtualServiceRequest buildServiceDetails(boolean scriptEnabled, Entry<String, Class> virtualServiceEntry,
             Method method) throws JsonProcessingException, InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         RequestMapping[] annotInstance = method.getAnnotationsByType(RequestMapping.class);
@@ -128,6 +128,8 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
             buildInput(method, virtualServiceRequest);
             virtualServiceRequest.setOperationId(method.getName());
             virtualServiceRequest.setHttpStatusMap(getHttpStatusMap());
+            virtualServiceRequest.setTypes(getTypes(scriptEnabled));
+
             return virtualServiceRequest;
         }
         return null;

@@ -9,6 +9,7 @@ import io.virtualan.message.core.MessageUtil;
 import io.virtualan.service.VirtualService;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,6 +18,7 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,9 @@ public class VirtualSoapController {
   Locale locale = LocaleContextHolder.getLocale();
   @Autowired
   private MessageUtil messageUtil;
+
+  @Value("${virtualan.script.enabled:false}")
+  private boolean scriptEnabled;
 
   @Autowired
   private MessageSource messageSource;
@@ -92,11 +97,24 @@ public class VirtualSoapController {
       Map<String, List<SoapService>> soapServicesByNs =
           soapServiceMap.values().stream()
               .sorted(Comparator.comparing(SoapService::getMethod))
+              .map(x -> {x.setTypes(getTypes(scriptEnabled)); return x;})
               .collect(Collectors.groupingBy(SoapService::getNs));
       return new ResponseEntity<>(soapServicesByNs, HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+  }
+
+
+  private static Map<String, String> getTypes(boolean scriptEnabled) {
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("RESPONSE", "Response");
+    map.put("PARAMS", "Params");
+    if(scriptEnabled) {
+      map.put("RULE", "Rule");
+      map.put("SCRIPT", "Script");
+    }
+    return map;
   }
 
   @DeleteMapping(value = "/virtualservices/soap/{id}")
@@ -109,10 +127,14 @@ public class VirtualSoapController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
+
   @GetMapping(value = "/virtualservices/soap")
   public ResponseEntity<List<VirtualServiceRequest>> listAllMockMessageLoadRequests() {
     final List<VirtualServiceRequest> mockLoadRequests = virtualService.findAllMockRequests();
-    final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.SOAP.toString().equalsIgnoreCase(x.getRequestType()) || x.getRequestType() == null).collect(
+
+    final List<VirtualServiceRequest> mockRestLoadRequests = mockLoadRequests.stream().filter(x -> RequestType.SOAP.toString().equalsIgnoreCase(x.getRequestType()) || x.getRequestType() == null)
+        .map(x -> {x.setTypes(getTypes(scriptEnabled)); return x;})
+        .collect(
         Collectors.toList());
     if (mockRestLoadRequests.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -124,7 +146,7 @@ public class VirtualSoapController {
   public ResponseEntity createMockRequest(
       @RequestBody VirtualServiceRequest virtualServiceRequest) {
     try {
-      if(virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
+      if(!scriptEnabled && virtualServiceRequest.getType() != null && (ResponseProcessType.SCRIPT.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString())
               || ResponseProcessType.RULE.toString().equalsIgnoreCase(virtualServiceRequest.getType().toString()))) {
         return new ResponseEntity<>(
                 "{\"message\":\""+messageSource.getMessage("VS_VALIDATION_FAILURE_REJECT", null, locale)+"\"}",

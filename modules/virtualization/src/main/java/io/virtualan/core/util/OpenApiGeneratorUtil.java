@@ -38,6 +38,7 @@ import org.openapitools.codegen.languages.SpringCodegen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,6 +52,10 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 @Component
 public class OpenApiGeneratorUtil {
+
+
+  @Value("${virtualan.script.enabled:false}")
+  private boolean scriptEnabled;
 
   private static Logger logger = LoggerFactory.getLogger(OpenApiGeneratorUtil.class);
   private File srcFolder = VirtualanConfiguration.getSrcPath();
@@ -80,17 +85,17 @@ public class OpenApiGeneratorUtil {
   public void loadInitialYamlFiles()
       throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
     File file = VirtualanConfiguration.getYamlPath();
-    getYaml(file);
+    getYaml( file);
   }
 
-  public void getYaml(File file)
+  public void getYaml( File file)
       throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
     if (file != null && file.listFiles() != null && file.listFiles().length > 0) {
       for (File subFile : file.listFiles()) {
         if (subFile.isDirectory()) {
           getYaml(subFile);
         } else {
-          generateRestApi(subFile.getName(), null);
+          generateRestApi(scriptEnabled, subFile.getName(), null);
         }
       }
     }
@@ -194,7 +199,7 @@ public class OpenApiGeneratorUtil {
       throw new IntrospectionException("Error when adding url to system ClassLoader ");
     }
   }
-  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(String yamlFile, VirtualServiceRequest request)
+  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request)
       throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
     ClassLoader classLoader = new VirtualanClassLoader(applicationContext.getClassLoader());
     try {
@@ -256,7 +261,7 @@ public class OpenApiGeneratorUtil {
       logger.warn("Unable to process :" + e.getMessage());
     }
 
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(classLoader.getParent());
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoader.getParent());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
     return map;
   }

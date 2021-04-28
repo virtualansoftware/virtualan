@@ -57,7 +57,7 @@ public class VirtualServiceRequest {
     private VirtualServiceStatus mockStatus;
     private java.util.Calendar lastUsedDateTime;
     private ContentType contentType;
-
+    private Map<String, String> types;
 
 
     public Object getHeaderParam(String param) {
