@@ -36,7 +36,7 @@
 		<swagger-annotations.version>1.6.2</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
-		<commons-lang3.version>3.7</commons-lang3.version>
+		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<jackson-databind.version>2.12.3</jackson-databind.version>
 		<kafka-clients-version>2.8.0</kafka-clients-version>
