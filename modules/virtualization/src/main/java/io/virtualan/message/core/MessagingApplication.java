@@ -37,7 +37,6 @@ import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.kafka.dsl.Kafka;
 import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
@@ -240,9 +239,8 @@ public class MessagingApplication {
             topics.toArray(new String[topics.size()]))
             .configureListenerContainer(c ->
                 c.ackMode(ContainerProperties.AckMode.RECORD)
-                    .ackOnError(true)
-                    .idleEventInterval(100L)
-                    .id("messageListenerContainer"))
+                .idleEventInterval(100L)
+                .id("messageListenerContainer"))
         ).<Message<?>>channel(sentToTransformer())
         .<Message<?>, MessageObject>transform(transformer())
         .<MessageObject>handle(getResponseMessage())
@@ -263,16 +261,17 @@ public class MessagingApplication {
   @Transformer
   public MessageObject parse(Message<?> message) {
     MessageObject messageObject = new MessageObject();
-    try {
-      messageObject.setJsonObject(
-          (JSONObject) new JSONTokener((message.getPayload().toString())).nextValue());
-      messageObject
-          .setInboundTopic(message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString());
+      try {
+        messageObject.setJsonObject(
+            (JSONObject) new JSONTokener((message.getPayload().toString())).nextValue());
+        messageObject
+            .setInboundTopic(message.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC).toString());
+        messageObject.setHeaders(message.getHeaders());
+        return messageObject;
+      } catch (JSONException e) {
+        log.warn("parse {}", e.getCause());
+      }
       return messageObject;
-    } catch (JSONException e) {
-      log.warn("parse {}", e.getCause());
-    }
-    return messageObject;
   }
 
   @Bean
@@ -312,9 +311,9 @@ public class MessagingApplication {
   @Bean
   private SendMessage postMessage() {
     return messageObject -> {
-      if (messageObject.getOutboundTopic() != null) {
+      if (messageObject.getOutboundTopic() != null && messageObject.getHeaders().get("X-Virtualan-Header") == null) {
         Message<String> message = MessageBuilder
-            .withPayload(messageObject.getJsonObject().toString())
+            .withPayload(messageObject.getOutputMessage())
             .setHeader(KafkaHeaders.TOPIC, messageObject.getOutboundTopic())
             .setHeader(KafkaHeaders.MESSAGE_KEY, messageObject.getMessageKey())
             .setHeader(KafkaHeaders.PARTITION_ID, 0)

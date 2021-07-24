@@ -3,7 +3,7 @@
     {
       "broker" : "localhost:9092",
       "topics": [
-          "virtualan.input", "virtualan.output"
+          "virtualan.input"
       ],
       "consumer" : "consumer-pet.properties",
       "producer" : "producer-pet.properties"

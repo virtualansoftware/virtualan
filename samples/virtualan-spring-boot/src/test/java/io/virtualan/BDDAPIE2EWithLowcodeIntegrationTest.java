@@ -1,8 +1,7 @@
 package io.virtualan;
 
 
-import io.virtualan.idaithalam.config.IdaithalamConfiguration;
-import io.virtualan.idaithalam.core.api.MassApiExecutor;
+import io.virtualan.idaithalam.core.api.VirtualanTestPlanExecutor;
 import lombok.SneakyThrows;
 import org.junit.After;
 import org.junit.Assert;
@@ -38,8 +37,8 @@ public class BDDAPIE2EWithLowcodeIntegrationTest {
     @Test
     public void executeEnd2EndTesting() throws InterruptedException {
         try {
-            //IdaithalamConfiguration.setProperty("SPECIAL_SKIP_CHAR", "\\|=\\\\\\\\|;\\\\n=\\\\\\\\n;");
-            boolean isSuccess = MassApiExecutor.invoke("apiexecution.yaml");
+
+            boolean isSuccess = VirtualanTestPlanExecutor.invoke("apiexecution.yaml");
             if (!isSuccess) {
                 Assert.assertTrue("Integration testcases are Failed", false);
             }
