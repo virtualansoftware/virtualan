@@ -18,7 +18,9 @@ import io.virtualan.message.core.MessagingApplication;
 @EnableKafka
 @SpringBootApplication
 @ComponentScan(basePackages = {"io.virtualan"})
-@EmbeddedKafka(partitions = 1, controlledShutdown = false, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@EmbeddedKafka(partitions = 1, controlledShutdown = false, brokerProperties = {
+    "listeners=PLAINTEXT://localhost:9092", "port=9092",
+    "log.dir=target/kafka-logs"})
 public class Kafka2SpringBoot {
 
     @Autowired
@@ -48,6 +50,7 @@ public class Kafka2SpringBoot {
 
             EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(1, false) ;
             embeddedKafkaBroker.kafkaPorts(this.kafkaPort);
+            embeddedKafkaBroker.brokerProperty("log.dir", "target/kafka-logs");
             return embeddedKafkaBroker;
 
         }
