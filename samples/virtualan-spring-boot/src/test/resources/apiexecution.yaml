@@ -5,13 +5,13 @@ apiExecutor:
     env: localhost
     outputDir: target/pet/localhost
     inputExcel: virtualan_bdd_testcase_run_manager_1.xlsx
-    cucumblanProperies:
+    cucumblanProperties:
       service.api.api: http://localhost:8080
       service.api.virtualservices: http://localhost:8080
-  - reportTitle: "Integration testcase with env live.virtualandemo.com"
-    env: live.virtualandemo
-    outputDir: target/pet/live
-    inputExcel: virtualan_bdd_testcase_run_manager_1.xlsx
-    cucumblanProperies:
-      service.api.api: https://live.virtualandemo.com
-      service.api.virtualservices: https://live.virtualandemo.com
+#  - reportTitle: "Integration testcase with env live.virtualandemo.com"
+#    env: live.virtualandemo
+#    outputDir: target/pet/live
+#    inputExcel: virtualan_bdd_testcase_run_manager_1.xlsx
+#    cucumblanProperties:
+#      service.api.api: https://live.virtualandemo.com
+#      service.api.virtualservices: https://live.virtualandemo.com

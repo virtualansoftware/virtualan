@@ -10,7 +10,10 @@ info:
   license:
     name: No license
 servers:
-  - url: /api
+  - url: https://live.virtualandemo.com
+    description: Production server (uses live data)
+  - url: http://localhost:8800
+    description: Sandbox server (uses test data)
 paths:
   /riskfactor/compute:
     post:
