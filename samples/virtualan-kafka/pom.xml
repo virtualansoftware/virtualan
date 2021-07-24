@@ -173,7 +173,7 @@
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			<version>2.5.0</version>
+			<version>2.6.0</version>
 		</dependency>
 
 		<!-- KAFKA LOCAL TESTING CONFIGURATION -->
@@ -206,7 +206,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.2.1.RELEASE</version>
+			<version>2.3.0.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -224,7 +224,7 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.1</version>
 		</dependency>
 
 		<dependency>
@@ -237,7 +237,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
-			<version>2.3.1.RELEASE</version>
+			<version>2.3.2.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -278,7 +278,7 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
-			<version>2.3.0.RELEASE</version>
+			<version>2.2.2.RELEASE</version>
 		</dependency>
 
 
