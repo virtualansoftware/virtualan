@@ -20,9 +20,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
-		<spring.boot.version>2.3.12.RELEASE</spring.boot.version>
+		<spring.boot.version>2.5.2</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
-		<spring.version>5.0.3.RELEASE</spring.version>
 		<spring.boot.mq.version>2.4.4</spring.boot.mq.version>
 		<groovy.version>3.0.7</groovy.version>
 		<junit.version>4.13.1</junit.version>
@@ -39,9 +38,9 @@
 		<commons-lang3.version>3.7</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<jackson-databind.version>2.10.5.1</jackson-databind.version>
-		<kafka-clients-version>2.3.0</kafka-clients-version>
-		<spring-kafka.version>2.3.0.RELEASE</spring-kafka.version>
-		<spring-integration-kafka.version>3.2.0.RELEASE</spring-integration-kafka.version>
+		<kafka-clients-version>2.8.0</kafka-clients-version>
+		<spring-kafka.version>2.7.2</spring-kafka.version>
+		<spring-integration-kafka.version>5.5.2</spring-integration-kafka.version>
 	</properties>
 	<developers>
 		<!-- original author of the project -->
