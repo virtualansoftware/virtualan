@@ -20,7 +20,7 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
-		<spring.boot.version>2.4.4</spring.boot.version>
+		<spring.boot.version>2.3.12.RELEASE</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
 		<spring.version>5.0.3.RELEASE</spring.version>
 		<spring.boot.mq.version>2.4.4</spring.boot.mq.version>
