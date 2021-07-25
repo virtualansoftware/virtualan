@@ -424,7 +424,7 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.10.5</version>
+			<version>${springfox.version}</version>
 		</dependency>
 	</dependencies>
 </project>
