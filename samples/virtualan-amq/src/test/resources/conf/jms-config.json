@@ -1,0 +1,10 @@
+{
+  "AMQ" : [
+    {
+      "systemName": "Virtualan-AMQ-1",
+      "broker-url" : "vm://embedded",
+      "user": "admin",
+      "password" :"admin",
+      "receiver-queue": ["virtualan.input_1", "virtualan.input_2", "virtualan.input_3"]
+    } ]
+}
