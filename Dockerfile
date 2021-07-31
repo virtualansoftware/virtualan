@@ -5,9 +5,8 @@ FROM maven:3.6.0-jdk-11-slim AS build
 #FROM adoptopenjdk/openjdk11:alpine
 LABEL maintainer="info@virtualan.io"
 COPY . /home/app/
-RUN mkdir /home/.m2
-WORKDIR /home/.m2
-RUN --mount=type=cache,target=/home/.m2 mvn -f /home/app/samples/virtualan-virtualization/pom.xml clean install
+RUN mvn dependency:go-offline
+RUN mvn -f /home/app/samples/virtualan-virtualization/pom.xml clean install
 
 #
 # GCS Mount stage
