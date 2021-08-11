@@ -27,7 +27,7 @@
 		<junit.version>4.13.1</junit.version>
 		<slf4j.version>1.7.32</slf4j.version>
 		<validation-api.version>1.1.0.Final</validation-api.version>
-		<lombok.version>1.18.10</lombok.version>
+		<lombok.version>1.18.20</lombok.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<javax.jws-api.version>1.1</javax.jws-api.version>
 		<jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
