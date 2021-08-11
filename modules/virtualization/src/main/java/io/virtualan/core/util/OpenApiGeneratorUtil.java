@@ -227,7 +227,7 @@ public class OpenApiGeneratorUtil {
       compile(srcFile, destFile);
       collectFiles(destFile, fileNameAll, ".class");
       collectFiles(destFolder, fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), classLoader.getParent());
+      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader().getParent());
       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(destFolder.getAbsolutePath(), "");
         className = className.substring(className.indexOf(File.separator, 1) + 1);
@@ -261,7 +261,7 @@ public class OpenApiGeneratorUtil {
       logger.warn("Unable to process :" + e.getMessage());
     }
 
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoader.getParent());
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader().getParent());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
     return map;
   }
