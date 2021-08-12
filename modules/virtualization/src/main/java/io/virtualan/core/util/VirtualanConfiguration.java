@@ -91,11 +91,22 @@ public class VirtualanConfiguration {
     return properties.getProperty(keyName);
   }
 
+  public  static  File getPath() {
+    return getPath("default-path", "/conf");
+  }
   public  static  File getSrcPath() {
-    return getPath("srcFolder", "/conf/source");
+    return getDefaultPath( "source");
   }
   public  static File getDestPath() {
-    return getPath("destFolder", "/conf/classes");
+    return getDefaultPath( "classes");
+  }
+
+  public static File getDefaultPath(String defaultPath) {
+    File file = new File(getPath() + File.separator + defaultPath);
+    if(!file.exists()){
+      file.mkdirs();
+    }
+    return new File(getPath() + File.separator + defaultPath) ;
   }
 
   public  static  File getDependencyPath() {
@@ -103,7 +114,7 @@ public class VirtualanConfiguration {
   }
 
   public  static File getYamlPath() {
-    return getPath("yamlFolder", "/conf/yaml");
+    return getDefaultPath("yaml");
   }
 
   public static File getPath(String keyName, String defaultPath) {
