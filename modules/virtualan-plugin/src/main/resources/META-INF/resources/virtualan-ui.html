@@ -246,11 +246,16 @@ json-tree .branch-preview::after {
 .impact {
   font-family: Impact, Charcoal, sans-serif;
 }
-
+.line {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
 </style>
 <body>
 
-	
+
 
 	<!-- main app container -->
 
@@ -358,11 +363,15 @@ json-tree .branch-preview::after {
 								ng-click="sctrl.openSwaggerEditor()">OpenAPI Editor</a></li>
 							<li><a class="dropdown-item" href="#" data-toggle="modal"
 								data-target="#format-Json">JSON Formatter</a></li>
+							<li><hr class="line" /></li>
+							<li><a class="dropdown-item" href="#">v2.2.3</a></li>
+							<li><a  class="dropdown-item" href="https://tutorials.virtualan.io?downloaded=plugin&version=v2.2.3" target="_new">Help</a></li>
+
 						</ul>
 				</li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li ><a href="#" class="impact"><h4><font color="#004080">{{ctrl.appName}} REST-SV - v2.2.1 </font>
+					<li ><a href="#" class="impact"><h4><font color="#004080">{{ctrl.appName}}</font>
 							</h4></a></li>
 				</ul>
 			</div>

@@ -13,15 +13,11 @@ import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -40,6 +36,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,8 +81,13 @@ public class OpenApiGeneratorUtil {
     }
   }
 
+  @Autowired
+  private ApplicationContext appContext;
+
+  @EventListener(ApplicationReadyEvent.class)
   public void loadInitialYamlFiles()
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
+          throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException, MalformedURLException, IntrospectionException {
+    addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), appContext.getClassLoader());
     File file = VirtualanConfiguration.getYamlPath();
     getYaml( file);
   }
@@ -95,7 +99,7 @@ public class OpenApiGeneratorUtil {
         if (subFile.isDirectory()) {
           getYaml(subFile);
         } else {
-          generateRestApi(scriptEnabled, subFile.getName(), null);
+          generateRestApi(scriptEnabled, subFile.getName(), null, appContext.getClassLoader());
         }
       }
     }
@@ -199,9 +203,9 @@ public class OpenApiGeneratorUtil {
       throw new IntrospectionException("Error when adding url to system ClassLoader ");
     }
   }
-  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request)
+  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
       throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
-    ClassLoader classLoader = new VirtualanClassLoader(applicationContext.getClassLoader());
+    ClassLoader classLoader = new VirtualanClassLoader(contextLoader);
     try {
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
@@ -210,14 +214,14 @@ public class OpenApiGeneratorUtil {
       File srcFile = null;
       if (yamlFile != null) {
         destFile = new File(destFolder.getAbsolutePath() + File.separator + yamlFile
-            .substring(0, yamlFile.lastIndexOf(".")));
+                .substring(0, yamlFile.lastIndexOf(".")));
         srcFile = new File(srcFolder.getAbsolutePath() + File.separator + yamlFile
-            .substring(0, yamlFile.lastIndexOf(".")));
+                .substring(0, yamlFile.lastIndexOf(".")));
       } else {
         destFile = new File(
-            destFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+                destFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
         srcFile = new File(
-            srcFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+                srcFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
       }
       if (!destFile.exists()) {
         destFile.mkdir();
@@ -227,7 +231,7 @@ public class OpenApiGeneratorUtil {
       compile(srcFile, destFile);
       collectFiles(destFile, fileNameAll, ".class");
       collectFiles(destFolder, fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), classLoader.getParent());
+      addURLToClassLoader(destFile.toURI().toURL(), contextLoader);
       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(destFolder.getAbsolutePath(), "");
         className = className.substring(className.indexOf(File.separator, 1) + 1);
@@ -260,10 +264,9 @@ public class OpenApiGeneratorUtil {
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoader.getParent());
-    getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-    return map;
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, contextLoader);
+      getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
+      return map;
   }
 
   private void removeMapping(Class myControllerClzzz) throws IOException, ClassNotFoundException {

@@ -236,7 +236,7 @@ public class VirtualServiceController {
       newFile.mkdir();
     }
     VirtualanConfiguration.writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
-    return openApiGeneratorUtil.generateRestApi(scriptEnabled, dataload, null);
+    return openApiGeneratorUtil.generateRestApi(scriptEnabled, dataload, null, applicationContext.getClassLoader().getParent());
   }
 
 
@@ -492,16 +492,13 @@ public class VirtualServiceController {
   public ResponseEntity<List<String>> readCatalog() {
     final Set<String> fileList = new HashSet<>();
     List<String> lists = Arrays
-        .asList("classpath:META-INF/resources/yaml/*/", "classpath:META-INF/resources/wsdl/*/");
+        .asList("classpath:META-INF/resources/yaml/*", "classpath:META-INF/resources/wsdl/*", "classpath:yaml/*");
     fileList.add("VirtualService");
     for (String pathName : lists) {
       try {
         final Resource[] resources = getCatalogList(pathName);
         for (final Resource file : resources) {
-          final String[] names = file.toString().split("/");
-          if (names.length > 1) {
-            fileList.add(names[names.length - 2]);
-          }
+            fileList.add(file.getFilename());
         }
       } catch (Exception e) {
         log.error("api-catalogs : {}", e.getMessage());
@@ -547,18 +544,20 @@ public class VirtualServiceController {
 
 
   private Resource[] getCatalogs(String name) throws IOException {
-    final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
     final PathMatchingResourcePatternResolver resolver =
-        new PathMatchingResourcePatternResolver(classLoader);
-    return resolver
+        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+    Resource[] resources =  resolver
         .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
+    if (resources == null || resources.length ==0){
+      resources =  resolver
+              .getResources("classpath:yaml/" + name + "/*.*");
+    }
+    return resources;
   }
 
   private Resource[] getCatalogList(String path) throws IOException {
-    final ClassLoader classLoader = MethodHandles.lookup().getClass().getClassLoader();
-
     final PathMatchingResourcePatternResolver resolver =
-        new PathMatchingResourcePatternResolver(classLoader);
+        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
     return resolver.getResources(path);
   }
 

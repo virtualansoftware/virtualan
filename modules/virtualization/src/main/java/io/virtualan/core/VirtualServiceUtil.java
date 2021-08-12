@@ -49,9 +49,12 @@ import io.virtualan.message.core.MessageUtil;
 import io.virtualan.requestbody.RequestBody;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
+
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -163,7 +166,7 @@ public class VirtualServiceUtil {
   @PostConstruct
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public void init() throws ClassNotFoundException, JsonProcessingException,
-      InstantiationException, IllegalAccessException {
+          InstantiationException, IllegalAccessException, MalformedURLException, IntrospectionException {
     setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
       virtualServiceInfo = getVirtualServiceInfo();
@@ -173,7 +176,7 @@ public class VirtualServiceUtil {
       setVirtualServiceType(VirtualServiceType.NON_REST);
       virtualServiceInfo = getVirtualServiceInfo();
     }
-    openApiGeneratorUtil.loadInitialYamlFiles();
+    //openApiGeneratorUtil.loadInitialYamlFiles();
   }
 
   public VirtualServiceInfo getVirtualServiceInfo() {
@@ -258,7 +261,7 @@ public class VirtualServiceUtil {
           mockLoadRequest.setOperationId(operationId);
           mockLoadRequest.setResource(resouceSplitterList.get(0));
         } else {
-          openApiGeneratorUtil.generateRestApi(scriptEnabled, null, mockLoadRequest);
+          openApiGeneratorUtil.generateRestApi(scriptEnabled, null, mockLoadRequest, applicationContext.getClassLoader().getParent());
           log.warn(" Manually Resource registered " + mockLoadRequest.getMethod());
         }
       }
