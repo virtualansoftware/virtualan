@@ -501,7 +501,6 @@ public class VirtualServiceController {
     final Set<String> fileList = new HashSet<>();
     List<String> lists = Arrays
         .asList("classpath:META-INF/resources/yaml/*", "classpath:META-INF/resources/wsdl/*", "classpath:yaml/*");
-    fileList.add("VirtualService");
     for (String pathName : lists) {
       try {
         final Resource[] resources = getCatalogList(pathName);
@@ -532,14 +531,9 @@ public class VirtualServiceController {
   public ResponseEntity<List<String>> readCatalog(@PathVariable("name") String name) {
     final List<String> fileList = new LinkedList<>();
     try {
-      if ("VirtualService".equalsIgnoreCase(name)) {
-        fileList.add("virtualservices.yaml");
-      }
-
       for (final Resource file : getCatalogs(name)) {
         fileList.add(file.getFilename());
       }
-
     } catch (final IOException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
