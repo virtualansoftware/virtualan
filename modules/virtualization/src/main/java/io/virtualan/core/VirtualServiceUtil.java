@@ -164,9 +164,9 @@ public class VirtualServiceUtil {
           InstantiationException, IllegalAccessException, MalformedURLException, IntrospectionException {
     setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
+      Helper.addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), appContext.getClassLoader().getParent());
       ClassLoader classLoader = new VirtualanClassLoader(appContext.getClassLoader());
       applicationContext.classLoader(classLoader);
-      Helper.addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
       virtualServiceInfo = getVirtualServiceInfo();
       virtualServiceInfo.loadVirtualServices(scriptEnabled, applicationContext.getClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());

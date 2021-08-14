@@ -553,7 +553,7 @@ public class VirtualServiceController {
 
   private Resource[] getCatalogs(String name) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
-        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+        new PathMatchingResourcePatternResolver(this.applicationContext.getClassLoader().getParent().getParent());
     Resource[] resources =  resolver
         .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
     if (resources == null || resources.length ==0){
@@ -565,7 +565,7 @@ public class VirtualServiceController {
 
   private Resource[] getCatalogList(String path) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
-        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent().getParent());
     return resolver.getResources(path);
   }
 

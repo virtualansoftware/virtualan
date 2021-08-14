@@ -290,16 +290,10 @@ public class OpenApiGeneratorUtil {
     }
 
     ClassLoader classLoaderNew = new VirtualanClassLoader(appContext.getClassLoader().getParent());
-    addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
-
-    reloadAllClasses("person", classLoaderNew);
-    reloadAllClasses("petstore", classLoaderNew);
-
-
-//    Resource[] resources = getCatalogList("classpath:yaml/*");
-//    for (Resource resource: resources) {
-//      reloadAllClasses(resource.getFilename(), classLoaderNew);
-//    }
+    Resource[] resources = getCatalogList("classpath:yaml/*");
+    for (Resource resource: resources) {
+      reloadAllClasses(resource.getFilename(), classLoaderNew);
+    }
     Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoaderNew);
     applicationContext.classLoader(classLoaderNew);
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
@@ -308,7 +302,7 @@ public class OpenApiGeneratorUtil {
 
   private Resource[] getCatalogList(String path) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
-            new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+            new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent().getParent());
     return resolver.getResources(path);
   }
 
