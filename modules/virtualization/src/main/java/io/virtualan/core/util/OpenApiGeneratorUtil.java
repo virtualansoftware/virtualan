@@ -39,6 +39,8 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,6 +65,10 @@ public class OpenApiGeneratorUtil {
   private File yamlFolder = VirtualanConfiguration.getYamlPath();
   @Autowired
   private ApplicationContextProvider applicationContext;
+
+  @Autowired
+  private ApplicationContext  appContext;
+
   @Autowired
   private VirtualServiceUtil virtualServiceUtil;
   @Autowired
@@ -81,13 +87,10 @@ public class OpenApiGeneratorUtil {
     }
   }
 
-  @Autowired
-  private ApplicationContext appContext;
-
   @EventListener(ApplicationReadyEvent.class)
   public void loadInitialYamlFiles()
           throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException, MalformedURLException, IntrospectionException {
-    addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), appContext.getClassLoader());
+    addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
     File file = VirtualanConfiguration.getYamlPath();
     getYaml( file);
   }
@@ -192,48 +195,18 @@ public class OpenApiGeneratorUtil {
     generator.opts(input).generate();
   }
 
-  public void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
-    URLClassLoader systemClassLoader = (URLClassLoader) classLoader;
-    Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
+  public boolean reloadAllClasses(String yamlFile, ClassLoader classLoaderNew) {
     try {
-      Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-      method.setAccessible(true);
-      method.invoke(systemClassLoader, new Object[]{url});
-    } catch (Throwable t) {
-      throw new IntrospectionException("Error when adding url to system ClassLoader ");
-    }
-  }
-  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
-    ClassLoader classLoader = new VirtualanClassLoader(contextLoader);
-    try {
-      openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
       List<String> fileNameAll = new ArrayList<String>();
       File destFile = null;
       File srcFile = null;
-      if (yamlFile != null) {
-        destFile = new File(destFolder.getAbsolutePath() + File.separator + yamlFile
-                .substring(0, yamlFile.lastIndexOf(".")));
-        srcFile = new File(srcFolder.getAbsolutePath() + File.separator + yamlFile
-                .substring(0, yamlFile.lastIndexOf(".")));
-      } else {
-        destFile = new File(
-                destFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
-        srcFile = new File(
-                srcFolder.getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
-      }
-      if (!destFile.exists()) {
-        destFile.mkdir();
-      } else {
-        deleteFolder(destFile);
-      }
-      compile(srcFile, destFile);
+      destFile = new File(VirtualanConfiguration.getDestPath().getAbsolutePath() + File.separator + yamlFile);
       collectFiles(destFile, fileNameAll, ".class");
-      collectFiles(destFolder, fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), contextLoader);
+      collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
+      addURLToClassLoader(destFile.toURI().toURL(), classLoaderNew);
       for (String classNameRaw : fileNames) {
-        String className = classNameRaw.replace(destFolder.getAbsolutePath(), "");
+        String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
         className = className.substring(className.indexOf(File.separator, 1) + 1);
         className = className.replaceAll("/", ".");
         className = className.replaceAll("\\\\", ".");
@@ -241,7 +214,7 @@ public class OpenApiGeneratorUtil {
         String name = className;
         name = name.substring(name.lastIndexOf('.') + 1);
         name = name.substring(0, 1).toLowerCase() + name.substring(1);
-        Class myController = classLoader.loadClass(className);
+        Class myController = classLoaderNew.loadClass(className);
         if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
           GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
           beanDefinition.setBeanClass(myController);
@@ -264,10 +237,163 @@ public class OpenApiGeneratorUtil {
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, contextLoader);
-      getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-      return map;
+    return true;
   }
+
+  public  Map<String, Map<String, VirtualServiceRequest>> removeRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
+          throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, IntrospectionException {
+    try {
+      List<String> fileNames = new ArrayList<String>();
+      List<String> fileNameAll = new ArrayList<String>();
+      File destFile = null;
+      destFile = new File(VirtualanConfiguration.getDestPath().getAbsolutePath() + File.separator + yamlFile);
+      if (destFile.exists()) {
+        collectFiles(destFile, fileNameAll, ".class");
+        collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
+        for (String classNameRaw : fileNames) {
+          String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
+          className = className.substring(className.indexOf(File.separator, 1) + 1);
+          className = className.replaceAll("/", ".");
+          className = className.replaceAll("\\\\", ".");
+          className = className.substring(0, className.lastIndexOf("."));
+          String name = className;
+          name = name.substring(name.lastIndexOf('.') + 1);
+          name = name.substring(0, 1).toLowerCase() + name.substring(1);
+          Class myController = applicationContext.getClassLoader().loadClass(className);
+          if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
+            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+            beanDefinition.setBeanClass(myController);
+            beanDefinition.setAutowireCandidate(true);
+            beanDefinition.setLazyInit(false);
+            beanDefinition.setAbstract(false);
+            for (Class classssss : myController.getInterfaces()) {
+              if (classssss.isAnnotationPresent(VirtualService.class)) {
+                if (applicationContext.containsBean(name)) {
+                  removeMapping(classssss);
+                  applicationContext.removeBean(name);
+                }
+              }
+            }
+          }
+        }
+        deleteFolder(destFile);
+        destFile.delete();
+        File srcFile = new File(VirtualanConfiguration.getSrcPath().getAbsolutePath() + File.separator + yamlFile);
+        deleteFolder(srcFile);
+        srcFile.delete();
+        File yaml = new File(VirtualanConfiguration.getYamlPath().getAbsolutePath() + File.separator + yamlFile);
+        deleteFolder(yaml);
+        yaml.delete();
+      }
+    } catch (Exception e) {
+      logger.warn("Unable to process :" + e.getMessage());
+    }
+
+    ClassLoader classLoaderNew = new VirtualanClassLoader(appContext.getClassLoader().getParent());
+    addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
+
+    reloadAllClasses("person", classLoaderNew);
+    reloadAllClasses("petstore", classLoaderNew);
+
+
+//    Resource[] resources = getCatalogList("classpath:yaml/*");
+//    for (Resource resource: resources) {
+//      reloadAllClasses(resource.getFilename(), classLoaderNew);
+//    }
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoaderNew);
+    applicationContext.classLoader(classLoaderNew);
+    getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
+    return map;
+  }
+
+  private Resource[] getCatalogList(String path) throws IOException {
+    final PathMatchingResourcePatternResolver resolver =
+            new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+    return resolver.getResources(path);
+  }
+
+  public void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
+    URLClassLoader systemClassLoader = null;
+    if(classLoader instanceof  VirtualanClassLoader) {
+      systemClassLoader
+              = new URLClassLoader(new URL[]{url}, classLoader);
+    } else  {
+      systemClassLoader = (URLClassLoader) classLoader;
+    }    Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
+    try {
+      Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+      method.setAccessible(true);
+      method.invoke(systemClassLoader, new Object[]{url});
+    } catch (Throwable t) {
+      throw new IntrospectionException("Error when adding url to system ClassLoader ");
+    }
+  }
+
+  public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
+          throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
+    try {
+      openApiGenerator(yamlFile, request);
+      List<String> fileNames = new ArrayList<String>();
+      List<String> fileNameAll = new ArrayList<String>();
+      File destFile = null;
+      File srcFile = null;
+      if (yamlFile != null) {
+        destFile = new File(VirtualanConfiguration.getDestPath().getAbsolutePath() + File.separator + yamlFile
+                .substring(0, yamlFile.lastIndexOf(".")));
+        srcFile = new File(VirtualanConfiguration.getSrcPath().getAbsolutePath() + File.separator + yamlFile
+                .substring(0, yamlFile.lastIndexOf(".")));
+      } else {
+        destFile = new File(
+                VirtualanConfiguration.getDestPath().getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+        srcFile = new File(
+                VirtualanConfiguration.getSrcPath().getAbsolutePath() + File.separator + OpenApiGenerator.getResource(request));
+      }
+      if (!destFile.exists()) {
+        destFile.mkdir();
+      } else {
+        deleteFolder(destFile);
+      }
+      compile(srcFile, destFile);
+      collectFiles(destFile, fileNameAll, ".class");
+      collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
+      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader());
+      for (String classNameRaw : fileNames) {
+        String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
+        className = className.substring(className.indexOf(File.separator, 1) + 1);
+        className = className.replaceAll("/", ".");
+        className = className.replaceAll("\\\\", ".");
+        className = className.substring(0, className.lastIndexOf("."));
+        String name = className;
+        name = name.substring(name.lastIndexOf('.') + 1);
+        name = name.substring(0, 1).toLowerCase() + name.substring(1);
+        Class myController = applicationContext.getClassLoader().loadClass(className);
+        if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
+          GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+          beanDefinition.setBeanClass(myController);
+          beanDefinition.setAutowireCandidate(true);
+          beanDefinition.setLazyInit(false);
+          beanDefinition.setAbstract(false);
+          for (Class classssss : myController.getInterfaces()) {
+            if (classssss.isAnnotationPresent(VirtualService.class)) {
+              if (applicationContext.containsBean(name)) {
+                removeMapping(classssss);
+                applicationContext.removeBean(name);
+              }
+              applicationContext.addBean(name, beanDefinition);
+              addMapping(name, classssss);
+            }
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      logger.warn("Unable to process :" + e.getMessage());
+    }
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader());
+    getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
+    return map;
+  }
+
 
   private void removeMapping(Class myControllerClzzz) throws IOException, ClassNotFoundException {
     for (Method method : myControllerClzzz.getDeclaredMethods()) {

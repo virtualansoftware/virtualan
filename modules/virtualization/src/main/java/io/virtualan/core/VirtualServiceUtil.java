@@ -33,16 +33,7 @@ import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
 import io.virtualan.core.model.VirtualServiceStatus;
 import io.virtualan.core.soap.SoapFaultException;
-import io.virtualan.core.util.BestMatchComparator;
-import io.virtualan.core.util.Converter;
-import io.virtualan.core.util.OpenApiGeneratorUtil;
-import io.virtualan.core.util.ReturnMockResponse;
-import io.virtualan.core.util.ScriptErrorException;
-import io.virtualan.core.util.VirtualServiceParamComparator;
-import io.virtualan.core.util.VirtualServiceValidRequest;
-import io.virtualan.core.util.VirtualanClassLoader;
-import io.virtualan.core.util.VirtualanConfiguration;
-import io.virtualan.core.util.XMLConverter;
+import io.virtualan.core.util.*;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
 import io.virtualan.message.core.MessageUtil;
@@ -76,6 +67,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.Ordered;
@@ -134,6 +126,9 @@ public class VirtualServiceUtil {
   private VirtualServiceInfoFactory virtualServiceInfoFactory;
   private VirtualServiceInfo virtualServiceInfo;
 
+  @Autowired
+  private ApplicationContext appContext;
+
   public static Object getActualValue(Object object, Map<String, Object> contextObject) {
     String key = object.toString();
     if (key.indexOf('<') != -1) {
@@ -169,6 +164,9 @@ public class VirtualServiceUtil {
           InstantiationException, IllegalAccessException, MalformedURLException, IntrospectionException {
     setVirtualServiceType(VirtualServiceType.SPRING);
     if (getVirtualServiceType() != null) {
+      ClassLoader classLoader = new VirtualanClassLoader(appContext.getClassLoader());
+      applicationContext.classLoader(classLoader);
+      Helper.addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
       virtualServiceInfo = getVirtualServiceInfo();
       virtualServiceInfo.loadVirtualServices(scriptEnabled, applicationContext.getClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
