@@ -51,6 +51,9 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo.Builder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+/**
+ * The type Open api generator util.
+ */
 @Component
 public class OpenApiGeneratorUtil {
 
@@ -87,22 +90,33 @@ public class OpenApiGeneratorUtil {
     }
   }
 
+  /**
+   * Load initial yaml files.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void loadInitialYamlFiles()
-          throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException, MalformedURLException, IntrospectionException {
+          throws MalformedURLException, IntrospectionException {
     addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
     File file = VirtualanConfiguration.getYamlPath();
     getYaml( file);
   }
 
-  public void getYaml( File file)
-      throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
+  /**
+   * Gets yaml.
+   *
+   * @param file the file
+   */
+  public void getYaml( File file) {
     if (file != null && file.listFiles() != null && file.listFiles().length > 0) {
       for (File subFile : file.listFiles()) {
         if (subFile.isDirectory()) {
           getYaml(subFile);
         } else {
-          generateRestApi(scriptEnabled, subFile.getName(), null, appContext.getClassLoader());
+          try {
+            generateRestApi(scriptEnabled, subFile.getName(), null, appContext.getClassLoader());
+          }catch (Exception e){
+            logger.warn("Unable to process : " + e.getMessage());
+          }
         }
       }
     }
@@ -195,6 +209,13 @@ public class OpenApiGeneratorUtil {
     generator.opts(input).generate();
   }
 
+  /**
+   * Reload all classes boolean.
+   *
+   * @param yamlFile       the yaml file
+   * @param classLoaderNew the class loader new
+   * @return the boolean
+   */
   public boolean reloadAllClasses(String yamlFile, ClassLoader classLoaderNew) {
     try {
       List<String> fileNames = new ArrayList<String>();
@@ -240,6 +261,20 @@ public class OpenApiGeneratorUtil {
     return true;
   }
 
+  /**
+   * Remove rest api map.
+   *
+   * @param scriptEnabled the script enabled
+   * @param yamlFile      the yaml file
+   * @param request       the request
+   * @param contextLoader the context loader
+   * @return the map
+   * @throws ClassNotFoundException the class not found exception
+   * @throws InstantiationException the instantiation exception
+   * @throws IllegalAccessException the illegal access exception
+   * @throws IOException            the io exception
+   * @throws IntrospectionException the introspection exception
+   */
   public  Map<String, Map<String, VirtualServiceRequest>> removeRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
           throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, IntrospectionException {
     try {
@@ -306,6 +341,13 @@ public class OpenApiGeneratorUtil {
     return resolver.getResources(path);
   }
 
+  /**
+   * Add url to class loader.
+   *
+   * @param url         the url
+   * @param classLoader the class loader
+   * @throws IntrospectionException the introspection exception
+   */
   public void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
     URLClassLoader systemClassLoader = null;
     if(classLoader instanceof  VirtualanClassLoader) {
@@ -323,6 +365,19 @@ public class OpenApiGeneratorUtil {
     }
   }
 
+  /**
+   * Generate rest api map.
+   *
+   * @param scriptEnabled the script enabled
+   * @param yamlFile      the yaml file
+   * @param request       the request
+   * @param contextLoader the context loader
+   * @return the map
+   * @throws ClassNotFoundException  the class not found exception
+   * @throws InstantiationException  the instantiation exception
+   * @throws IllegalAccessException  the illegal access exception
+   * @throws JsonProcessingException the json processing exception
+   */
   public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
           throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
     try {
