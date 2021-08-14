@@ -8,6 +8,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -17,6 +19,7 @@ import org.json.JSONTokener;
  *
  * @author Elan Thangamani
  */
+@Slf4j
 public class VirtualanConfiguration {
   private static Properties properties = new Properties();
   static {
@@ -60,16 +63,19 @@ public class VirtualanConfiguration {
 
 
   public static  void reload(){
+    String profile = System.getenv("spring.profiles.active");
+    profile = profile == null ? System.getenv("SPRING_PROFILES_ACTIVE") : profile ;
+    String fileName = profile != null ? "virtualan-"+profile+".properties" : "virtualan.properties";
     try {
       InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
-          "virtualan.properties");
+          fileName);
       if(stream == null) {
         stream = VirtualanConfiguration.class.getClassLoader().getResourceAsStream(
-            "virtualan.properties");
+            fileName);
       }
       properties.load(stream);
     } catch (Exception e) {
-
+       log.warn(fileName + " is missing");
     }
   }
   /**

@@ -35,6 +35,8 @@ import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.requestbody.RequestBodyTypes;
 import io.virtualan.service.VirtualService;
+
+import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,14 +64,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -224,7 +219,7 @@ public class VirtualServiceController {
    *
    * @return the response entity
    */
-  @PostMapping(value = "/virtualservices/load")
+  @PostMapping(value = "/virtualservices/apis")
   public Map<String, Map<String, VirtualServiceRequest>> createVirtualanApis(
       @ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl,
       @ApiParam(value = "Skip the  validation of yaml.", defaultValue = "true") @Valid @RequestPart(value = "skipValidation", required = false) String skipValidation)
@@ -237,6 +232,19 @@ public class VirtualServiceController {
     }
     VirtualanConfiguration.writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
     return openApiGeneratorUtil.generateRestApi(scriptEnabled, dataload, null, applicationContext.getClassLoader().getParent());
+  }
+
+
+  /**
+   * remove virtual api by the name of the service.
+   *
+   * @return the response entity
+   */
+  @DeleteMapping(value = "/virtualservices/apis")
+  public Map<String, Map<String, VirtualServiceRequest>> deleteVirtualanApis(
+          @Valid @RequestParam(value = "apiName", required = false) String apiName)
+          throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, IntrospectionException {
+    return openApiGeneratorUtil.removeRestApi(scriptEnabled, apiName, null, applicationContext.getClassLoader().getParent());
   }
 
 
@@ -493,7 +501,6 @@ public class VirtualServiceController {
     final Set<String> fileList = new HashSet<>();
     List<String> lists = Arrays
         .asList("classpath:META-INF/resources/yaml/*", "classpath:META-INF/resources/wsdl/*", "classpath:yaml/*");
-    fileList.add("VirtualService");
     for (String pathName : lists) {
       try {
         final Resource[] resources = getCatalogList(pathName);
@@ -524,14 +531,9 @@ public class VirtualServiceController {
   public ResponseEntity<List<String>> readCatalog(@PathVariable("name") String name) {
     final List<String> fileList = new LinkedList<>();
     try {
-      if ("VirtualService".equalsIgnoreCase(name)) {
-        fileList.add("virtualservices.yaml");
-      }
-
       for (final Resource file : getCatalogs(name)) {
         fileList.add(file.getFilename());
       }
-
     } catch (final IOException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -545,7 +547,7 @@ public class VirtualServiceController {
 
   private Resource[] getCatalogs(String name) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
-        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+        new PathMatchingResourcePatternResolver(this.applicationContext.getClassLoader().getParent().getParent());
     Resource[] resources =  resolver
         .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
     if (resources == null || resources.length ==0){
@@ -557,7 +559,7 @@ public class VirtualServiceController {
 
   private Resource[] getCatalogList(String path) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
-        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent());
+        new PathMatchingResourcePatternResolver(applicationContext.getClassLoader().getParent().getParent());
     return resolver.getResources(path);
   }
 
