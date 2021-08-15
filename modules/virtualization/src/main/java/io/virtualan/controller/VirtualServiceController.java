@@ -548,11 +548,13 @@ public class VirtualServiceController {
   private Resource[] getCatalogs(String name) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
         new PathMatchingResourcePatternResolver(this.applicationContext.getClassLoader().getParent().getParent());
-    Resource[] resources =  resolver
-        .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
-    if (resources == null || resources.length ==0){
-      resources =  resolver
-              .getResources("classpath:yaml/" + name + "/*.*");
+    Resource[] resources = null;
+    try {
+      resources = resolver
+              .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
+    }catch (Exception e) {
+        resources = resolver
+                .getResources("classpath:yaml/" + name + "/*.*");
     }
     return resources;
   }
