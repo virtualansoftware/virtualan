@@ -26,6 +26,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -324,14 +325,14 @@ public class OpenApiGeneratorUtil {
       logger.warn("Unable to process :" + e.getMessage());
     }
 
-    ClassLoader classLoaderNew = new VirtualanClassLoader(appContext.getClassLoader().getParent());
-    Resource[] resources = getCatalogList("classpath:yaml/*");
-    for (Resource resource: resources) {
-      reloadAllClasses(resource.getFilename(), classLoaderNew);
-    }
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoaderNew);
-    applicationContext.classLoader(classLoaderNew);
+    return getActiveServices(scriptEnabled);
+  }
+
+  @NotNull
+  private Map<String, Map<String, VirtualServiceRequest>> getActiveServices(boolean scriptEnabled) throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader().getParent());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
+    map.entrySet().removeIf(entry -> !applicationContext.containsBean(entry.getKey()+"ApiController"));
     return map;
   }
 
@@ -404,8 +405,8 @@ public class OpenApiGeneratorUtil {
       }
       compile(srcFile, destFile);
       collectFiles(destFile, fileNameAll, ".class");
-      collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader());
+      collectFiles(destFile, fileNames, ".class");
+      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader().getParent());
       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
         className = className.substring(className.indexOf(File.separator, 1) + 1);
@@ -438,9 +439,7 @@ public class OpenApiGeneratorUtil {
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader());
-    getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-    return map;
+    return getActiveServices(scriptEnabled);
   }
 
 
