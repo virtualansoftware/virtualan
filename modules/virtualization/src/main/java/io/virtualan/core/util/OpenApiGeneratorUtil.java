@@ -26,6 +26,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -210,58 +211,6 @@ public class OpenApiGeneratorUtil {
   }
 
   /**
-   * Reload all classes boolean.
-   *
-   * @param yamlFile       the yaml file
-   * @param classLoaderNew the class loader new
-   * @return the boolean
-   */
-  public boolean reloadAllClasses(String yamlFile, ClassLoader classLoaderNew) {
-    try {
-      List<String> fileNames = new ArrayList<String>();
-      List<String> fileNameAll = new ArrayList<String>();
-      File destFile = null;
-      File srcFile = null;
-      destFile = new File(VirtualanConfiguration.getDestPath().getAbsolutePath() + File.separator + yamlFile);
-      collectFiles(destFile, fileNameAll, ".class");
-      collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), classLoaderNew);
-      for (String classNameRaw : fileNames) {
-        String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
-        className = className.substring(className.indexOf(File.separator, 1) + 1);
-        className = className.replaceAll("/", ".");
-        className = className.replaceAll("\\\\", ".");
-        className = className.substring(0, className.lastIndexOf("."));
-        String name = className;
-        name = name.substring(name.lastIndexOf('.') + 1);
-        name = name.substring(0, 1).toLowerCase() + name.substring(1);
-        Class myController = classLoaderNew.loadClass(className);
-        if (fileNameAll.contains(classNameRaw) && name.endsWith("Controller")) {
-          GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-          beanDefinition.setBeanClass(myController);
-          beanDefinition.setAutowireCandidate(true);
-          beanDefinition.setLazyInit(false);
-          beanDefinition.setAbstract(false);
-          for (Class classssss : myController.getInterfaces()) {
-            if (classssss.isAnnotationPresent(VirtualService.class)) {
-              if (applicationContext.containsBean(name)) {
-                removeMapping(classssss);
-                applicationContext.removeBean(name);
-              }
-              applicationContext.addBean(name, beanDefinition);
-              addMapping(name, classssss);
-            }
-          }
-        }
-      }
-
-    } catch (Exception e) {
-      logger.warn("Unable to process :" + e.getMessage());
-    }
-    return true;
-  }
-
-  /**
    * Remove rest api map.
    *
    * @param scriptEnabled the script enabled
@@ -276,7 +225,8 @@ public class OpenApiGeneratorUtil {
    * @throws IntrospectionException the introspection exception
    */
   public  Map<String, Map<String, VirtualServiceRequest>> removeRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
-          throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, IntrospectionException {
+          throws Exception {
+    List<String> beans = new ArrayList<>();
     try {
       List<String> fileNames = new ArrayList<String>();
       List<String> fileNameAll = new ArrayList<String>();
@@ -306,6 +256,7 @@ public class OpenApiGeneratorUtil {
                 if (applicationContext.containsBean(name)) {
                   removeMapping(classssss);
                   applicationContext.removeBean(name);
+                  beans.add(name);
                 }
               }
             }
@@ -319,20 +270,34 @@ public class OpenApiGeneratorUtil {
         File yaml = new File(VirtualanConfiguration.getYamlPath().getAbsolutePath() + File.separator + yamlFile);
         deleteFolder(yaml);
         yaml.delete();
+        return getActiveServices(scriptEnabled, beans);
+      } else {
+        throw new Exception("This resource does not exists");
       }
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
+      getActiveServices(scriptEnabled, beans);
+      if(e.getMessage() != null) {
+        throw new Exception(e.getMessage());
+      } else {
+        throw new Exception("Unexpected error Check the logs");
+      }
     }
+  }
 
-    ClassLoader classLoaderNew = new VirtualanClassLoader(appContext.getClassLoader().getParent());
-    Resource[] resources = getCatalogList("classpath:yaml/*");
-    for (Resource resource: resources) {
-      reloadAllClasses(resource.getFilename(), classLoaderNew);
-    }
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, classLoaderNew);
-    applicationContext.classLoader(classLoaderNew);
+  @NotNull
+  private Map<String, Map<String, VirtualServiceRequest>> getActiveServices(boolean scriptEnabled, List<String> list) throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
+    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader().getParent());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-    return map;
+    Map<String, Map<String, VirtualServiceRequest>> response = new HashMap<>();
+    for(String beans : list){
+      String bean  = beans.replace("ApiController", "");
+      if(map.containsKey(bean)){
+        response.put(bean, map.get(bean));
+      }
+    }
+    map.entrySet().removeIf(entry -> !applicationContext.containsBean(entry.getKey()+"ApiController"));
+    return response;
   }
 
   private Resource[] getCatalogList(String path) throws IOException {
@@ -380,6 +345,7 @@ public class OpenApiGeneratorUtil {
    */
   public Map<String, Map<String, VirtualServiceRequest>> generateRestApi(boolean scriptEnabled, String yamlFile, VirtualServiceRequest request, ClassLoader contextLoader)
           throws ClassNotFoundException, InstantiationException, IllegalAccessException, JsonProcessingException {
+    List<String> addedBeans = new ArrayList();
     try {
       openApiGenerator(yamlFile, request);
       List<String> fileNames = new ArrayList<String>();
@@ -404,8 +370,8 @@ public class OpenApiGeneratorUtil {
       }
       compile(srcFile, destFile);
       collectFiles(destFile, fileNameAll, ".class");
-      collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader());
+      collectFiles(destFile, fileNames, ".class");
+      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader().getParent());
       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
         className = className.substring(className.indexOf(File.separator, 1) + 1);
@@ -430,6 +396,7 @@ public class OpenApiGeneratorUtil {
               }
               applicationContext.addBean(name, beanDefinition);
               addMapping(name, classssss);
+              addedBeans.add(name);
             }
           }
         }
@@ -438,9 +405,7 @@ public class OpenApiGeneratorUtil {
     } catch (Exception e) {
       logger.warn("Unable to process :" + e.getMessage());
     }
-    Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader());
-    getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
-    return map;
+    return getActiveServices(scriptEnabled, addedBeans);
   }
 
 

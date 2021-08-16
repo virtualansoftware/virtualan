@@ -220,7 +220,7 @@ public class VirtualServiceController {
    * @return the response entity
    */
   @PostMapping(value = "/virtualservices/apis")
-  public Map<String, Map<String, VirtualServiceRequest>> createVirtualanApis(
+  public ResponseEntity<Map<String, Map<String, VirtualServiceRequest>>> createVirtualanApis(
       @ApiParam(value = "") @Valid @RequestPart(value = "openApiUrl", required = true) MultipartFile openApiUrl,
       @ApiParam(value = "Skip the  validation of yaml.", defaultValue = "true") @Valid @RequestPart(value = "skipValidation", required = false) String skipValidation)
       throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -231,7 +231,7 @@ public class VirtualServiceController {
       newFile.mkdir();
     }
     VirtualanConfiguration.writeYaml(newFile + File.separator + dataload, openApiUrl.getInputStream());
-    return openApiGeneratorUtil.generateRestApi(scriptEnabled, dataload, null, applicationContext.getClassLoader().getParent());
+    return  new ResponseEntity<>(openApiGeneratorUtil.generateRestApi(scriptEnabled, dataload, null, applicationContext.getClassLoader().getParent()), HttpStatus.OK);
   }
 
 
@@ -241,10 +241,10 @@ public class VirtualServiceController {
    * @return the response entity
    */
   @DeleteMapping(value = "/virtualservices/apis")
-  public Map<String, Map<String, VirtualServiceRequest>> deleteVirtualanApis(
+  public ResponseEntity deleteVirtualanApis(
           @Valid @RequestParam(value = "apiName", required = false) String apiName)
-          throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, IntrospectionException {
-    return openApiGeneratorUtil.removeRestApi(scriptEnabled, apiName, null, applicationContext.getClassLoader().getParent());
+          throws Exception {
+    return new ResponseEntity(openApiGeneratorUtil.removeRestApi(scriptEnabled, apiName, null, applicationContext.getClassLoader().getParent()), HttpStatus.OK);
   }
 
 
@@ -548,11 +548,13 @@ public class VirtualServiceController {
   private Resource[] getCatalogs(String name) throws IOException {
     final PathMatchingResourcePatternResolver resolver =
         new PathMatchingResourcePatternResolver(this.applicationContext.getClassLoader().getParent().getParent());
-    Resource[] resources =  resolver
-        .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
-    if (resources == null || resources.length ==0){
-      resources =  resolver
-              .getResources("classpath:yaml/" + name + "/*.*");
+    Resource[] resources = null;
+    try {
+      resources = resolver
+              .getResources("classpath:META-INF/resources/**/" + name + "/*.*");
+    }catch (Exception e) {
+        resources = resolver
+                .getResources("classpath:yaml/" + name + "/*.*");
     }
     return resources;
   }
