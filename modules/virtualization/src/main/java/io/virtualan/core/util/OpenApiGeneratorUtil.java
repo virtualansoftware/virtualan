@@ -64,7 +64,6 @@ public class OpenApiGeneratorUtil {
 
   private static Logger logger = LoggerFactory.getLogger(OpenApiGeneratorUtil.class);
   private File srcFolder = VirtualanConfiguration.getSrcPath();
-  private File destFolder = VirtualanConfiguration.getDestPath();
   private File dependencyFolder = VirtualanConfiguration.getDependencyPath();
   private File yamlFolder = VirtualanConfiguration.getYamlPath();
   @Autowired

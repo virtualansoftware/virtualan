@@ -1,5 +1,5 @@
 package io.virtualan.core.model;
 
 public enum RequestType {
-    KAFKA, REST, MQ, AMQ, SOAP
+    KAFKA, REST, MQ, AMQ, SOAP, MQTT
 }
