@@ -39,10 +39,10 @@ import org.springframework.stereotype.Service;
  * The type Mqtt service.
  */
 @ConditionalOnResource(resources = {"classpath:conf/mqtt-config.json"})
-@Service
+@Service("mqttService")
 public class MqttService {
 
-  private static final Logger log = LoggerFactory.getLogger(MessagingApplication.class);
+  private static final Logger log = LoggerFactory.getLogger(MqttService.class);
   private String[] brokerUrl;
   private String[] topics;
   private String MQTT_USERNAME;
