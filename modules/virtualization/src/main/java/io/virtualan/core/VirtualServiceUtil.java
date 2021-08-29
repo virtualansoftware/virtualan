@@ -174,7 +174,6 @@ public class VirtualServiceUtil {
       setVirtualServiceType(VirtualServiceType.NON_REST);
       virtualServiceInfo = getVirtualServiceInfo();
     }
-    //openApiGeneratorUtil.loadInitialYamlFiles();
   }
 
   public VirtualServiceInfo getVirtualServiceInfo() {
