@@ -25,9 +25,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service("jmsMessageSender")
 @ConditionalOnResource(resources = {"classpath:conf/jms-config.json"})
 @Slf4j
 public class JMSMessageSender {
