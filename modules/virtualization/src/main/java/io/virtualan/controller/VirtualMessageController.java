@@ -130,6 +130,11 @@ public class VirtualMessageController {
       request.setUrl(virtualServiceMessageRequest.getBrokerUrl());
       request.setMethod(virtualServiceMessageRequest.getResponseTopicOrQueueName());
       request.setOperationId(virtualServiceMessageRequest.getRequestTopicOrQueueName());
+      if(request.getMethod().equalsIgnoreCase(request.getOperationId())){
+        return new ResponseEntity<VirtualServiceStatus>(new VirtualServiceStatus(
+            messageSource.getMessage("VS_INVALID_TOPIC_ERROR", null, locale)),
+            HttpStatus.BAD_REQUEST);
+      }
       if(virtualServiceMessageRequest.getRequestType() == null ) {
         request.setRequestType(RequestType.KAFKA.toString());
       } else {
@@ -184,7 +189,7 @@ public class VirtualMessageController {
         if(jmsArray != null && jmsArray.length() > 0) {
           JSONObject expected = jmsArray.optJSONObject(0);
           JSONObject jmsObject = new JSONObject();
-          jmsObject.put("broker", key +" : " +expected.getString("broker-url"));
+          jmsObject.put("broker", key +" : " +expected.getJSONArray("broker-url").getString(0));
           jmsObject.put("topics", expected.getJSONArray("receiver-queue"));
           messageServiceInfos.put(jmsObject);
         }
