@@ -77,7 +77,12 @@ public class MqttService {
   public void init() throws IOException {
     try {
       JSONObject jmsConfigurations = getMQTTConfiguration();
-      JSONArray brokerUrls = jmsConfigurations.getJSONArray("broker-urls");
+      JSONArray brokerUrls = jmsConfigurations.getJSONArray("broker-url");
+      if(brokerUrls.length() ==0){
+        log.error(" broker-url parameter is mandatory for MQTT");
+        System.exit(0);
+      }
+      brokerUrl = new String[brokerUrls.length()];
       for (int i = 0; i < brokerUrls.length(); i++) {
         brokerUrl[i] = (brokerUrls.getString(i));
       }
@@ -88,8 +93,13 @@ public class MqttService {
         topics[i] = (arryTopics.getString(i));
       }
 
-      MQTT_USERNAME = jmsConfigurations.getString("username");
-      MQTT_PASSWORD = jmsConfigurations.getString("password");
+      if(jmsConfigurations.optString("username").length() > 0) {
+        MQTT_USERNAME = jmsConfigurations.optString("username");
+      }
+
+      if(jmsConfigurations.optString("password").length() > 0) {
+        MQTT_PASSWORD = jmsConfigurations.optString("password");
+      }
 
       if(jmsConfigurations.optInt("qos") >0) {
         QOS = jmsConfigurations.optInt("qos");
@@ -122,12 +132,17 @@ public class MqttService {
 
   private MqttConnectOptions connectOptions() {
     MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-    mqttConnectOptions.setUserName(MQTT_USERNAME);
-    mqttConnectOptions.setPassword(MQTT_PASSWORD.toCharArray());
-    mqttConnectOptions.setCleanSession(true);
-    mqttConnectOptions.setConnectionTimeout(30);
-    mqttConnectOptions.setKeepAliveInterval(60);
-    mqttConnectOptions.setAutomaticReconnect(true);
+    if(MQTT_USERNAME != null) {
+      mqttConnectOptions.setUserName(MQTT_USERNAME);
+    }
+
+    if(MQTT_PASSWORD != null) {
+      mqttConnectOptions.setPassword(MQTT_PASSWORD.toCharArray());
+    }
+    mqttConnectOptions.setCleanSession(CLEAN_SESSION);
+    mqttConnectOptions.setConnectionTimeout(CONNECTION_TIMEOUT);
+    mqttConnectOptions.setKeepAliveInterval(KEEP_ALIVE_INTERVAL);
+    mqttConnectOptions.setAutomaticReconnect(AUTOMATIC_RECONNECT);
     mqttConnectOptions.setServerURIs(brokerUrl);
     return mqttConnectOptions;
   }
