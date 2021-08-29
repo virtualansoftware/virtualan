@@ -58,7 +58,7 @@ import org.springframework.stereotype.Service;
 @EnableIntegration
 @EnableKafka
 @ConditionalOnResource(resources = {"classpath:conf/kafka.json"})
-@Service
+@Service("messagingApplication")
 public class MessagingApplication {
 
   private static final Logger log = LoggerFactory.getLogger(MessagingApplication.class);
