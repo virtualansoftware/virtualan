@@ -23,6 +23,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -332,7 +333,7 @@ public class MessagingApplication {
 
   interface SendMessage {
 
-    String send(MessageObject messageObject);
+    String send(MessageObject messageObject) throws MqttException;
   }
 
 }

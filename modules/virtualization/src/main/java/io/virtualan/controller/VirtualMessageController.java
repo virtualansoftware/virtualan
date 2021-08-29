@@ -96,7 +96,8 @@ public class VirtualMessageController {
       VirtualServiceMessageRequest virtualServiceMessageRequest = new VirtualServiceMessageRequest();
       request = converter.convertAsJson(request);
       if(RequestType.KAFKA.name().equalsIgnoreCase(request.getRequestType())
-          || RequestType.AMQ.name().equalsIgnoreCase((request.getRequestType()))) {
+          || RequestType.AMQ.name().equalsIgnoreCase((request.getRequestType()))
+          || RequestType.MQTT.name().equalsIgnoreCase((request.getRequestType()))) {
         BeanUtils.copyProperties(request, virtualServiceMessageRequest);
         virtualServiceMessageRequest.setBrokerUrl(request.getUrl());
         virtualServiceMessageRequest.setResponseTopicOrQueueName(request.getMethod());
@@ -168,6 +169,26 @@ public class VirtualMessageController {
       String jmsConfigJson = readString(stream);
       JSONObject jsonObject = new JSONObject(jmsConfigJson);
       messageServiceInfos = jsonObject.optJSONArray("Kafka");
+    }
+
+    //MQTT CONFIGS
+    stream = VirtualMessageController.class.getClassLoader()
+        .getResourceAsStream("conf/mqtt-config.json");
+    if (stream != null) {
+      String jmsConfigJson = readString(stream);
+      JSONObject jsonObject = new JSONObject(jmsConfigJson);
+      Iterator<String> keys = jsonObject.keys();
+      while(keys.hasNext()) {
+        String key = keys.next();
+        JSONArray jmsArray = jsonObject.getJSONArray(key);
+        if(jmsArray != null && jmsArray.length() > 0) {
+          JSONObject expected = jmsArray.optJSONObject(0);
+          JSONObject jmsObject = new JSONObject();
+          jmsObject.put("broker", key +" : " +expected.getString("broker-url"));
+          jmsObject.put("topics", expected.getJSONArray("receiver-queue"));
+          messageServiceInfos.put(jmsObject);
+        }
+      }
     }
 
     //JMS CONFIGS
