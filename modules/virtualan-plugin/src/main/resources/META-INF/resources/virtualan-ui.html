@@ -230,8 +230,9 @@ json-tree .branch-preview::after {
 
 .navbar-custom {
 	color: #ffffff;
-	border-radius: 0;
+	border-radius: 5px;
 	min-height: auto;
+	border-bottom: 5px solid black
 }
 
 .navbar-custom .navbar-nav>li>a {
@@ -297,6 +298,7 @@ json-tree .branch-preview::after {
 }
 
 </style>
+
 <body>
 
 
@@ -312,7 +314,7 @@ json-tree .branch-preview::after {
                                                                               color="#800040">Virtualan</font></a></h3>
             <ul class="nav navbar-nav">
 
-                <li class="active"><a href="#"><h5 class="modal-title menu-color">Home</h5></a></li>
+                <li class="active"><a href="#" ng-click="ctrl.loadTutorialsPage('notutorials.html')"><h5 class="modal-title menu-color">Home</h5></a></li>
 
                 <li class="dropdown" ng-controller="MockController as ctrl" ng-show="ctrl.isNotEmpty()"><a
                         class="nav-link dropdown-toggle"
@@ -467,11 +469,51 @@ json-tree .branch-preview::after {
 <script src="static/js/controller/swagger_controller.js"></script>
 <script src="static/js/controller/catalog_controller.js"></script>
 <script src="static/js/controller/utils_controller.js"></script>
+<style>
+.ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  #background-color: #f1f1f1;
+}
 
+.li a {
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color on hover */
+.li a:hover {
+  background-color: #555;
+  color: white;
+}
+</style>
 
 <div ng-app="myApp" ng-controller="MockController as ctrl">
-    <div class="modal fade" id="format-Json" ng-model="formatJson"
-    ">
+
+    <!-- Tutorials Start-->
+    <div class="panel-body" layout="row">
+        <div flex-gt-sm="10" flex="10">
+            <ul class="ul">
+                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-mock-data')">Data setup API and UI</a></li>
+                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-init-load')">Initial load</a></li>
+                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-business-rule')">Rule setup</a></li>
+                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-dynamic-script')">Groovy scripting</a></li>
+                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://www.youtube.com/embed/JjV-I0OZBIo')">Parameters way of Mocking</a></li>
+                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://www.youtube.com/embed/eUahrOljxZg')">Response type of Mocking</a></li>
+            </ul>
+        </div>
+        <div flex-gt-sm="90" flex="90">
+        <iframe id="loadPage" width="100%"  style=" border-style: none; " height="750" ng-src="{{ ctrl.iframeUrl() }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe>
+        </div>
+    </div>
+
+    <!-- Tutorials end -->
+
+    <div class="modal fade" id="format-Json" ng-model="formatJson">
     <div class="modal-dialog modal-xl">
 
         <div class="modal-content">

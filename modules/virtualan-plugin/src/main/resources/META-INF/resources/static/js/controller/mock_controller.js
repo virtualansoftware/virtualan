@@ -1,6 +1,6 @@
 'use strict';
 
-myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService', function($scope, $filter,  $modal, MockService) {
+myApp.controller('MockController', ['$scope',  '$filter', '$modal', '$sce', 'MockService', function($scope, $filter,  $modal, $sce,  MockService) {
 
 	var self = this;
     self.mockRequest={id:'',resource:'',url:'',method:'',type:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
@@ -37,7 +37,26 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.treeJson = '';
     self.appName = "Virtualan!!";
     getAppName();
+    self.pageUrl = "notutorials.html";
+
     loadAllMockRequest();
+
+    self.iframeUrl = function(){
+        return $sce.trustAsResourceUrl(self.pageUrl);
+    };
+
+    self.loadTutorialsPage= function(url){
+             self.pageUrl = url;
+//        MockService.checkUrl(url).then(
+//           function(d) {
+//             self.pageUrl = url;
+//           },
+//           function(errResponse){
+//             self.pageUrl = "/notutorials.html";
+//                console.error('Error while fetching Soap Mocks');
+//             }
+//           );
+     };
 
     self.isNotEmpty = function() {
        return (Object.keys(self.mockLoadRequests).length > 0);

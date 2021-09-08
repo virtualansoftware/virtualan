@@ -225,11 +225,11 @@ json-tree .branch-preview::after {
 .nav-mock {
 	margin: 20px;
 }
-
 .navbar-custom {
 	color: #ffffff;
-	border-radius: 0;
+	border-radius: 5px;
 	min-height: auto;
+	border-bottom: 5px solid black
 }
 
 .navbar-custom .navbar-nav>li>a {
@@ -516,6 +516,13 @@ json-tree .branch-preview::after {
 <script src="static/js/controller/catalog_controller.js"></script>
 <script src="static/js/controller/utils_controller.js"></script>
 
+<script>
+$(document).ready(function(){
+  $("#videoButon1").click(function(){
+    $("$=#").toggle();
+  });
+});
+</script>
 
 <div ng-app="myApp" ng-controller="MockController as ctrl">
     <div class="modal fade" id="format-Json" ng-model="formatJson">
@@ -575,9 +582,19 @@ json-tree .branch-preview::after {
     </div>
 </div>
 
+
+<button src="videoButon1">Show me</button>
+<!-- Tutorials Start-->
+<p id="video1">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/JjV-I0OZBIo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</p>
+<!-- Tutorials end -->
+
+
 <!-- Virtual service Start-->
 <div layout="column" ng-app="myApp" class="tabsDynamicTabs"
      ng-cloak>
+
 
     <!-- Modal -->
     <div class="modal fade" id="add-mock">
@@ -2080,6 +2097,11 @@ json-tree .branch-preview::after {
     </div>
 
 </div>
+
+
+
+
+
 
 <!-- END -->
 

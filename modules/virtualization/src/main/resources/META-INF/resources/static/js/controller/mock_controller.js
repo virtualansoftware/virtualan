@@ -1,6 +1,6 @@
 'use strict';
 
-myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService', function($scope, $filter,  $modal, MockService) {
+myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService', function($scope, $filter,  $modal, MockService, $http) {
     
 	var self = this;
     self.mockRequest={id:'',resource:'',url:'',method:'',type:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
@@ -52,6 +52,8 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     loadAllTopics();
     loadAllSoapRequest();
     self.tmp= null;
+    self.pageUrl = "notutorials.html";
+
     self.isNotEmpty = function() {
        return (Object.keys(self.mockLoadRequests).length > 0);
     }
@@ -119,6 +121,19 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
       }
       return false;
     };
+
+    self.loadTutorialsPage= function(url){
+        MockService.checkUrl(url).then(
+           function(d) {
+             self.pageUrl = url;
+           },
+           function(errResponse){
+             self.pageUrl = "notutorials.html";
+                console.error('Error while fetching Soap Mocks');
+             }
+           );
+     }
+
 
     self.loadDefaultRule = function(type, value, mockRequest) {
      if(value != null) {
