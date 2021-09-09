@@ -70,7 +70,7 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
 
     function checkUrl(url) {
         var deferred = $q.defer();
-        $http.get(url)
+        $http.get(url, {cache: true})
             .then(
             function (response) {
             	 deferred.resolve(response.data);

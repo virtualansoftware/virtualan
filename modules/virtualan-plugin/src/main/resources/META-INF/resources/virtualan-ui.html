@@ -297,9 +297,13 @@ json-tree .branch-preview::after {
     border-top: 1px solid #eee;
 }
 
+.small {
+  font: 15px Arial, sans-serif;
+}
+
 </style>
 
-<body>
+<body ng-controller="UtilsController as uctrl">
 
 
 <!-- main app container -->
@@ -314,7 +318,7 @@ json-tree .branch-preview::after {
                                                                               color="#800040">Virtualan</font></a></h3>
             <ul class="nav navbar-nav">
 
-                <li class="active"><a href="#" ng-click="ctrl.loadTutorialsPage('notutorials.html')"><h5 class="modal-title menu-color">Home</h5></a></li>
+                <li class="active"><a href="#" ng-click="uctrl.loadTutorialsPage('welcome.html')"><h5 class="modal-title menu-color">Home</h5></a></li>
 
                 <li class="dropdown" ng-controller="MockController as ctrl" ng-show="ctrl.isNotEmpty()"><a
                         class="nav-link dropdown-toggle"
@@ -415,8 +419,8 @@ json-tree .branch-preview::after {
                         </li>
                         <li><a class="dropdown-item menu-color" href="#">v2.3.0</a></li>
                         <li><a class="dropdown-item menu-color"
-                               href="https://tutorials.virtualan.io?downloaded=plugin&version=v2.3.0"
-                               target="_new">Help</a></li>
+                               href="#"
+                                ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&version=v2.3.0')">Help</a></li>
 
                     </ul>
                 </li>
@@ -469,45 +473,13 @@ json-tree .branch-preview::after {
 <script src="static/js/controller/swagger_controller.js"></script>
 <script src="static/js/controller/catalog_controller.js"></script>
 <script src="static/js/controller/utils_controller.js"></script>
-<style>
-.ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 200px;
-  #background-color: #f1f1f1;
-}
-
-.li a {
-  display: block;
-  color: #000;
-  padding: 8px 16px;
-  text-decoration: none;
-}
-
-/* Change the link color on hover */
-.li a:hover {
-  background-color: #555;
-  color: white;
-}
-</style>
 
 <div ng-app="myApp" ng-controller="MockController as ctrl">
 
     <!-- Tutorials Start-->
-    <div class="panel-body" layout="row">
-        <div flex-gt-sm="10" flex="10">
-            <ul class="ul">
-                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-mock-data')">Data setup API and UI</a></li>
-                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-init-load')">Initial load</a></li>
-                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-business-rule')">Rule setup</a></li>
-                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-dynamic-script')">Groovy scripting</a></li>
-                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://www.youtube.com/embed/JjV-I0OZBIo')">Parameters way of Mocking</a></li>
-                <li class="li"><a href="#" ng-click="ctrl.loadTutorialsPage('https://www.youtube.com/embed/eUahrOljxZg')">Response type of Mocking</a></li>
-            </ul>
-        </div>
-        <div flex-gt-sm="90" flex="90">
-        <iframe id="loadPage" width="100%"  style=" border-style: none; " height="750" ng-src="{{ ctrl.iframeUrl() }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen ></iframe>
+    <div class="panel-body" layout="column">
+        <div flex-gt-sm="100" flex="100">
+        <iframe id="loadPage" width="100%"  style=" border-style: none; " height="720" ng-src="{{ uctrl.iframeUrl() }}" frameborder="0"></iframe>
         </div>
     </div>
 
