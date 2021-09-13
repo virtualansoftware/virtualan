@@ -13,7 +13,7 @@
 	<version>1.2.1-SNAPSHOT</version>
 	<description>
 		Service virtualization is the simulation of the behavior of software components that are unavailable or otherwise restricted during the preproduction stage of the software development lifecycle.
-		Supports Open API(Rest), Kafka, AMQ and Soap.
+		Supports Open API(Rest), MQTT, Kafka, AMQ and Soap.
 	</description>
 	<properties>
 		<java.version>1.8</java.version>
