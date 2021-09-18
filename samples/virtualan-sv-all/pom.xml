@@ -7,7 +7,7 @@
 	<description>Virtualan service virtualization all types like Rest, Soap and Message support - Demo</description>
 	<version>1.0.3-SNAPSHOT</version>
 	<properties>
-    <virtualan.version>1.1.7-SNAPSHOT</virtualan.version>
+    <virtualan.version>1.2.1-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 		<maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
 		<java.version>1.8</java.version>

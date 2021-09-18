@@ -1,7 +1,7 @@
 'use strict';
 
 myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService', function($scope, $filter,  $modal, MockService) {
-    
+
 	var self = this;
     self.mockRequest={id:'',resource:'',url:'',method:'',type:'',operationId:'',input:'',output:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
     self.mockCreateRequest= {id:'',resource:'',method:'',type:'',url:'',operationId:'',input:'',output:'', contentType:'',excludeList:'', httpStatus:'',availableParams:[], headerParams:[]};
@@ -70,7 +70,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     	self.currentSoapPage = pageNo;
     };
 
-     function getAppName(){	
+     function getAppName(){
     	MockService.readApplicationName()
             .then(
             function(d) {

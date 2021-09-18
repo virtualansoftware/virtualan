@@ -15,7 +15,8 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
         deleteMockRequest:deleteMockRequest,
         loadCatalogFiles:loadCatalogFiles,
         loadCatalogNames:loadCatalogNames,
-        readApplicationName:readApplicationName
+        readApplicationName:readApplicationName,
+        checkUrl:checkUrl
     };
 
     return factory;
@@ -60,6 +61,22 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
             },
             function(errResponse){
                 console.error('Error while fetching loadAllMockRequest');
+                deferred.reject(errResponse);
+            }
+        );
+        return deferred.promise;
+    }
+
+
+    function checkUrl(url) {
+        var deferred = $q.defer();
+        $http.get(url, {cache: true})
+            .then(
+            function (response) {
+            	 deferred.resolve(response.data);
+            },
+            function(errResponse){
+                console.error('Error while fetching url');
                 deferred.reject(errResponse);
             }
         );

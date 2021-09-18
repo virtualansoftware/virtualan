@@ -1,6 +1,6 @@
 'use strict';
-myApp.controller('UtilsController', [ '$scope', '$filter', '$window',
-		function($scope, $filter, $window) {
+myApp.controller('UtilsController', [ '$scope', '$filter', '$window','MockService','$sce',
+		function($scope, $filter, $window, MockService, $sce ) {
 
 			var self = this;
 			self.input = "Enter the Json here to get formatted";
@@ -13,4 +13,22 @@ myApp.controller('UtilsController', [ '$scope', '$filter', '$window',
 				}
 			}
 
+
+            self.pageUrl = null;
+
+            self.iframeUrl = function(){
+                return $sce.trustAsResourceUrl(self.pageUrl);
+            };
+
+            self.loadTutorialsPage= function(url){
+                MockService.checkUrl(url).then(
+                   function(d) {
+                     self.pageUrl = url;
+                   },
+                   function(errResponse){
+                     self.pageUrl = "notutorials.html";
+                        console.error('Error while fetching Soap Mocks');
+                     }
+                   );
+             };
 		} ]);

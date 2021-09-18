@@ -27,7 +27,9 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
         loadCatalogFiles:loadCatalogFiles,
         loadCatalogNames:loadCatalogNames,
         readApplicationName:readApplicationName,
-        loadAllSoapRequest: loadAllSoapRequest
+        loadAllSoapRequest: loadAllSoapRequest,
+        checkUrl:checkUrl
+
     };
 
     return factory;
@@ -41,6 +43,21 @@ myApp.factory('MockService', ['$http', '$q', function($http, $q){
             },
             function(errResponse){
                 console.error('Error while loading catalogs');
+                deferred.reject(errResponse);
+            }
+        );
+        return deferred.promise;
+    }
+
+  function checkUrl(url) {
+        var deferred = $q.defer();
+        $http.get(url, {cache: true})
+            .then(
+            function (response) {
+                 deferred.resolve(response.data);
+            },
+            function(errResponse){
+                console.error('Error while fetching url');
                 deferred.reject(errResponse);
             }
         );
