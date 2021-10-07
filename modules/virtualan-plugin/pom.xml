@@ -35,7 +35,7 @@
 		<rs-api.version>2.1.1</rs-api.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
-		<jackson-databind.version>2.12.3</jackson-databind.version>
+		<jackson-databind.version>2.12.5</jackson-databind.version>
 	</properties>
 	<developers>
 		<!-- original author of the project -->
