@@ -39,7 +39,7 @@
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<jackson-databind.version>2.10.5.1</jackson-databind.version>
 		<kafka-clients-version>2.8.0</kafka-clients-version>
-		<spring-kafka.version>2.7.2</spring-kafka.version>
+		<spring-kafka.version>2.8.0</spring-kafka.version>
 		<spring-integration-kafka.version>5.5.2</spring-integration-kafka.version>
 	</properties>
 	<developers>
