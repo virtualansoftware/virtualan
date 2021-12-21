@@ -172,7 +172,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-activemq</artifactId>
-			<version>2.5.0</version>
+			<version>2.5.7</version>
 		</dependency>
 
 		<dependency>
@@ -186,7 +186,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.5.0</version>
+			<version>2.5.7</version>
 		</dependency>
 
 		<!-- Kafka -->
@@ -205,7 +205,7 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>2.8.0</version>
+			<version>2.8.1</version>
 		</dependency>
 
 		<dependency>
@@ -217,7 +217,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
-			<version>2.5.0</version>
+			<version>2.5.7</version>
 		</dependency>
 		<!-- Kafka -->
 
@@ -230,7 +230,7 @@
 				</exclusion>
 			</exclusions>
 			<groupId>org.springframework.boot</groupId>
-			<version>2.5.0</version>
+			<version>2.5.7</version>
 		</dependency>
 
 		<dependency>
