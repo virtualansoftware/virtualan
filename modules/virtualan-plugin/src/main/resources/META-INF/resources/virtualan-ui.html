@@ -326,10 +326,10 @@ json-tree .branch-preview::after {
                     Virtual Service<span class="caret"></span>
                 </h5></a>
                     <ul class="dropdown-menu" ng-controller="MockController as ctrl">
-                        <li><a class="dropdown-item menu-color" href="#" data-toggle="modal"
+                        <li><a class="dropdown-item" href="#" data-toggle="modal"
                                data-target="#add-mock"><span
                                 class="glyphicon glyphicon-plus"></span> Add Mock Data</a></li>
-                        <li><a class="dropdown-item menu-color" href="#" data-toggle="modal"
+                        <li><a class="dropdown-item" href="#" data-toggle="modal"
                                data-target="#load-mock" ng-click="ctrl.loadData()"><span
                                 class="glyphicon glyphicon-th-list"></span> Load Mock Data</a></li>
                     </ul>
@@ -417,10 +417,10 @@ json-tree .branch-preview::after {
                         <li>
                             <hr class="line"/>
                         </li>
-                        <li><a class="dropdown-item menu-color" href="#">v2.3.0</a></li>
+                        <li><a class="dropdown-item menu-color" href="#">v2.3.2</a></li>
                         <li><a class="dropdown-item menu-color"
                                href="#"
-                                ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&version=v2.3.0')">Help</a></li>
+                                ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&version=v2.3.1')">Help</a></li>
 
                     </ul>
                 </li>
@@ -956,6 +956,7 @@ json-tree .branch-preview::after {
 </div>
 
 
+<div ng-controller="MockController as ctrl">
 
     <!-- Modal -->
     <div class="modal fade" id="load-mock">
