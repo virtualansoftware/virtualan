@@ -29,7 +29,7 @@
 		<lombok.version>1.18.20</lombok.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
-		<mapson.version>1.1.6</mapson.version>
+		<mapson.version>1.1.10</mapson.version>
 		<swagger-annotations.version>1.6.2</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
@@ -225,8 +225,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring.boot.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-to-slf4j</artifactId>
+				</exclusion></exclusions>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-to-slf4j</artifactId>
+			<version>2.17.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
