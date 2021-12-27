@@ -14,7 +14,7 @@
     <virtualan.version>1.2.3-SNAPSHOT</virtualan.version>
     <cucumber.version>1.2.5</cucumber.version>
     <hsqldb.version>2.5.0</hsqldb.version>
-    <spring.boot.version>2.5.7</spring.boot.version>
+    <spring.boot.version>2.5.8</spring.boot.version>
     <groovy.version>3.0.7</groovy.version>
   </properties>
   <build>
@@ -181,7 +181,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.12.3</version>
+      <version>2.12.6</version>
     </dependency>
 
 
