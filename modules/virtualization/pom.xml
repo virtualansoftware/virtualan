@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>io.virtualan</groupId>
 		<artifactId>virtualan-project</artifactId>
-		<version>2.3.3-SNAPSHOT</version>
+		<version>2.3.4-SNAPSHOT</version>
 		<relativePath>../..</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -10,7 +10,7 @@
 	<artifactId>virtualization</artifactId>
 	<packaging>jar</packaging>
 	<name>virtualization</name>
-	<version>1.2.3-SNAPSHOT</version>
+	<version>1.2.4-SNAPSHOT</version>
 	<description>
 		Service virtualization is the simulation of the behavior of software components that are unavailable or otherwise restricted during the preproduction stage of the software development lifecycle.
 		Supports Open API(Rest), MQTT, Kafka, AMQ and Soap.
@@ -31,7 +31,7 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<javax.jws-api.version>1.1</javax.jws-api.version>
 		<jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
-		<mapson.version>1.1.6</mapson.version>
+		<mapson.version>1.1.10</mapson.version>
 		<swagger-annotations.version>1.6.2</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
@@ -252,6 +252,17 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.17.0</version>
 		</dependency>
 
 		<dependency>
@@ -283,9 +294,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20200518</version>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>5.16.3</version>
 		</dependency>
 		<!-- JUnit -->
 		<dependency>
@@ -302,8 +313,18 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-activemq</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring.boot.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-to-slf4j</artifactId>
+				</exclusion></exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-to-slf4j</artifactId>
+			<version>2.17.0</version>
 		</dependency>
 
 		<dependency>
