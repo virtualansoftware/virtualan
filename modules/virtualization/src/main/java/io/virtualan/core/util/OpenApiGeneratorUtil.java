@@ -26,7 +26,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.DefaultGenerator;
@@ -284,7 +283,6 @@ public class OpenApiGeneratorUtil {
     }
   }
 
-  @NotNull
   private Map<String, Map<String, VirtualServiceRequest>> getActiveServices(boolean scriptEnabled, List<String> list) throws ClassNotFoundException, JsonProcessingException, InstantiationException, IllegalAccessException {
     Map<String, Map<String, VirtualServiceRequest>> map = getVirtualServiceInfo().loadVirtualServices(scriptEnabled, applicationContext.getClassLoader().getParent());
     getVirtualServiceInfo().setResourceParent(getVirtualServiceInfo().loadMapper());
