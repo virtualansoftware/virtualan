@@ -7,16 +7,24 @@
 	<description>Virtualan service virtualization all types like Rest, Soap and Message support - Demo</description>
 	<version>1.0.3-SNAPSHOT</version>
 	<properties>
-   		 <virtualan.version>1.2.3</virtualan.version>
+   		 <virtualan.version>1.2.4-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 		<maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -86,7 +94,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>5.1.0</version>
+				<version>5.3.1</version>
 				<executions>
 					<execution>
 						<id>Person-service-vs-api</id>
@@ -161,13 +169,6 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.11.0</version>
-		</dependency>
-
-
 		<!-- Start AMQ -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -189,12 +190,6 @@
 			<version>2.5.8</version>
 		</dependency>
 
-		<!-- Kafka -->
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-			<version>2.8.1</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
@@ -205,7 +200,7 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>2.8.1</version>
+			<version>2.7.1</version>
 		</dependency>
 
 		<dependency>
@@ -273,41 +268,41 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
-			<version>2.8.1</version>
+			<version>2.7.1</version>
 		</dependency>
 
 
 		<!-- END Virtual Service API support -->
 
 
-
-
-		<!-- Setup BDD Test cases -->
 		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured</artifactId>
-			<version>3.0.0</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<version>2.5.8</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-java8</artifactId>
-			<version>${cucumber.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-junit</artifactId>
-			<version>${cucumber.version}</version>
-			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
-			<groupId>info.cukes</groupId>
+			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-spring</artifactId>
-			<version>${cucumber.version}</version>
+			<version>7.0.0</version>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.virtualan</groupId>
+			<artifactId>idaithalam</artifactId>
+			<version>1.4.4</version>
 		</dependency>
 
 	</dependencies>

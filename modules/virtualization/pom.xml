@@ -16,7 +16,7 @@
 		Supports Open API(Rest), MQTT, Kafka, AMQ and Soap.
 	</description>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
@@ -37,7 +37,7 @@
 		<rs-api.version>2.1.1</rs-api.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
-		<jackson-databind.version>2.13.0</jackson-databind.version>
+		<jackson-databind.version>2.10.5.1</jackson-databind.version>
 		<spring-kafka.version>2.8.0</spring-kafka.version>
 		<kafka-clients-version>2.8.1</kafka-clients-version>
 		<spring-integration-kafka.version>5.5.6</spring-integration-kafka.version>
@@ -159,8 +159,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 			<plugin>

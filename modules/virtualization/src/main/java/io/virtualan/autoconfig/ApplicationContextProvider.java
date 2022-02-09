@@ -26,12 +26,22 @@ public class ApplicationContextProvider {
   @Autowired
   private GenericApplicationContext genericApplicationContext;
 
+  @Autowired
+  private org.springframework.context.ApplicationContext appContext;
+
   public VirtualanClassLoader getVirtualanClassLoader() {
     if (virtualanClassLoader == null) {
       return new VirtualanClassLoader(genericApplicationContext.getClassLoader());
     }
     return virtualanClassLoader;
   }
+
+  public  void addURLToClassLoader(URL url) {
+    io.virtualan.core.util.MyClassloader myClassloader = new io.virtualan.core.util.MyClassloader(new java.net.URL[0], appContext.getClassLoader().getParent());
+    myClassloader.addURL(url);
+    classLoader(myClassloader);
+  }
+
 
   public void classLoader(ClassLoader classLoader) {
     genericApplicationContext.setClassLoader(classLoader);
