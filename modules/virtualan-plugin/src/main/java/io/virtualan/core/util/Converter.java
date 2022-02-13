@@ -27,7 +27,7 @@ public class Converter {
     private  ObjectMapper objectMapper;
 
     private String getString(Object jsonObject) throws JsonProcessingException {
-        if(jsonObject instanceof LinkedHashMap) {
+        if(jsonObject != null && jsonObject instanceof LinkedHashMap) {
             return objectMapper.writeValueAsString(jsonObject);
         }
         return null;
@@ -38,7 +38,7 @@ public class Converter {
         if(jsonStr != null && !jsonStr.isEmpty()) {
             try {
                 return objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
-            } catch (JsonProcessingException e) {
+            } catch (Exception e) {
                 throw new BadDataException(e.getMessage());
             }
         }
@@ -47,7 +47,7 @@ public class Converter {
 
 
     public void convertJsonAsString(VirtualServiceRequest virtualServiceRequest)
-        throws JsonProcessingException {
+            throws JsonProcessingException {
         if(ContentType.JSON.equals(virtualServiceRequest.getContentType())){
             virtualServiceRequest.setInput(getString(virtualServiceRequest.getInput()));
             virtualServiceRequest.setOutput(getString(virtualServiceRequest.getOutput()));
@@ -55,7 +55,7 @@ public class Converter {
     }
 
     public VirtualServiceRequest convertAsJson(
-        VirtualServiceRequest virtualServiceRequest) {
+            VirtualServiceRequest virtualServiceRequest) {
         VirtualServiceRequest virtualServiceRequestRes = new VirtualServiceRequest();
         BeanUtils.copyProperties(virtualServiceRequest, virtualServiceRequestRes);
         if(ContentType.JSON.equals(virtualServiceRequest.getContentType())){
@@ -97,10 +97,10 @@ public class Converter {
             final String[] availableParamsList = paramStr.split(Converter.PARAM_DELIMITER);
             if (availableParamsList != null && availableParamsList.length > 0) {
                 for (final String availableParamsStr : availableParamsList) {
-                    if (availableParamsStr.split("=").length == 2) {
+                    if (availableParamsStr.split("(?<!\\\\)=").length == 2) {
                         availableParams
-                            .add(new VirtualServiceKeyValue(availableParamsStr.split("=")[0],
-                                availableParamsStr.split("=")[1]));
+                                .add(new VirtualServiceKeyValue(removeVirtualanEqualsEscape(availableParamsStr.split("(?<!\\\\)=")[0]),
+                                        removeVirtualanEqualsEscape(availableParamsStr.split("(?<!\\\\)=")[1])));
                     }
                 }
             }
@@ -119,9 +119,19 @@ public class Converter {
         mockEntity.setOutput(mockRequest.getOutput() != null ? mockRequest.getOutput().toString() : null);
 
         mockEntity
-            .setAvailableParamsList(Converter.readParameters(mockRequest.getAvailableParams()));
+                .setAvailableParamsList(Converter.readParameters(mockRequest.getAvailableParams()));
         mockEntity.setHeaderParamsList(Converter.readParameters(mockRequest.getHeaderParams()));
         return mockEntity;
+    }
+
+
+    public static String removeVirtualanEqualsEscape(String input) {
+        return input.replace("\\\\=", "=");
+    }
+
+
+    public static String addEscape(String input) {
+        return input.replace("=", "\\\\=");
     }
 
     public static String readParameters(List<VirtualServiceKeyValue> paranList) {
@@ -130,15 +140,16 @@ public class Converter {
         if (paranList != null && !paranList.isEmpty()) {
             for (final VirtualServiceKeyValue availableParam : paranList) {
                 if (availableParam.getValue() != null) {
+
                     availableParamList.append(availableParam.getKey() + "="
-                        + availableParam.getValue() + Converter.PARAM_DELIMITER);
+                            + addEscape(availableParam.getValue()) + Converter.PARAM_DELIMITER);
                 }
             }
             availableParamStr = availableParamList.toString();
-            if (availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER) > 0) {
+            if (availableParamStr != null && availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER) > 0) {
                 return availableParamStr.substring(0,
-                    availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER));
-            } else if ( availableParamStr.trim().length() > 0) {
+                        availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER));
+            } else if ( availableParamStr != null && availableParamStr.trim().length() > 0) {
                 return availableParamStr;
             }
         }

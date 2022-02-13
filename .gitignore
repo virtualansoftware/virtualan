@@ -14,3 +14,7 @@
 # Maven
 log/
 target/
+/samples/virtualan-sv-all/src/main/gen/com/sforce/
+/samples/virtualan-wsdl-soap/src/main/java/com/sforce/
+/samples/virtualan-wsdl-soap/src/main/java/io/virtualan/types/helloworld/
+/samples/virtualan-wsdl-soap/src/main/java/io/virtualan/services/helloworld/

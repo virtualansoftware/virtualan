@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.core.model.ContentType;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -29,8 +28,7 @@ public class Converter {
 
     private String getString(Object jsonObject) throws JsonProcessingException {
         if(jsonObject != null && jsonObject instanceof LinkedHashMap) {
-            String json = objectMapper.writeValueAsString(jsonObject);
-            return json;
+            return objectMapper.writeValueAsString(jsonObject);
         }
         return null;
     }
@@ -40,9 +38,7 @@ public class Converter {
         if(jsonStr != null && !jsonStr.isEmpty()) {
             try {
                 return objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
-            } catch (JsonProcessingException e) {
-                throw new BadDataException(e.getMessage());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new BadDataException(e.getMessage());
             }
         }
@@ -51,7 +47,7 @@ public class Converter {
 
 
     public void convertJsonAsString(VirtualServiceRequest virtualServiceRequest)
-        throws JsonProcessingException {
+            throws JsonProcessingException {
         if(ContentType.JSON.equals(virtualServiceRequest.getContentType())){
             virtualServiceRequest.setInput(getString(virtualServiceRequest.getInput()));
             virtualServiceRequest.setOutput(getString(virtualServiceRequest.getOutput()));
@@ -59,7 +55,7 @@ public class Converter {
     }
 
     public VirtualServiceRequest convertAsJson(
-        VirtualServiceRequest virtualServiceRequest) {
+            VirtualServiceRequest virtualServiceRequest) {
         VirtualServiceRequest virtualServiceRequestRes = new VirtualServiceRequest();
         BeanUtils.copyProperties(virtualServiceRequest, virtualServiceRequestRes);
         if(ContentType.JSON.equals(virtualServiceRequest.getContentType())){
@@ -72,7 +68,7 @@ public class Converter {
 
     public static Map<String, String> converter(List<VirtualServiceKeyValue> paramList) {
         final Map<String, String> mapkeyValue = new HashMap<>();
-        if (paramList != null && paramList.size() > 0) {
+        if (paramList != null && !paramList.isEmpty()) {
             for (final VirtualServiceKeyValue availableParam : paramList) {
                 if (availableParam.getValue() != null) {
                     mapkeyValue.put(availableParam.getKey(), availableParam.getValue());
@@ -101,10 +97,10 @@ public class Converter {
             final String[] availableParamsList = paramStr.split(Converter.PARAM_DELIMITER);
             if (availableParamsList != null && availableParamsList.length > 0) {
                 for (final String availableParamsStr : availableParamsList) {
-                    if (availableParamsStr.split("=").length == 2) {
+                    if (availableParamsStr.split("(?<!\\\\)=").length == 2) {
                         availableParams
-                            .add(new VirtualServiceKeyValue(availableParamsStr.split("=")[0],
-                                availableParamsStr.split("=")[1]));
+                                .add(new VirtualServiceKeyValue(removeVirtualanEqualsEscape(availableParamsStr.split("(?<!\\\\)=")[0]),
+                                        removeVirtualanEqualsEscape(availableParamsStr.split("(?<!\\\\)=")[1])));
                     }
                 }
             }
@@ -123,26 +119,37 @@ public class Converter {
         mockEntity.setOutput(mockRequest.getOutput() != null ? mockRequest.getOutput().toString() : null);
 
         mockEntity
-            .setAvailableParamsList(Converter.readParameters(mockRequest.getAvailableParams()));
+                .setAvailableParamsList(Converter.readParameters(mockRequest.getAvailableParams()));
         mockEntity.setHeaderParamsList(Converter.readParameters(mockRequest.getHeaderParams()));
         return mockEntity;
     }
 
+
+    public static String removeVirtualanEqualsEscape(String input) {
+        return input.replace("\\\\=", "=");
+    }
+
+
+    public static String addEscape(String input) {
+        return input.replace("=", "\\\\=");
+    }
+
     public static String readParameters(List<VirtualServiceKeyValue> paranList) {
-        final StringBuffer availableParamList = new StringBuffer();
+        final StringBuilder availableParamList = new StringBuilder();
         String availableParamStr = null;
-        if (paranList != null && paranList.size() > 0) {
+        if (paranList != null && !paranList.isEmpty()) {
             for (final VirtualServiceKeyValue availableParam : paranList) {
                 if (availableParam.getValue() != null) {
+
                     availableParamList.append(availableParam.getKey() + "="
-                        + availableParam.getValue() + Converter.PARAM_DELIMITER);
+                            + addEscape(availableParam.getValue()) + Converter.PARAM_DELIMITER);
                 }
             }
             availableParamStr = availableParamList.toString();
-            if (availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER) > 0) {
+            if (availableParamStr != null && availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER) > 0) {
                 return availableParamStr.substring(0,
-                    availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER));
-            } else if (availableParamStr != null && availableParamStr.trim().length() > 0) {
+                        availableParamStr.lastIndexOf(Converter.PARAM_DELIMITER));
+            } else if ( availableParamStr != null && availableParamStr.trim().length() > 0) {
                 return availableParamStr;
             }
         }

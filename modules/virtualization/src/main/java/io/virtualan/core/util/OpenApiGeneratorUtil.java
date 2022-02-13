@@ -95,7 +95,7 @@ public class OpenApiGeneratorUtil {
   @EventListener(ApplicationReadyEvent.class)
   public void loadInitialYamlFiles()
           throws MalformedURLException, IntrospectionException {
-    addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
+    //Helper.addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), applicationContext.getClassLoader());
     File file = VirtualanConfiguration.getYamlPath();
     getYaml( file);
   }
@@ -230,6 +230,8 @@ public class OpenApiGeneratorUtil {
       List<String> fileNameAll = new ArrayList<String>();
       File destFile = null;
       destFile = new File(VirtualanConfiguration.getDestPath().getAbsolutePath() + File.separator + yamlFile);
+      MyClassloader myClassloader = new MyClassloader(new java.net.URL[]{destFile.toURI().toURL()}, applicationContext.getClassLoader().getParent());
+      applicationContext.classLoader(myClassloader);
       if (destFile.exists()) {
         collectFiles(destFile, fileNameAll, ".class");
         collectFiles(VirtualanConfiguration.getDestPath(), fileNames, ".class");
@@ -303,29 +305,29 @@ public class OpenApiGeneratorUtil {
     return resolver.getResources(path);
   }
 
-  /**
-   * Add url to class loader.
-   *
-   * @param url         the url
-   * @param classLoader the class loader
-   * @throws IntrospectionException the introspection exception
-   */
-  public void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
-    URLClassLoader systemClassLoader = null;
-    if(classLoader instanceof  VirtualanClassLoader) {
-      systemClassLoader
-              = new URLClassLoader(new URL[]{url}, classLoader);
-    } else  {
-      systemClassLoader = (URLClassLoader) classLoader;
-    }    Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
-    try {
-      Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-      method.setAccessible(true);
-      method.invoke(systemClassLoader, new Object[]{url});
-    } catch (Throwable t) {
-      throw new IntrospectionException("Error when adding url to system ClassLoader ");
-    }
-  }
+//  /**
+//   * Add url to class loader.
+//   *
+//   * @param url         the url
+//   * @param classLoader the class loader
+//   * @throws IntrospectionException the introspection exception
+//   */
+//  public void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
+//    URLClassLoader systemClassLoader = null;
+//    if(classLoader instanceof  VirtualanClassLoader) {
+//      systemClassLoader
+//              = new URLClassLoader(new URL[]{url}, classLoader);
+//    } else  {
+//      systemClassLoader = (URLClassLoader) classLoader;
+//    }    Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
+//    try {
+//      Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+//      method.setAccessible(true);
+//      method.invoke(systemClassLoader, new Object[]{url});
+//    } catch (Throwable t) {
+//      throw new IntrospectionException("Error when adding url to system ClassLoader ");
+//    }
+//  }
 
   /**
    * Generate rest api map.
@@ -368,8 +370,9 @@ public class OpenApiGeneratorUtil {
       compile(srcFile, destFile);
       collectFiles(destFile, fileNameAll, ".class");
       collectFiles(destFile, fileNames, ".class");
-      addURLToClassLoader(destFile.toURI().toURL(), applicationContext.getClassLoader().getParent());
-      for (String classNameRaw : fileNames) {
+       MyClassloader myClassloader = new MyClassloader(new java.net.URL[]{destFile.toURI().toURL()}, applicationContext.getClassLoader().getParent());
+       applicationContext.classLoader(myClassloader);
+       for (String classNameRaw : fileNames) {
         String className = classNameRaw.replace(VirtualanConfiguration.getDestPath().getAbsolutePath(), "");
         className = className.substring(className.indexOf(File.separator, 1) + 1);
         className = className.replaceAll("/", ".");
