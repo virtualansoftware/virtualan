@@ -223,7 +223,7 @@ public class VirtualMessageController {
           } else {
             jmsObject.put("broker", key +" : " +expected.getString("broker-url"));
           }
-          jmsObject.put("topics", expected.getJSONArray("receiver-queue"));
+          jmsObject.put("topics", expected.optJSONArray("receiver-queue"));
           messageServiceInfos.put(jmsObject);
         }
       }
