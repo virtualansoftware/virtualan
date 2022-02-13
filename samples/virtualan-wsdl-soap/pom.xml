@@ -162,7 +162,7 @@
     <dependency>
       <artifactId>hsqldb</artifactId>
       <groupId>org.hsqldb</groupId>
-      <version>2.5.1</version>
+      <version>2.6.1</version>
     </dependency>
 
     <dependency>
