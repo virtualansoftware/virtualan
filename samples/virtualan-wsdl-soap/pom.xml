@@ -7,7 +7,7 @@
   <version>1.0.3-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
   <properties>
-    <virtualan.version>1.2.3</virtualan.version>
+    <virtualan.version>1.3.1-SNAPSHOT</virtualan.version>
     <cucumber.version>1.2.5</cucumber.version>
     <java.version>1.8</java.version>
     <maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
@@ -149,7 +149,7 @@
     <dependency>
       <artifactId>spring-context</artifactId>
       <groupId>org.springframework</groupId>
-      <version>5.3.14</version>
+      <version>5.3.15</version>
     </dependency>
 
     <dependency>
@@ -162,7 +162,7 @@
     <dependency>
       <artifactId>hsqldb</artifactId>
       <groupId>org.hsqldb</groupId>
-      <version>2.5.1</version>
+      <version>2.6.1</version>
     </dependency>
 
     <dependency>

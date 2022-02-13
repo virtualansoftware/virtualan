@@ -27,25 +27,6 @@ public class Helper {
         }
     }
 
-    public static void addURLToClassLoader(URL url, ClassLoader classLoader) throws IntrospectionException {
-        URLClassLoader systemClassLoader = null;
-        if(classLoader instanceof  VirtualanClassLoader) {
-            systemClassLoader
-                    = new URLClassLoader(new URL[]{url}, classLoader);
-        } else  {
-            systemClassLoader = (URLClassLoader) classLoader;
-        }
-
-        Class<URLClassLoader> classLoaderClass = URLClassLoader.class;
-        try {
-            Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class});
-            method.setAccessible(true);
-            method.invoke(systemClassLoader, new Object[]{url});
-        } catch (Throwable t) {
-            throw new IntrospectionException("Error when adding url to system ClassLoader ");
-        }
-    }
-
     public static void writeYaml(String filename, InputStream in) throws IOException {
         File targetFile = new File(filename);
         InputStream initialStream = in;
