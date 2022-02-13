@@ -12,7 +12,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<virtualan.version>2.4.1-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
-		<hsqldb.version>2.3.2</hsqldb.version>
+		<hsqldb.version>2.6.1</hsqldb.version>
 		<spring.boot.version>2.5.8</spring.boot.version>
 		<springfox.version>2.9.2</springfox.version>
 		<groovy.version>2.4.7</groovy.version>
