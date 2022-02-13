@@ -126,9 +126,6 @@ public class VirtualServiceUtil {
   private VirtualServiceInfoFactory virtualServiceInfoFactory;
   private VirtualServiceInfo virtualServiceInfo;
 
-  @Autowired
-  private ApplicationContext appContext;
-
   public static Object getActualValue(Object object, Map<String, Object> contextObject) {
     String key = object.toString();
     if (key.indexOf('<') != -1) {
@@ -163,10 +160,9 @@ public class VirtualServiceUtil {
   public void init() throws ClassNotFoundException, JsonProcessingException,
           InstantiationException, IllegalAccessException, MalformedURLException, IntrospectionException {
     setVirtualServiceType(VirtualServiceType.SPRING);
+
     if (getVirtualServiceType() != null) {
-      Helper.addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), appContext.getClassLoader().getParent());
-      ClassLoader classLoader = new VirtualanClassLoader(appContext.getClassLoader());
-      applicationContext.classLoader(classLoader);
+      //Helper.addURLToClassLoader(VirtualanConfiguration.getPath().toURI().toURL(), appContext.getClassLoader().getParent());
       virtualServiceInfo = getVirtualServiceInfo();
       virtualServiceInfo.loadVirtualServices(scriptEnabled, applicationContext.getClassLoader());
       virtualServiceInfo.setResourceParent(virtualServiceInfo.loadMapper());
