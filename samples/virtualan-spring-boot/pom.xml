@@ -11,7 +11,7 @@
   <properties>
     <spring.boot.version>2.5.1</spring.boot.version>
     <cucumber-spring.version>7.0.0</cucumber-spring.version>
-    <virtualan.version>2.4.1-SNAPSHOT</virtualan.version>
+    <virtualan.version>2.4.2-SNAPSHOT</virtualan.version>
     <hsqldb.version>2.3.2</hsqldb.version>
     <idaithalam.version>1.4.4</idaithalam.version>
     <testng.ver>7.4.0</testng.ver>
