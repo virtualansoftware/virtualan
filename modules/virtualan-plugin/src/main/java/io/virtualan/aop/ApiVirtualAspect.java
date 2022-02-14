@@ -15,27 +15,13 @@
 
 package io.virtualan.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.virtualan.annotation.VirtualService;
+import io.virtualan.api.ApiResource;
+import io.virtualan.core.VirtualServiceUtil;
+import io.virtualan.core.model.MockServiceRequest;
 import io.virtualan.core.util.ScriptErrorException;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
-import javax.xml.bind.JAXBException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -47,22 +33,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.virtualan.annotation.VirtualService;
-import io.virtualan.api.ApiResource;
-import io.virtualan.core.VirtualServiceUtil;
-import io.virtualan.core.model.MockServiceRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
- * 
- * This Aspect is core class to intercept @VirtualService and @ApiVirtual annotation to produce the response for the virtualized methods. 
- *  
- * Annotate class with @VirtualService and @ApiVirtual and make that service as virtualized service  
+ * This Aspect is core class to intercept @VirtualService and @ApiVirtual annotation to produce the response for the virtualized methods.
+ * <p>
+ * Annotate class with @VirtualService and @ApiVirtual and make that service as virtualized service
  *
- * @author  Elan Thangamani
- * 
+ * @author Elan Thangamani
  */
 @Aspect
 @Component
@@ -80,18 +69,36 @@ public class ApiVirtualAspect {
         return virtualServiceUtil;
     }
 
-    public String addQueryParamValue(Object value) {
-        return String.join(",", (java.util.List) value);
+    public String addQueryParamValue(Object list) {
+        StringBuilder builder = new StringBuilder();
+        for (Object obj : (java.util.List) list) {
+            if(obj != null) {
+                if (obj instanceof Integer) {
+                    builder.append(String.valueOf(obj));
+                } else if (obj instanceof Double) {
+                    builder.append(String.valueOf(obj));
+                } else if (obj instanceof Long) {
+                    builder.append(String.valueOf(obj));
+                } else {
+                    builder.append(String.valueOf(obj));
+                }
+                builder.append(",");
+            }
+        }
+        if(builder.toString().endsWith(",")) {
+            builder.deleteCharAt(builder.length()-1);
+        }
+        return builder.toString();
     }
 
     @Pointcut("@annotation(io.virtualan.annotation.ApiVirtual)")
     public void apiVirtualServicePointcut() {
-    log.info("apiVirtualServicePointcut called");
+        log.info("apiVirtualServicePointcut called");
     }
 
     @Around("apiVirtualServicePointcut()")
     public Object aroundAddAdvice(ProceedingJoinPoint thisJoinPoint)
-        throws IOException, JAXBException, ScriptErrorException {
+            throws IOException, JAXBException, ScriptErrorException {
         MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
         Object[] args = thisJoinPoint.getArgs();
@@ -104,22 +111,22 @@ public class ApiVirtualAspect {
         SimpleEntry<Boolean, Class> isVirtualan = isVirtualService(targetClass);
         if (isVirtualan.getKey().booleanValue()) {
             String parentPath = ApiResource.getResourceParent(isVirtualan.getValue());
-                if(mockServiceRequest.getResource() == null) {
-                    mockServiceRequest.setResource(ApiResource.getResource(method));
-                } else {
-                    mockServiceRequest.setResource(parentPath);
-                }
-                mockServiceRequest.setOperationId(method.getName());
-                readInputParam(args, methodSignature, mockServiceRequest);
-
-                Map<String, String> headersInfo = getHeadersInfo();
-                mockServiceRequest.setHeaderParams(headersInfo);
+            if (mockServiceRequest.getResource() == null) {
+                mockServiceRequest.setResource(ApiResource.getResource(method));
+            } else {
+                mockServiceRequest.setResource(parentPath);
             }
+            mockServiceRequest.setOperationId(method.getName());
+            readInputParam(args, methodSignature, mockServiceRequest);
+
+            Map<String, String> headersInfo = getHeadersInfo();
+            mockServiceRequest.setHeaderParams(headersInfo);
+        }
         return getVirtualServiceUtil().returnResponse(method, mockServiceRequest);
     }
 
     public SimpleEntry<Boolean, Class> isVirtualService(Class<?> claszzz) {
-        if(claszzz.isAnnotationPresent(VirtualService.class) ) {
+        if (claszzz.isAnnotationPresent(VirtualService.class)) {
             return new SimpleEntry<>(true, claszzz);
         } else {
             for (Class clazz : claszzz.getInterfaces()) {
@@ -144,7 +151,7 @@ public class ApiVirtualAspect {
     }
 
     private void readInputParam(Object[] args, MethodSignature methodSignature,
-        MockServiceRequest mockServiceRequest) {
+                                MockServiceRequest mockServiceRequest) {
         Map<String, String> paramMap = new HashMap<>();
         Map<String, Object> parameters = new HashMap<>();
 
@@ -155,7 +162,7 @@ public class ApiVirtualAspect {
 
         for (int argIndex = 0; argIndex < args.length; argIndex++) {
             if (parameterAnnotations[argIndex] != null
-                && parameterAnnotations[argIndex].length > 0) {
+                    && parameterAnnotations[argIndex].length > 0) {
                 String requestParamName = null;
                 for (Annotation annotation : parameterAnnotations[argIndex]) {
                     ServiceParamObject serviceParamObject = new ServiceParamObject();
@@ -163,7 +170,7 @@ public class ApiVirtualAspect {
                     serviceParamObject.setArgIndex(argIndex);
                     serviceParamObject.setArgs(args);
                     serviceParamObject.setMethodSignature(methodSignature);
-                    serviceParamObject.setMockServiceRequest( mockServiceRequest);
+                    serviceParamObject.setMockServiceRequest(mockServiceRequest);
                     serviceParamObject.setParamMap(paramMap);
                     serviceParamObject.setParameters(parameters);
                     serviceParamObject.setParamMapType(paramMapType);
@@ -212,8 +219,8 @@ public class ApiVirtualAspect {
         }
 
         private String getParamName(Object[] args, MethodSignature methodSignature,
-            MockServiceRequest mockServiceRequest, int argIndex,
-            Annotation annotation) {
+                                    MockServiceRequest mockServiceRequest, int argIndex,
+                                    Annotation annotation) {
             if (annotation instanceof RequestParam) {
                 RequestParam requestParam = (RequestParam) annotation;
                 requestParamName = requestParam.value();
@@ -245,12 +252,11 @@ public class ApiVirtualAspect {
         }
 
 
-
         private void getBody(MethodSignature methodSignature, MockServiceRequest mockServiceRequest,
-            int argIndex, Object arg) {
+                             int argIndex, Object arg) {
             try {
                 mockServiceRequest.setInputObjectType(Class.forName(
-                    (methodSignature.getParameterTypes()[argIndex]).getName()));
+                        (methodSignature.getParameterTypes()[argIndex]).getName()));
                 mockServiceRequest.setInput(arg);
             } catch (ClassNotFoundException e) {
                 log.error(e.getMessage());
@@ -265,11 +271,11 @@ public class ApiVirtualAspect {
 
         public GetParams invoke() {
             requestParamName = getParamName(args, methodSignature, mockServiceRequest,
-                argIndex,  annotation);
+                    argIndex, annotation);
             if (requestParamName != null) {
                 if ((args[argIndex]) instanceof List) {
                     paramMap.put(requestParamName, addQueryParamValue(args[argIndex]));
-                    parameters.put(requestParamName,addQueryParamValue(args[argIndex]));
+                    parameters.put(requestParamName, addQueryParamValue(args[argIndex]));
                 } else {
                     paramMap.put(requestParamName, String.valueOf(args[argIndex]));
                     parameters.put(requestParamName, args[argIndex]);

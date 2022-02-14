@@ -82,8 +82,26 @@ public class ApiVirtualAspect {
         return virtualServiceUtil;
     }
 
-    public String addQueryParamValue(Object value) {
-        return String.join(",", (java.util.List) value);
+    public String addQueryParamValue(Object list) {
+        StringBuilder builder = new StringBuilder();
+        for (Object obj : (java.util.List) list) {
+            if(obj != null) {
+                if (obj instanceof Integer) {
+                    builder.append(String.valueOf(obj));
+                } else if (obj instanceof Double) {
+                    builder.append(String.valueOf(obj));
+                } else if (obj instanceof Long) {
+                    builder.append(String.valueOf(obj));
+                } else {
+                    builder.append(String.valueOf(obj));
+                }
+                builder.append(",");
+            }
+        }
+        if(builder.toString().endsWith(",")) {
+            builder.deleteCharAt(builder.length()-1);
+        }
+        return builder.toString();
     }
 
     @Pointcut("@annotation(io.virtualan.annotation.ApiVirtual)")
