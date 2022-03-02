@@ -330,7 +330,7 @@ json-tree .branch-preview::after {
                                data-target="#add-mock"><span
                                 class="glyphicon glyphicon-plus"></span> Add Mock Data</a></li>
                         <li><a class="dropdown-item" href="#" data-toggle="modal"
-                               data-target="#load-mock" ng-click="ctrl.loadData()"><span
+                               data-target="#load-mock" data-ng-click="ctrl.reloadData()"><span
                                 class="glyphicon glyphicon-th-list"></span> Load Mock Data</a></li>
                     </ul>
                 </li>
@@ -417,11 +417,10 @@ json-tree .branch-preview::after {
                         <li>
                             <hr class="line"/>
                         </li>
-                        <li><a class="dropdown-item menu-color" href="#">v2.4.1</a></li>
+                        <li><a class="dropdown-item menu-color" href="#">v2.4.2</a></li>
                         <li><a class="dropdown-item menu-color"
                                href="#"
-                                ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&version=v2.4.1')">Help</a></li>
-
+                                ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&version=v2.4.2')">Help</a></li>
                     </ul>
                 </li>
             </ul>
@@ -982,7 +981,7 @@ json-tree .branch-preview::after {
                     </div>
                 </div>
                 <div class="modal-body">
-                    <div class="tablecontainer">
+                    <div class="tablecontainer" style="overflow-x:scroll;">
                         <input type="text" ng-model="ctrl.searchText"
                                class="head-text-black form-control search-icon float-right"
                                placeholder="Type to filter"> Total items:
@@ -1068,8 +1067,8 @@ json-tree .branch-preview::after {
                                 </td>
                                 <td><span ng-bind="mockRequest.excludeList"></span></td>
                                 <td>
-                                    <!-- 							<button type="button" ng-click="ctrl.edit(u.id)"
-                            class="btn btn-success custom-width">Edit</button> -->
+<!--                                    <button type="button" ng-click="ctrl.edit(u.id)"-->
+<!--                            class="btn btn-success custom-width">Edit</button>-->
                                     <button type="button" ng-click="ctrl.remove(mockRequest.id)"
                                             class="btn btn-danger custom-width">Remove
                                     </button>
@@ -1095,9 +1094,9 @@ json-tree .branch-preview::after {
                                 boundary-links="true" max-size="ctrl.maxSize"
                                 ng-model="ctrl.currentPage" class="pagination-sm"
                                 items-per-page="ctrl.perPage"></pagination>
-                    <!-- 	<button type="button" class="btn btn-info"
-                    ng-click="ctrl.loadData()">Load Data</button>
--->
+                    	<button type="button" class="btn btn-info"
+                                data-target="#load-mock" data-toggle="modal" data-ng-click="ctrl.reloadData()">Refresh</button>
+
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
