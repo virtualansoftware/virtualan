@@ -418,18 +418,19 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
 
     self.loadData = fetchAllMockRequest();
 
-    function fetchAllMsgMockRequest(){
-        	MockService.fetchAllMsgMockRequest()
-                .then(
-                function(d) {
-                    self.mockMsgRequests = d;
-                    self.filterMsgList = self.mockMsgRequests;
-                },
-                function(errResponse){
-                    console.error('Error while fetching Mocks');
-                }
-            );
-        };
+
+    self.reloadData = function(){
+        MockService.fetchAllMockRequest()
+            .then(
+            function(d) {
+                self.mockRequests = d;
+                self.filterList = self.mockRequests;
+            },
+            function(errResponse){
+                console.error('Error while fetching Mocks');
+            }
+        );
+     };
 
     function fetchAllMockRequest(){
     	MockService.fetchAllMockRequest()
@@ -556,15 +557,7 @@ self.showJSONDialog = false;
         );
     }
 
-    function deleteMsgMockRequest(id){
-        MockService.deleteMockRequest(id)
-            .then(
-            		fetchAllMsgMockRequest,
-            function(errResponse){
-                console.error('Error while deleting Msg MockRequest');
-            }
-        );
-    }
+
 
     function deleteMockRequest(id){
         MockService.deleteMockRequest(id)

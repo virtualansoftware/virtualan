@@ -329,7 +329,7 @@ json-tree .branch-preview::after {
                                data-target="#add-mock"><span
                                 class="glyphicon glyphicon-plus"></span> Add Mock Data</a></li>
                         <li><a class="dropdown-item" href="#" data-toggle="modal"
-                               data-target="#load-mock" ng-click="ctrl.loadData()"><span
+                               data-target="#load-mock" data-ng-click="ctrl.reloadData()"><span
                                 class="glyphicon glyphicon-th-list"></span> Load Mock Data</a></li>
                     </ul>
                 </li>
@@ -344,7 +344,7 @@ json-tree .branch-preview::after {
                                data-target="#add-message-mock"><span
                                 class="glyphicon glyphicon-plus"></span> Add Mock Data</a></li>
                         <li><a class="dropdown-item" href="#" data-toggle="modal"
-                               data-target="#load-message-mock" ng-click="ctrl.loadMsgData()"><span
+                               data-target="#load-message-mock" data-ng-click="ctrl.reloadMsgData()"><span
                                 class="glyphicon glyphicon-th-list"></span> Load Mock Data</a></li>
                     </ul>
                 </li>
@@ -359,7 +359,7 @@ json-tree .branch-preview::after {
                                data-target="#add-soap-mock"><span
                                 class="glyphicon glyphicon-plus"></span> Add Mock Data</a></li>
                         <li><a class="dropdown-item" href="#" data-toggle="modal"
-                               data-target="#load-soap-mock" ng-click="ctrl.loadSoapData()"><span
+                               data-target="#load-soap-mock" data-ng-click="ctrl.reloadSoapData()"><span
                                 class="glyphicon glyphicon-th-list"></span> Load Mock Data</a></li>
                     </ul>
                 </li>
@@ -455,10 +455,10 @@ json-tree .branch-preview::after {
                         <li>
                             <hr class="line"/>
                         </li>
-                        <li><a class="dropdown-item" href="#">v1.3.1</a></li>
+                        <li><a class="dropdown-item" href="#">v1.3.2</a></li>
                         <li><a class="dropdown-item"
                                href="#"
-                               ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-setup?downloaded=plugin&version=v1.3.1')">Help</a></li>
+                               ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-setup?downloaded=plugin&version=v1.3.2')">Help</a></li>
                     </ul>
                 </li>
             </ul>
@@ -1570,7 +1570,7 @@ json-tree .branch-preview::after {
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="tablecontainer">
+                        <div class="tablecontainer" style="overflow-x:scroll;">
                             <input type="text" ng-model="ctrl.searchSoapText"
                                    class="head-text-black form-control search-icon float-right"
                                    placeholder="Type to filter"> Total items:
@@ -1663,9 +1663,9 @@ json-tree .branch-preview::after {
                                     boundary-links="true" max-size="ctrl.maxSoapSize"
                                     ng-model="ctrl.currentSoapPage" class="pagination-sm"
                                     items-per-page="ctrl.perSoapPage"></pagination>
-                        <!-- 	<button type="button" class="btn btn-info"
-                        ng-click="ctrl.loadData()">Load Data</button>
- -->
+                        <button type="button" class="btn btn-info"
+                                data-target="#load-soap-mock" data-toggle="modal" data-ng-click="ctrl.reloadSoapData()">Refresh</button>
+
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -1696,7 +1696,7 @@ json-tree .branch-preview::after {
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="tablecontainer">
+                        <div class="tablecontainer" style="overflow-x:scroll;">
                             <input type="text" ng-model="ctrl.searchMsgText"
                                    class="head-text-black form-control search-icon float-right"
                                    placeholder="Type to filter"> Total items:
@@ -1800,9 +1800,10 @@ json-tree .branch-preview::after {
                                     boundary-links="true" max-size="ctrl.maxMsgSize"
                                     ng-model="ctrl.currentMsgPage" class="pagination-sm"
                                     items-per-page="ctrl.perMsgPage"></pagination>
-                        <!-- 	<button type="button" class="btn btn-info"
-                        ng-click="ctrl.loadData()">Load Data</button>
- -->
+                        <button type="button" class="btn btn-info"
+                                data-target="#load-message-mock" data-toggle="modal" data-ng-click="ctrl.reloadMsgData()">Refresh</button>
+
+                        -->
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -1836,7 +1837,7 @@ json-tree .branch-preview::after {
                         </div>
                     </div>
                     <div class="modal-body">
-                        <div class="tablecontainer">
+                        <div class="tablecontainer" style="overflow-x:scroll;">
                             <input type="text" ng-model="ctrl.searchText"
                                    class="head-text-black form-control search-icon float-right"
                                    placeholder="Type to filter"> Total items: {{ctrl.filtered.length}} <br/>
@@ -1951,6 +1952,8 @@ json-tree .branch-preview::after {
                                     boundary-links="true" max-size="ctrl.maxSize"
                                     ng-model="ctrl.currentPage" class="pagination-sm"
                                     items-per-page="ctrl.perPage"></pagination>
+                        <button type="button" class="btn btn-info"
+                                data-target="#load-mock" data-toggle="modal" data-ng-click="ctrl.reloadData()">Refresh</button>
 
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>

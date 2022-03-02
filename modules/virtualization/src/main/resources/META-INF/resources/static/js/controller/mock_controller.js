@@ -485,6 +485,19 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
     self.loadMsgData = fetchAllMsgMockRequest();
     self.loadSoapData = fetchAllSoapMockRequest();
 
+    self.reloadSoapData = function(){
+        MockService.fetchAllSoapMockRequest()
+            .then(
+            function(d) {
+                self.mockSoapRequests = d;
+                self.filterSoapList = self.mockSoapRequests;
+            },
+            function(errResponse){
+                console.error('Error while fetching Soap Mocks');
+            }
+        );
+    };
+
     function fetchAllSoapMockRequest(){
     	MockService.fetchAllSoapMockRequest()
             .then(
@@ -494,6 +507,19 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             },
             function(errResponse){
                 console.error('Error while fetching Soap Mocks');
+            }
+        );
+    };
+
+     self.reloadMsgData = function (){
+        MockService.fetchAllMsgMockRequest()
+            .then(
+            function(d) {
+                self.mockMsgRequests = d;
+                self.filterMsgList = self.mockMsgRequests;
+            },
+            function(errResponse){
+                console.error('Error while fetching Mocks');
             }
         );
     };
@@ -529,7 +555,19 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
             }
         );
     };
-    
+
+    self.reloadData =  function (){
+        MockService.fetchAllMockRequest()
+              .then(
+              function(d) {
+                  self.mockRequests = filterRestObject(d);
+                  self.filterList = self.mockRequests;
+              },
+              function(errResponse){
+                  console.error('Error while fetching Mocks');
+              }
+          );
+      };
     
     function loadAllMockRequest(){
         MockService.loadAllMockRequest()
