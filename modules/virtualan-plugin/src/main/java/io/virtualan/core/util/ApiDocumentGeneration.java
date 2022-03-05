@@ -1,44 +1,34 @@
 package io.virtualan.core.util;
 
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 import io.virtualan.controller.VirtualServiceController;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.springframework.stereotype.Component;
 
-@EnableSwagger2
+@Component
 public class ApiDocumentGeneration {
 
-    @Autowired
-    private VirtualServiceController virtualServiceController;
-
     @Bean
-    public Docket customImplementation(ServletContext servletContext) {
-        final Docket docket = new Docket(DocumentationType.SWAGGER_2);
-        final ApiSelectorBuilder selector = docket.select();
-        for (final Map.Entry<String, Class> virtualServices : virtualServiceController
-                .getVirtualServiceInfo().findVirtualServices().entrySet()) {
-            selector.apis(RequestHandlerSelectors
-                    .basePackage(virtualServices.getValue().getPackage().getName()));
-        }
-        selector.build().directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
-                .directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
-                .apiInfo(apiInfo());
-        return docket;
+    public OpenAPI customOpenAPI() {
+        Contact contact = new Contact();
+        contact.setName(contactName);
+        contact.setEmail( contactEmail);
+        contact.setUrl(contactUrl);
+        return new OpenAPI()
+            .info(new Info()
+                    .title(apiTitle)
+                    .version("2.4.3")
+                    .description(apiTitle)
+                    .termsOfService("https://www.virtualan.io/contact-us.html")
+                    .contact(contact)
+                    .license(new License().name("Apache 2.0").url("https://www.virtualan.io")));
     }
-
 
     @Value("${virtualan.api.contact.name:Elan Thangamani}")
     private String contactName;
@@ -46,18 +36,10 @@ public class ApiDocumentGeneration {
     @Value("${virtualan.api.contact.url:http://www.virtualan.io}")
     private String contactUrl;
 
-    @Value("${virtualan.api.contact.email:elans3.java@gmail.com}")
+    @Value("${virtualan.api.contact.email:elan.thangamani@virtualan.io}")
     private String contactEmail;
 
     @Value("${virtualan.api.title:Virtualan API Catalog}")
     private String apiTitle;
-
-    ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title(apiTitle).description("Virtualan API Catalog")
-                .license("Apache-2.0").licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-                .termsOfServiceUrl("").version("1.0.0")
-                .contact(new Contact(contactName, contactUrl, contactEmail)).build();
-    }
-
 
 }

@@ -46,8 +46,16 @@ public class VirtualParameterizedUtil {
   private VirtualServiceValidRequest virtualServiceValidRequest;
 
 
-  @Autowired
   private VirtualServiceUtil virtualServiceUtil;
+
+  public VirtualServiceUtil getVirtualServiceUtil() {
+    return virtualServiceUtil;
+  }
+
+  @Autowired
+  public void setVirtualServiceUtil(VirtualServiceUtil virtualServiceUtil) {
+    this.virtualServiceUtil = virtualServiceUtil;
+  }
 
   public Map<Integer, ResponseParam> handleParameterizedRequest(
       VirtualServiceRequest mockTransferObject) {

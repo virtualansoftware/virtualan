@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.MockRequest;
 import io.virtualan.core.model.MockResponse;
 import io.virtualan.core.model.MockServiceRequest;
@@ -55,9 +54,6 @@ public class VirtualServiceValidRequest {
 
     @Autowired
     private RuleEvaluator ruleEvaluator;
-
-    @Autowired
-    private VirtualServiceUtil virtualServiceUtil;
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -178,13 +174,35 @@ public class VirtualServiceValidRequest {
         return matchMap;
     }
 
+    public Map<Integer, ReturnMockResponse> isResponseExists(
+        final Map<MockRequest, MockResponse> mockDataSetupMap,
+        MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
+
+        if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
+            && mockServiceRequest.getInput() == null) {
+            return validForNoParam(mockDataSetupMap,
+                mockServiceRequest);
+        } else if((mockServiceRequest.getParams() == null
+            || mockServiceRequest.getParams().isEmpty())
+            && mockServiceRequest.getInput() != null) {
+            return validForInputObject(mockDataSetupMap,
+                mockServiceRequest);
+        } else if (mockServiceRequest.getParams() != null
+            && !mockServiceRequest.getParams().isEmpty()) {
+            return validForParam(mockDataSetupMap,
+                mockServiceRequest);
+        }
+        return null;
+    }
+
+
     public Map<Integer, ReturnMockResponse> validObject(
         final Map<MockRequest, MockResponse> mockDataSetupMap,
         MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         if(ContentType.XML.equals(mockServiceRequest.getContentType())) {
-            return virtualServiceUtil.isResponseExists(mockDataSetupMap, mockServiceRequest);
+            return isResponseExists(mockDataSetupMap, mockServiceRequest);
         } else {
             String jsonString =
                 (mockServiceRequest.getInputObjectType() != null &&
