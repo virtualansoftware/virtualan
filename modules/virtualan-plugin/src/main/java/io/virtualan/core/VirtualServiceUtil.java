@@ -479,7 +479,7 @@ public class VirtualServiceUtil {
                     .checkScriptResponse(mockDataSetupMap, mockServiceRequest);
             } catch (ScriptErrorException e) {
                 log.error("Error  in Script configuration :" + e.getMessage());
-            }
+                }
         }
 
         //No script conditions exists/met then run the mock response

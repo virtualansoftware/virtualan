@@ -29,6 +29,8 @@ public class Converter {
     private String getString(Object jsonObject) throws JsonProcessingException {
         if(jsonObject != null && jsonObject instanceof LinkedHashMap) {
             return objectMapper.writeValueAsString(jsonObject);
+        } else if (jsonObject != null && jsonObject instanceof String){
+            return jsonObject.toString();
         }
         return null;
     }

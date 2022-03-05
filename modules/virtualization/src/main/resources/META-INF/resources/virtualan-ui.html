@@ -455,10 +455,10 @@ json-tree .branch-preview::after {
                         <li>
                             <hr class="line"/>
                         </li>
-                        <li><a class="dropdown-item" href="#">v1.3.2</a></li>
+                        <li><a class="dropdown-item" href="#">v1.3.3</a></li>
                         <li><a class="dropdown-item"
                                href="#"
-                               ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-setup?downloaded=plugin&version=v1.3.2')">Help</a></li>
+                               ng-click="uctrl.loadTutorialsPage('https://tutorials.virtualan.io/#/Virtualan-setup?downloaded=plugin&version=v1.3.3')">Help</a></li>
                     </ul>
                 </li>
             </ul>
@@ -690,6 +690,11 @@ json-tree .branch-preview::after {
 
                                                                                 ng-options="name for (type, name) in mockRequest.types"
                                                                                 required>
+                                                                        </select>
+                                                                        <select name="contentType"
+                                                                                ng-model="mockRequest.contentType"
+                                                                                required>
+                                                                            <option selected id="JSON" >JSON</option>
                                                                         </select>
                                                                         <div class="has-error" ng-show="myForm.$dirty">
 																		<span ng-show="myForm.httpStatus.$error.required">This
