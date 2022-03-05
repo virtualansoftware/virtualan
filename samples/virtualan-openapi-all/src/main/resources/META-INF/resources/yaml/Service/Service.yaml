@@ -1,19 +1,11 @@
-openapi: "3.0.3"
+openapi: "3.0.0"
 info:
-  version: 0.0.2
-  title: XXXX Sample specification
-  description: Sample API
-  contact:
-    name: Test User
-    url: http://api.localhost
-    email: abcd.xyz-xxxxxx@xxxx.ac
+  version: 1.0.0
+  title: Sample API
   license:
-    name: No license
+    name: MIT
 servers:
-  - url: https://live.virtualandemo.com
-    description: Production server (uses live data)
-  - url: http://localhost:8800
-    description: Sandbox server (uses test data)
+  - url: http://localhost:8080/api/
 paths:
   /sample:
     post:

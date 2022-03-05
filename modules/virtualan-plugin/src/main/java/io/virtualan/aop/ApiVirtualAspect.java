@@ -62,11 +62,16 @@ public class ApiVirtualAspect {
     HttpServletRequest request;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
+
     private VirtualServiceUtil virtualServiceUtil;
 
     public VirtualServiceUtil getVirtualServiceUtil() {
         return virtualServiceUtil;
+    }
+
+    @Autowired
+    public void setVirtualServiceUtil(VirtualServiceUtil virtualServiceUtil) {
+        this.virtualServiceUtil = virtualServiceUtil;
     }
 
     public String addQueryParamValue(Object list) {

@@ -22,7 +22,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 
 /**
@@ -34,7 +33,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableAspectJAutoProxy
-@EnableSwagger2
 @EnableAsync
 @ComponentScan(basePackages = {"io.virtualan"})
 public class VirtualServiceConfig {

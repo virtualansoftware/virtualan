@@ -64,6 +64,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -96,7 +97,6 @@ public class VirtualServiceUtil {
     @Autowired
     private VirtualServiceParamComparator virtualServiceParamComparator;
 
-    @Autowired
     private VirtualParameterizedUtil virtualParameterizedUtil;
 
     @Autowired
@@ -113,6 +113,17 @@ public class VirtualServiceUtil {
     private VirtualServiceInfoFactory virtualServiceInfoFactory;
 
     private VirtualServiceInfo virtualServiceInfo;
+
+    public VirtualParameterizedUtil getVirtualParameterizedUtil() {
+        return virtualParameterizedUtil;
+    }
+
+    @Autowired
+    @Lazy
+    public void setVirtualParameterizedUtil(
+        VirtualParameterizedUtil virtualParameterizedUtil) {
+        this.virtualParameterizedUtil = virtualParameterizedUtil;
+    }
 
     public static Object getActualValue(Object object, Map<String, Object> contextObject) {
         String key = object.toString();
@@ -289,7 +300,7 @@ public class VirtualServiceUtil {
             }
 
             final Map<Integer, ReturnMockResponse> returnMockResponseMap =
-                isResponseExists(mockDataSetupMap, mockServiceRequest);
+                virtualServiceValidRequest.isResponseExists(mockDataSetupMap, mockServiceRequest);
 
             if (returnMockResponseMap.size() > 0) {
                 return isResposeExists(mockTransferObject, mockServiceRequest.getInputObjectType(),
@@ -410,26 +421,6 @@ public class VirtualServiceUtil {
             mockServiceRequest);
     }
 
-    public Map<Integer, ReturnMockResponse> isResponseExists(
-        final Map<MockRequest, MockResponse> mockDataSetupMap,
-        MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
-
-        if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty())
-            && mockServiceRequest.getInput() == null) {
-            return virtualServiceValidRequest.validForNoParam(mockDataSetupMap,
-                mockServiceRequest);
-        } else if((mockServiceRequest.getParams() == null
-            || mockServiceRequest.getParams().isEmpty())
-            && mockServiceRequest.getInput() != null) {
-            return virtualServiceValidRequest.validForInputObject(mockDataSetupMap,
-                mockServiceRequest);
-        } else if (mockServiceRequest.getParams() != null
-            && !mockServiceRequest.getParams().isEmpty()) {
-            return virtualServiceValidRequest.validForParam(mockDataSetupMap,
-                mockServiceRequest);
-        }
-        return null;
-    }
 
     MockServiceRequest buildMockServiceRequest(VirtualServiceRequest mockTransferObject) {
 
@@ -479,13 +470,13 @@ public class VirtualServiceUtil {
                     .checkScriptResponse(mockDataSetupMap, mockServiceRequest);
             } catch (ScriptErrorException e) {
                 log.error("Error  in Script configuration :" + e.getMessage());
-            }
+                }
         }
 
         //No script conditions exists/met then run the mock response
         if (returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
             returnMockResponseMap =
-                isResponseExists(mockDataSetupMap, mockServiceRequest);
+                virtualServiceValidRequest.isResponseExists(mockDataSetupMap, mockServiceRequest);
         }
 
         VirtualServiceUtil.log.debug("number of matches : {}",

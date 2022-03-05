@@ -811,6 +811,7 @@ myApp.controller('MockController', ['$scope',  '$filter', '$modal', 'MockService
               operationId:mockRequest.operationId,
         			input:mockRequest.input,
         			output:mockRequest.output,
+        			contentType:mockRequest.contentType,
         			excludeList:mockRequest.excludeList, 
         			httpStatusCode:mockRequest.httpStatusCode,
         			method:mockRequest.method,

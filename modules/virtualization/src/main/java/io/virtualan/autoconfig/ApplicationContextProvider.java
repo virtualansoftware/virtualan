@@ -1,22 +1,10 @@
 package io.virtualan.autoconfig;
 
 import io.virtualan.core.util.VirtualanClassLoader;
-import io.virtualan.core.util.VirtualanConfiguration;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.DescriptiveResource;
 import org.springframework.stereotype.Component;
 
 @Component
