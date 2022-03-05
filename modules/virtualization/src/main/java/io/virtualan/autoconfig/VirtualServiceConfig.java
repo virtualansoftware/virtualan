@@ -24,7 +24,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 
 /**
@@ -36,7 +35,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@EnableSwagger2
 @EnableAsync
 @ComponentScan(basePackages = {"io.virtualan"})
 @Order(Ordered.HIGHEST_PRECEDENCE)

@@ -18,8 +18,6 @@ import com.cedarsoftware.util.io.JsonObject;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.ResponseProcessType;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,16 +28,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.MockRequest;
 import io.virtualan.core.model.MockResponse;
 import io.virtualan.core.model.MockServiceRequest;
@@ -62,9 +56,6 @@ public class VirtualServiceValidRequest {
 
     @Autowired
     private RuleEvaluator ruleEvaluator;
-
-    @Autowired
-    private VirtualServiceUtil virtualServiceUtil;
 
     @Autowired
     private ScriptExecutor scriptExecutor;
@@ -185,14 +176,27 @@ public class VirtualServiceValidRequest {
         log.debug("Rule evaluated Ended : " + matchMap);
         return matchMap;
     }
-    
+
+    public Map<Integer, ReturnMockResponse> isResponseExists(
+        final Map<MockRequest, MockResponse> mockDataSetupMap,
+        MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
+        if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty()) && mockServiceRequest.getInput() == null) {
+            return validForNoParam(mockDataSetupMap, mockServiceRequest);
+        } else if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty()) && mockServiceRequest.getInput() != null) {
+            return validForInputObject(mockDataSetupMap, mockServiceRequest);
+        } else {
+            return mockServiceRequest.getParams() != null && !mockServiceRequest.getParams().isEmpty() ? validForParam(mockDataSetupMap, mockServiceRequest) : null;
+        }
+    }
+
+
     public Map<Integer, ReturnMockResponse> validObject(
             final Map<MockRequest, MockResponse> mockDataSetupMap,
             MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
         final Map<Integer, ReturnMockResponse> matchMap = new HashMap<>();
         int count = 0;
         if(ContentType.XML.equals(mockServiceRequest.getContentType())) {
-            return virtualServiceUtil.isResponseExists(mockDataSetupMap, mockServiceRequest);
+            return isResponseExists(mockDataSetupMap, mockServiceRequest);
         } else {
             String jsonString =
                 (mockServiceRequest.getInputObjectType() != null &&

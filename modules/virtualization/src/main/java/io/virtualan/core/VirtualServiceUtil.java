@@ -69,6 +69,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -88,9 +89,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class VirtualServiceUtil {
 
-  static {
-    log.info("start the loading");
-  }
 
   private final Locale locale = LocaleContextHolder.getLocale();
   @Autowired
@@ -110,13 +108,18 @@ public class VirtualServiceUtil {
   @Autowired
   private VirtualServiceParamComparator virtualServiceParamComparator;
   @Autowired
+  @Lazy
   private OpenApiGeneratorUtil openApiGeneratorUtil;
   @Autowired
   private ApplicationContextProvider applicationContext;
   @Autowired
+  @Lazy
   private MessageUtil messageUtil;
+
   @Autowired
+  @Lazy
   private VirtualParameterizedUtil virtualParameterizedUtil;
+
   @Autowired
   private XMLConverter xmlConverter;
   @Autowired
@@ -327,7 +330,7 @@ public class VirtualServiceUtil {
       }
 
       final Map<Integer, ReturnMockResponse> returnMockResponseMap =
-          isResponseExists(mockDataSetupMap, mockServiceRequest);
+          virtualServiceValidRequest.isResponseExists(mockDataSetupMap, mockServiceRequest);
 
       if (returnMockResponseMap.size() > 0) {
         return isResposeExists(mockTransferObject, mockServiceRequest.getInputObjectType(),
@@ -449,17 +452,6 @@ public class VirtualServiceUtil {
         mockServiceRequest);
   }
 
-  public Map<Integer, ReturnMockResponse> isResponseExists(
-      final Map<MockRequest, MockResponse> mockDataSetupMap,
-      MockServiceRequest mockServiceRequest) throws IOException, JAXBException {
-    if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty()) && mockServiceRequest.getInput() == null) {
-      return this.virtualServiceValidRequest.validForNoParam(mockDataSetupMap, mockServiceRequest);
-    } else if ((mockServiceRequest.getParams() == null || mockServiceRequest.getParams().isEmpty()) && mockServiceRequest.getInput() != null) {
-      return this.virtualServiceValidRequest.validForInputObject(mockDataSetupMap, mockServiceRequest);
-    } else {
-      return mockServiceRequest.getParams() != null && !mockServiceRequest.getParams().isEmpty() ? this.virtualServiceValidRequest.validForParam(mockDataSetupMap, mockServiceRequest) : null;
-    }
-  }
 
   MockServiceRequest buildMockServiceRequest(VirtualServiceRequest mockTransferObject) {
 
@@ -527,7 +519,7 @@ public class VirtualServiceUtil {
     //No script conditions exists/met then run the mock response
     if (returnMockResponseMap == null || returnMockResponseMap.isEmpty()) {
       returnMockResponseMap =
-          isResponseExists(mockDataSetupMap, mockServiceRequest);
+          virtualServiceValidRequest.isResponseExists(mockDataSetupMap, mockServiceRequest);
     }
 
     VirtualServiceUtil.log.debug("number of matches : {}",
