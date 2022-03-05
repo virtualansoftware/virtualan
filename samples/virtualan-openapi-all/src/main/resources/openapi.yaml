@@ -53,6 +53,16 @@ paths:
       produces:
         - application/json
       parameters:
+        - name: petIds
+          in: query
+          description: petIds
+          type: array
+          items:
+            type: integer
+            format: int32
+          collectionFormat: "multi"
+          minItems: 0
+          maxItems: 10
         - name: status
           in: query
           description: Status values that need to be considered for filter

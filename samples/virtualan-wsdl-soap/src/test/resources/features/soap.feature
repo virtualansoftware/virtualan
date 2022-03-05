@@ -1,7 +1,6 @@
 Feature: Test Soap API
-
-  Scenario: Setup a mock service for Soap for POST
-    Given set Soap Mock data for the following given input
+  Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
+    Given create Pet Mock data for the with given input
       | url					| http://virtualan.io/types/helloworld	|
       | input               | <hel:person xmlns:hel="http://virtualan.io/types/helloworld"> <hel:firstName>John</hel:firstName> <hel:lastName>Mathew</hel:lastName> </hel:person>       |
       | output              | <ns2:greeting xmlns:ns2="http://virtualan.io/types/helloworld">             <ns2:greeting>Welcome John for the SOAP World!!!</ns2:greeting></ns2:greeting> |
@@ -11,12 +10,15 @@ Feature: Test Soap API
       | resource            |  http://virtualan.io/types/helloworld	|
       | contentType         |  XML                                  |
       | requestType         |  SOAP                                 |
-    When tester create the mock data for Soap
-    Then verify the status code is 201
-    And verify mock response with "mockStatus" includes following in the response
-      | code | Mock created successfully |
-  Scenario: Setup a mock service for Soap for POST
-    Given set Soap Mock data for the following given input
+    And add content type with given header params
+      | contentType | application/json |
+    When a user post application/json in virtualservices resource on virtualan
+    Then the status code is 201
+    And verify across response includes following in the response
+      | mockStatus.code | Mock created successfully |
+
+  Scenario: Setup a mock service for Pet with CREATE call with "Mock Request Body" validation failure
+    Given create Pet Mock data for the with given input
       | url					| http://virtualan.io/types/helloworld	|
       | input               | <hel:person xmlns:hel="http://virtualan.io/types/helloworld"> <hel:firstName>Mani</hel:firstName> <hel:lastName>Elan</hel:lastName> </hel:person>       |
       | output              | <ns2:greeting xmlns:ns2="http://virtualan.io/types/helloworld">             <ns2:greeting>Welcome SOAP World!!!</ns2:greeting></ns2:greeting> |
@@ -26,7 +28,9 @@ Feature: Test Soap API
       | resource            |  http://virtualan.io/types/helloworld	|
       | contentType         |  XML                                  |
       | requestType         |  SOAP                                 |
-    When tester create the mock data for Soap
-    Then verify the status code is 400
-    And verify response includes following in the response
+    And add content type with given header params
+      | contentType | application/json |
+    When a user post application/json in virtualservices resource on virtualan
+    Then the status code is 400
+    And verify across response includes following in the response
       | code | This Mock request already Present, Change the input Data!!! |
