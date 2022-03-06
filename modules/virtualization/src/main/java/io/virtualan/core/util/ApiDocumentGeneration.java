@@ -21,7 +21,6 @@ public class ApiDocumentGeneration {
         return new OpenAPI()
             .info(new Info()
                 .title(apiTitle)
-                .version("2.4.3")
                 .description(apiTitle)
                 .termsOfService("https://www.virtualan.io/contact-us.html")
                 .contact(contact)

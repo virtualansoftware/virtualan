@@ -3,7 +3,6 @@ package io.virtualan;
 import cz.jirutka.spring.embedmongo.EmbeddedMongoFactoryBean;
 import com.mongodb.MongoClient;
 
-
 public class MongoConfig {
     private static final String MONGO_DB_URL = "localhost";
 

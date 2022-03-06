@@ -41,10 +41,12 @@ public class Converter {
             try {
                 return objectMapper.readValue(jsonStr, new TypeReference<Map<String, Object>>(){});
             } catch (Exception e) {
-                throw new BadDataException(e.getMessage());
+                // skip this error due to parameterized mock could have params like <> and
+                // could return direct number instead of JSON response.
+                //throw new BadDataException(e.getMessage());
             }
         }
-        return null;
+        return jsonStr;
     }
 
 
