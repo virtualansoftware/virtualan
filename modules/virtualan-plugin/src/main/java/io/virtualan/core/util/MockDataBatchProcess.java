@@ -57,7 +57,6 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 	
 	@PostConstruct
 	public void loadRequestdata()  {
-		System.setProperty("springdoc.swagger-ui.queryConfigEnabled", "true");
 		try {
 			InputStream stream = MockDataBatchProcess.class.getClassLoader().getResourceAsStream(dataLoadFileLocation);
 			if(stream != null) {
