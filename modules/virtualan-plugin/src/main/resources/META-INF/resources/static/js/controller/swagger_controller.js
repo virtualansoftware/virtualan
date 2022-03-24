@@ -8,7 +8,7 @@ myApp.controller('SwaggerController', [ '$scope', '$window','MockService',
 			self.catalogName = '';
 			
 			self.openSwaggerCatalog = function() {
-				loadUrl("swagger-ui/index.html");
+				loadUrl("swagger-ui.html");
 			};
 			self.openSwaggerUI = function() {
 				loadUrl("swagger-ui/index.html");

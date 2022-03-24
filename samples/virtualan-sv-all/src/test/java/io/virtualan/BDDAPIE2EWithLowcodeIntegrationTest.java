@@ -39,11 +39,11 @@ public class BDDAPIE2EWithLowcodeIntegrationTest {
         try {
 
             boolean isSuccess = VirtualanTestPlanExecutor.invoke("apiexecution.yaml");
-            if (!isSuccess) {
+            if (isSuccess) {
+                Assert.assertTrue("Successfully executed all the integration testcases", true);
+            } else {
                 Assert.assertTrue("Integration testcases are Failed", false);
             }
-            Assert.assertTrue("Successfully executed all the integration testcases",true);
-
         } catch (InterruptedException e) {
             e.printStackTrace();
             Assert.assertTrue("Integration testcases are Failed > " + e.getMessage(), false);
