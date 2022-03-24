@@ -21,7 +21,7 @@ before_build:
   - java -version
 
 build_script:
-  - mvn clean install
+  - mvn clean install -Denv=samples
 cache:
   - C:\maven\
   - C:\Users\appveyor\.m2
