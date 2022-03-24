@@ -5,7 +5,7 @@ install:
       Add-Type -AssemblyName System.IO.Compression.FileSystem
       if (!(Test-Path -Path "C:\maven" )) {
         (new-object System.Net.WebClient).DownloadFile(
-          'http://www.us.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.zip',
+          'https://www.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.zip',
           'C:\maven-bin.zip'
         )
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
@@ -15,10 +15,13 @@ install:
   - cmd: SET JAVA_OPTS=-XX:MaxPermSize=2g -Xmx4g
   - cmd: SET M2_HOME=C:\maven\apache-maven-3.2.5
 
+before_build:
+  - set "JAVA_HOME=C:\Program Files\Java\jdk11"
+  - set "PATH=C:\Program Files\Java\jdk11\bin;%PATH%"
+  - java -version
+
 build_script:
-  - mvn clean package -DskipTest
-test_script:
-  - mvn clean install -Denv=samples
+  - mvn clean install
 cache:
   - C:\maven\
   - C:\Users\appveyor\.m2
