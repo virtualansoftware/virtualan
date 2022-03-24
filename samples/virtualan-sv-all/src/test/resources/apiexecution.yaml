@@ -7,7 +7,6 @@ apiExecutor:
     inputExcel: virtualan_bdd_testcase_run_manager_1.xlsx
     cucumblanProperties:
       service.api.api: http://localhost:8800
-      service.api.virtualservices: http://localhost:8800
 #  - reportTitle: "Integration testcase with env live.virtualandemo.com"
 #    env: live.virtualandemo
 #    outputDir: target/pet/live
