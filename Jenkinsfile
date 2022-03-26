@@ -8,19 +8,19 @@ pipeline {
     stages {
         stage ('Compile Stage') {
             steps {
-                  bat 'mvn clean compile'
+                  sh 'mvn clean compile'
             }
         }
         stage ('Build Stage') {
             steps {
                 
-                    bat 'mvn clean install'
+                    sh 'mvn clean install'
             }
         }
        stage ('Test Sample Stage') {
             steps {
                 
-                    bat 'mvn clean install -Denv=samples '
+                    sh 'mvn clean install -Denv=samples '
             }
         }
         stage('Generate HTML report') {
