@@ -21,7 +21,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
 		<spring.boot.version>2.6.0</spring.boot.version>
-		<spring.boot.mq.version>2.5.7</spring.boot.mq.version>
+		<spring.boot.mq.version>2.6.6</spring.boot.mq.version>
 		<groovy.version>3.0.7</groovy.version>
 		<junit.version>4.13.1</junit.version>
 		<slf4j.version>1.7.36</slf4j.version>
