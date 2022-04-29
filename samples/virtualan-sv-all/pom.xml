@@ -302,7 +302,7 @@
 		<dependency>
 			<groupId>io.virtualan</groupId>
 			<artifactId>idaithalam</artifactId>
-			<version>1.6.2</version>
+			<version>1.6.4</version>
 		</dependency>
 
 	</dependencies>
