@@ -15,7 +15,7 @@ import io.virtualan.idaithalam.core.api.VirtualanTestPlanExecutor;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-    (classes = {org.openapitools.OpenAPI2SpringBoot.class},webEnvironment = WebEnvironment.DEFINED_PORT)
+    (classes = {org.openapitools.OpenApiGeneratorApplication.class},webEnvironment = WebEnvironment.DEFINED_PORT)
 public class BDDAPIE2EWithLowcodeIntegrationTest {
 
     @Before
