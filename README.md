@@ -2,7 +2,8 @@
 <h1 align="center">Virtualan</h1>
 <div align="center">
 
-**virtualan-plugin:**  [![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/virtualan-plugin.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22virtualan-plugin%22)   **virtualization:** [![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/virtualization.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22virtualization%22)  [![Build Status](https://travis-ci.com/virtualansoftware/virtualan.svg?branch=master)](https://travis-ci.com/virtualansoftware/virtualan) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=virtualansoftware_virtualan&metric=alert_status)](https://sonarcloud.io/dashboard?id=virtualansoftware_virtualan)
+**virtualan-plugin:**  [![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/virtualan-plugin.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22virtualan-plugin%22)   **virtualization:** [![Maven Central](https://img.shields.io/maven-central/v/io.virtualan/virtualization.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.virtualan%22%20AND%20a:%22virtualization%22) [![Build status](https://ci.appveyor.com/api/projects/status/31oxvck9dmghc4iv/branch/master?svg=true)](https://ci.appveyor.com/project/elans3/virtualan/branch/master)
+ [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=virtualansoftware_virtualan&metric=alert_status)](https://sonarcloud.io/dashboard?id=virtualansoftware_virtualan)
 </div>
 
 > Virtualan is an open source-based Open API Interface driven, Kafka, AMQ and MQTT Service virtualization product. It supports #OpenAPI, #AsyncAPI test development. This supports #shiftleft testing.
@@ -87,7 +88,7 @@ Developing  a sprint boot(supports from 2.0.1.RELEASE) REST services using Rest 
 ## [License](#table-of-contents)
 -------
 
-Copyright 2020 Virtualan Contributors (https://virtualan.io)  
+Copyright 2022 Virtualan Contributors (https://virtualan.io)  
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

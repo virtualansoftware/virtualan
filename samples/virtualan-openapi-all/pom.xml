@@ -7,14 +7,14 @@
   <version>1.0.3-SNAPSHOT</version>
   <description>Virtualan Rest virtualization and rest - Demo</description>
   <properties>
-    <cucumblan.version>1.4.0</cucumblan.version>
+    <cucumblan.version>1.4.1</cucumblan.version>
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <virtualan.version>1.4.2-SNAPSHOT</virtualan.version>
     <cucumber.version>7.0.0</cucumber.version>
     <hsqldb.version>2.6.1</hsqldb.version>
-    <spring.boot.version>2.6.4</spring.boot.version>
+    <spring.boot.version>2.6.8</spring.boot.version>
   </properties>
   <build>
     <finalName>sv-virtualan-rest-demo</finalName>
@@ -188,7 +188,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.2</version>
+      <version>2.13.2.1</version>
     </dependency>
 
 

@@ -13,7 +13,7 @@
 		<virtualan.version>2.5.2-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 		<hsqldb.version>2.6.1</hsqldb.version>
-		<spring.boot.version>2.6.4</spring.boot.version>
+		<spring.boot.version>2.6.8</spring.boot.version>
 		<groovy.version>2.4.7</groovy.version>
 		<testng-version>6.14.3</testng-version>
 	</properties>
@@ -143,7 +143,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.2</version>
+			<version>2.13.2.1</version>
 		</dependency>
 
 
@@ -179,7 +179,7 @@
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<version>3.2.8</version>
+			<version>3.4.3</version>
 		</dependency>
 
 		<dependency>

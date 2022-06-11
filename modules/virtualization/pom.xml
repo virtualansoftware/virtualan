@@ -20,11 +20,11 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
-		<spring.boot.version>2.6.0</spring.boot.version>
-		<spring.boot.mq.version>2.5.7</spring.boot.mq.version>
+		<spring.boot.mq.version>2.6.7</spring.boot.mq.version>
+		<spring.boot.version>2.6.8</spring.boot.version>
 		<groovy.version>3.0.7</groovy.version>
 		<junit.version>4.13.1</junit.version>
-		<slf4j.version>1.7.32</slf4j.version>
+		<slf4j.version>1.7.36</slf4j.version>
 		<validation-api.version>1.1.0.Final</validation-api.version>
 		<lombok.version>1.18.20</lombok.version>
 		<jaxb.version>2.3.1</jaxb.version>
@@ -36,8 +36,8 @@
 		<rs-api.version>2.1.1</rs-api.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
-		<jackson-databind.version>2.13.2</jackson-databind.version>
-		<spring-kafka.version>2.8.0</spring-kafka.version>
+		<jackson-databind.version>2.13.2.1</jackson-databind.version>
+		<spring-kafka.version>2.8.6</spring-kafka.version>
 		<kafka-clients-version>2.8.1</kafka-clients-version>
 		<spring-integration-kafka.version>5.5.6</spring-integration-kafka.version>
 	</properties>
@@ -267,7 +267,7 @@
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-mqtt</artifactId>
-			<version>5.5.6</version>
+			<version>5.5.12</version>
 		</dependency>
 
 		<dependency>
@@ -289,7 +289,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>5.3.13</version>
+			<version>5.3.18</version>
 		</dependency>
 
 		<dependency>
