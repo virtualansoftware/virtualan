@@ -7,7 +7,7 @@
   <version>1.0.3-SNAPSHOT</version>
   <description>Virtualan Rest virtualization and rest - Demo</description>
   <properties>
-    <cucumblan.version>1.4.0</cucumblan.version>
+    <cucumblan.version>1.4.1</cucumblan.version>
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
