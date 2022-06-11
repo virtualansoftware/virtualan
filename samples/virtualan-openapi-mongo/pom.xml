@@ -13,7 +13,7 @@
 		<virtualan.version>2.5.2-SNAPSHOT</virtualan.version>
 		<cucumber.version>1.2.5</cucumber.version>
 		<hsqldb.version>2.6.1</hsqldb.version>
-		<spring.boot.version>2.6.4</spring.boot.version>
+		<spring.boot.version>2.6.8</spring.boot.version>
 		<groovy.version>2.4.7</groovy.version>
 		<testng-version>6.14.3</testng-version>
 	</properties>
