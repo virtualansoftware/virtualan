@@ -7,7 +7,7 @@
   <version>1.0.3-SNAPSHOT</version>
   <modelVersion>4.0.0</modelVersion>
   <properties>
-    <virtualan.version>1.4.2-SNAPSHOT</virtualan.version>
+    <virtualan.version>1.4.3-SNAPSHOT</virtualan.version>
     <cucumber.version>1.2.5</cucumber.version>
     <java.version>1.8</java.version>
     <maven-jaxb2-plugin.version>0.14.0</maven-jaxb2-plugin.version>
