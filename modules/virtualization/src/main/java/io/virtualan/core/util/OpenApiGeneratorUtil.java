@@ -200,7 +200,7 @@ public class OpenApiGeneratorUtil {
     codegen.setApiPackage("io.virtualan.api." + fileName + int_random);
     codegen.setModelPackage("io.virtualan.model." + fileName + int_random);
     codegen.additionalProperties().put(SpringCodegen.VIRTUAL_SERVICE, true);
-    codegen.additionalProperties().put(SpringCodegen.JAVA_8, true);
+    //codegen.additionalProperties().put(SpringCodegen.JAVA_8, true);
     codegen.additionalProperties().put(SpringCodegen.SKIP_DEFAULT_INTERFACE, false);
     GlobalSettings.setProperty(CodegenConstants.SUPPORTING_FILES, "ApiUtil.java");
     input.openAPI(openAPI);
