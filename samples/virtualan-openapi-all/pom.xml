@@ -14,7 +14,7 @@
     <virtualan.version>1.4.3-SNAPSHOT</virtualan.version>
     <cucumber.version>7.0.0</cucumber.version>
     <hsqldb.version>2.7.1</hsqldb.version>
-    <spring.boot.version>2.6.13</spring.boot.version>
+    <spring.boot.version>2.7.10</spring.boot.version>
   </properties>
   <build>
     <finalName>sv-virtualan-rest-demo</finalName>
