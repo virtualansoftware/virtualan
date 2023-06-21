@@ -194,7 +194,7 @@
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-kafka</artifactId>
-			<version>5.5.7</version>
+			<version>6.0.6</version>
 		</dependency>
 
 		<dependency>
