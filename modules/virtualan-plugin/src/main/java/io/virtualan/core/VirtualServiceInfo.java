@@ -32,15 +32,15 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import io.virtualan.annotation.ApiVirtual;
 import io.virtualan.annotation.VirtualService;
 import io.virtualan.api.ApiMethod;
@@ -89,9 +89,9 @@ public interface VirtualServiceInfo {
 
 
     default String getResourceDesc(Method method) {
-        ApiOperation[] apiOperationAnno = method.getAnnotationsByType(ApiOperation.class);
+        Operation[] apiOperationAnno = method.getAnnotationsByType(Operation.class);
         if (apiOperationAnno != null && apiOperationAnno.length > 0) {
-            return apiOperationAnno[0].notes();
+            return apiOperationAnno[0].description();
         }
         return null;
     }
@@ -205,23 +205,26 @@ public interface VirtualServiceInfo {
             for (ApiResponses apiResponses : apiResponsesAnno) {
                 for (ApiResponse apiResponse : apiResponses.value()) {
                     try {
-                        if(!responseType.containsKey(String.valueOf(apiResponse.code()))) {
-                            responseType
-                                .put(String.valueOf(apiResponse.code()),
-                                    new VirtualServiceApiResponse(
-                                        String.valueOf(apiResponse.code()),
-                                        apiResponse.response().getCanonicalName(),
-                                        getObjectMapper().writerWithDefaultPrettyPrinter()
-                                            .writeValueAsString(Class
-                                                .forName(apiResponse.response()
-                                                    .getCanonicalName())
-                                                .getDeclaredConstructor().newInstance()),
-                                        apiResponse.message()));
+                        if(!responseType.containsKey(String.valueOf(apiResponse.responseCode()))) {
+                            responseType.put(String.valueOf(apiResponse.responseCode()),
+                                    new VirtualServiceApiResponse(String.valueOf(apiResponse.responseCode()),
+                                            null, null, apiResponse.description()));
+//TODO                            responseType
+//                                .put(String.valueOf(apiResponse.responseCode()),
+//                                    new VirtualServiceApiResponse(
+//                                        String.valueOf(apiResponse.responseCode()),
+//                                        apiResponse.response().getCanonicalName(),
+//                                        getObjectMapper().writerWithDefaultPrettyPrinter()
+//                                            .writeValueAsString(Class
+//                                                .forName(apiResponse.response()
+//                                                    .getCanonicalName())
+//                                                .getDeclaredConstructor().newInstance()),
+//                                        apiResponse.description()));
                         }
                     } catch (Exception e) {
-                        responseType.put(String.valueOf(apiResponse.code()),
-                            new VirtualServiceApiResponse(String.valueOf(apiResponse.code()),
-                                null, null, apiResponse.message()));
+                        responseType.put(String.valueOf(apiResponse.responseCode()),
+                            new VirtualServiceApiResponse(String.valueOf(apiResponse.responseCode()),
+                                null, null, apiResponse.description()));
                     }
                 }
             }

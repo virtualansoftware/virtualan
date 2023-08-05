@@ -20,7 +20,7 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.3.2</hsqldb.version>
-		<spring.boot.version>2.7.5</spring.boot.version>
+		<spring.boot.version>2.7.14</spring.boot.version>
 		<spring.version>5.0.3.RELEASE</spring.version>
 		<groovy.version>3.0.12</groovy.version>
 		<junit.version>4.13.2</junit.version>
@@ -30,7 +30,7 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<jackson-databind-nullable.version>0.2.3</jackson-databind-nullable.version>
 		<mapson.version>1.1.12</mapson.version>
-		<swagger-annotations.version>1.6.6</swagger-annotations.version>
+		<swagger-annotations.version>2.2.15</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
@@ -285,7 +285,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.swagger</groupId>
+			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations</artifactId>
 			<version>${swagger-annotations.version}</version>
 		</dependency>

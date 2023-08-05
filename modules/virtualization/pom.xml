@@ -31,7 +31,7 @@
 		<javax.jws-api.version>1.1</javax.jws-api.version>
 		<jackson-databind-nullable.version>0.2.1</jackson-databind-nullable.version>
 		<mapson.version>1.1.10</mapson.version>
-		<swagger-annotations.version>1.6.2</swagger-annotations.version>
+		<swagger-annotations.version>2.2.15</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
@@ -40,6 +40,8 @@
 		<spring-kafka.version>2.8.6</spring-kafka.version>
 		<kafka-clients-version>2.8.1</kafka-clients-version>
 		<spring-integration-kafka.version>5.5.6</spring-integration-kafka.version>
+		<spring.boot.mq.version>2.7.14</spring.boot.mq.version>
+
 	</properties>
 	<developers>
 		<!-- original author of the project -->
@@ -436,7 +438,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.swagger</groupId>
+			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations</artifactId>
 			<version>${swagger-annotations.version}</version>
 		</dependency>

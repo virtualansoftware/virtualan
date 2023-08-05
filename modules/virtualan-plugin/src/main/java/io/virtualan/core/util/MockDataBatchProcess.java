@@ -1,5 +1,6 @@
 package io.virtualan.core.util;
 
+import io.virtualan.controller.VirtualServiceController;
 import io.virtualan.core.VirtualServiceUtil;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.VirtualServiceKeyValue;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -54,34 +56,39 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 	@Value("${virtualan.do.cleanup:false}")
 	private boolean doCleanup;
 
-	
+	@Autowired
+	private VirtualServiceController virtualServiceController;
+
 	@PostConstruct
 	public void loadRequestdata()  {
-		try {
-			InputStream stream = MockDataBatchProcess.class.getClassLoader().getResourceAsStream(dataLoadFileLocation);
-			if(stream != null) {
-				String respData = new BufferedReader(
-						new InputStreamReader(stream, StandardCharsets.UTF_8)).lines()
-						.collect(Collectors.joining("\n"));
-				JSONTokener parser = new JSONTokener(respData);
-				List<VirtualServiceRequest> requestList = new LinkedList<>();
-				JSONArray arrayList = (JSONArray) parser.nextValue();
-				for (int i = 0; i < arrayList.length(); i++) {
-					VirtualServiceRequest request = createRequest((JSONObject) arrayList.get(i));
-					if(request.getOperationId() != null) {
-						requestList.add(request);
-					} else {
-						log.warn("This API({} : {}) is not supported by this service any more: {}" , request.getMethod(), request.getUrl(), request);
+		for (String file :dataLoadFileLocation.split(";")){
+			try {
+				InputStream stream = MockDataBatchProcess.class.getClassLoader().getResourceAsStream(file);
+				if (stream != null) {
+					String respData = new BufferedReader(
+							new InputStreamReader(stream, StandardCharsets.UTF_8)).lines()
+							.collect(Collectors.joining("\n"));
+					JSONTokener parser = new JSONTokener(respData);
+					List<VirtualServiceRequest> requestList = new LinkedList<>();
+					JSONArray arrayList = (JSONArray) parser.nextValue();
+					for (int i = 0; i < arrayList.length(); i++) {
+						VirtualServiceRequest request = createRequest((JSONObject) arrayList.get(i));
+						try {
+							ResponseEntity responseEntity  =virtualServiceController.createMockRequest(request);
+							log.warn("This API Request loaded status: {}", responseEntity.toString());
+						} catch (Exception e){
+							log.warn("this data already exists {}", request.toString());
+						}
 					}
+					//virtualService.importAllMockRequests(requestList);
+					log.info("initial load of the file ({}) successful!!", file);
+
+				} else {
+					log.warn("initial load of the file ({}) is missing...", file);
 				}
-				virtualService.importAllMockRequests(requestList);
-				log.info("initial load of the file ({}) successful!!", dataLoadFileLocation);
-				
-			} else {
-				log.warn("initial load of the file ({}) is missing...",dataLoadFileLocation);
+			} catch (Exception e) {
+				log.warn("Unable to load the file ({}) initial load -{}", file, e.getMessage());
 			}
-		}catch (Exception e){
-			log.warn("Unable to load the file ({}) initial load -{}",dataLoadFileLocation , e.getMessage());
 		}
 	}
 

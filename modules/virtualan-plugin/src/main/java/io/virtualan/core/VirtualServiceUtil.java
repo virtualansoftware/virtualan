@@ -37,6 +37,7 @@ import io.virtualan.core.util.ScriptErrorException;
 import io.virtualan.core.util.VirtualServiceParamComparator;
 import io.virtualan.core.util.VirtualServiceValidRequest;
 import io.virtualan.core.util.XMLConverter;
+import io.virtualan.core.util.rule.RuleEvaluator;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
 import io.virtualan.requestbody.RequestBody;
@@ -90,6 +91,10 @@ public class VirtualServiceUtil {
     private VirtualService virtualService;
     @Autowired
     private ScriptExecutor scriptExecutor;
+
+    @Autowired
+    private RuleEvaluator ruleEvaluator;
+
     @Autowired
     private Converter converter;
     @Autowired
@@ -284,10 +289,10 @@ public class VirtualServiceUtil {
                 mockTransferObject.getResource(), mockTransferObject.getOperationId());
             MockServiceRequest mockServiceRequest = buildMockServiceRequest(mockTransferObject);
 
+
             //User should enable - UI or API validate if it is a valid script
-            if (mockServiceRequest.getRule() != null) {
-                scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
-                    mockServiceRequest.getRule().toString());
+             if ("Script".equalsIgnoreCase(mockServiceRequest.getType()) && mockServiceRequest.getRule() != null) {
+                scriptExecutor.executeScript(mockServiceRequest, new MockResponse());
             }
 
             if (mockServiceRequest.getInputObjectType() != null
@@ -429,6 +434,17 @@ public class VirtualServiceUtil {
         if(mockTransferObject.getInputObjectType() == null){
             Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
             mockServiceRequest.setInputObjectType(inputObjectType);
+            if(mockServiceRequest.getInputObjectType() != null && mockTransferObject.getInput() != null
+                    &&
+                    !mockServiceRequest.getInputObjectType().getClass().equals( mockTransferObject.getInput().getClass())){
+                try {
+                    mockServiceRequest.setInput(getObjectMapper()
+                            .readValue(mockTransferObject.getInput().toString(),
+                                    mockServiceRequest.getInputObjectType()));
+                }catch ( JsonProcessingException e){
+
+                }
+            }
         } else {
             mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
         }
@@ -442,7 +458,9 @@ public class VirtualServiceUtil {
         mockServiceRequest
             .setParams(Converter.converter(mockTransferObject.getAvailableParams()));
         mockServiceRequest.setResource(mockTransferObject.getResource());
-        mockServiceRequest.setInput(mockTransferObject.getInput());
+        if(mockServiceRequest.getInput() == null) {
+            mockServiceRequest.setInput(mockTransferObject.getInput());
+        }
         mockServiceRequest.setOutput(mockTransferObject.getOutput());
         return mockServiceRequest;
     }
