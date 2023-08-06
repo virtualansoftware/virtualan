@@ -9,9 +9,9 @@
   <version>1.0.0-SNAPSHOT</version>
   <description>Virtualan Rest virtualization and rest - Demo</description>
   <properties>
-    <spring.boot.version>2.5.12</spring.boot.version>
+    <spring.boot.version>2.7.13</spring.boot.version>
     <cucumber-spring.version>7.0.0</cucumber-spring.version>
-    <virtualan.version>2.5.3-SNAPSHOT</virtualan.version>
+    <virtualan.version>2.5.3</virtualan.version>
     <hsqldb.version>2.7.1</hsqldb.version>
     <idaithalam.version>1.4.4</idaithalam.version>
     <testng.ver>7.4.0</testng.ver>
@@ -145,7 +145,7 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>3.0.8</version>
+      <version>3.0.18</version>
     </dependency>
 
   </dependencies>
