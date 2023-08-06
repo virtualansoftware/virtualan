@@ -11,7 +11,7 @@
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <virtualan.version>1.4.3-SNAPSHOT</virtualan.version>
+    <virtualan.version>1.4.4-SNAPSHOT</virtualan.version>
     <cucumber.version>7.0.0</cucumber.version>
     <hsqldb.version>2.7.1</hsqldb.version>
     <spring.boot.version>2.6.13</spring.boot.version>
