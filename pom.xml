@@ -28,16 +28,16 @@
 		<system>github</system>
 		<url>https://github.com/virtualansoftware/virtualan/issues</url>
 	</issueManagement>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+<!--	<distributionManagement>-->
+<!--		<snapshotRepository>-->
+<!--			<id>ossrh</id>-->
+<!--			<url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--		</snapshotRepository>-->
+<!--		<repository>-->
+<!--			<id>ossrh</id>-->
+<!--			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+<!--		</repository>-->
+<!--	</distributionManagement>-->
 	<licenses>
 		<license>
 			<name>Apache License 2.0</name>
@@ -71,11 +71,14 @@
 	</modules>
 	<repositories>
 		<repository>
-			<id>sonatype-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>central</id>
+			<name>Maven Central</name>
+			<layout>default</layout>
+			<url>https://repo1.maven.org/maven2</url>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+
 	</repositories>
 </project>
