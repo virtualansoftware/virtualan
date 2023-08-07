@@ -298,8 +298,9 @@ public class VirtualServiceController {
             Object inputObject = getInputObject(inputObjectType, requestBody);
             mockServiceRequest.setInput(inputObject);
             mockServiceRequest.setParams(Converter.converter(virtualServiceRequest.getAvailableParams()));
+            mockServiceRequest.setRule( virtualServiceRequest.getRule());
             MockResponse mockResponse = new MockResponse();
-            mockResponse = scriptExecutor.executeScript (mockServiceRequest, mockResponse, virtualServiceRequest.getRule());
+            mockResponse = scriptExecutor.executeScript (mockServiceRequest, mockResponse);
             if(mockResponse == null){
                 return new ResponseEntity<VirtualServiceStatus>(
                     new VirtualServiceStatus("Its not a valid mock response setup!!! Verify the script? ", messageSource

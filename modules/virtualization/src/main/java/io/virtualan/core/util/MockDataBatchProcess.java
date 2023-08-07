@@ -35,26 +35,26 @@ import java.util.List;
 public class MockDataBatchProcess implements SchedulingConfigurer {
 
 	private final Logger log = LoggerFactory.getLogger(MockDataBatchProcess.class);
-	
+
 	@Autowired
 	private VirtualServiceUtil virtualServiceUtil;
-	
+
 	@Autowired
 	private VirtualService virtualService;
 
 	@Value("${virtualan.task.pool.size:5}")
 	private int poolSize;
-	
+
 	@Value("${virtualan.data.load:not-set}")
 	private String dataLoadFileLocation;
-	
+
 	@Value("${virtualan.remove.unused-data.after:30}")
 	private int removeMockDataUnusedAfter;
 
 	@Value("${virtualan.do.cleanup:false}")
 	private boolean doCleanup;
 
-	
+
 	@PostConstruct
 	public void loadRequestdata()  {
 		try {
@@ -76,7 +76,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 				}
 				virtualService.importAllMockRequests(requestList);
 				log.info("initial load of the file ({}) successful!!",dataLoadFileLocation);
-				
+
 			} else {
 				log.warn("initial load of the file ({}) is missing...", dataLoadFileLocation);
 			}
@@ -128,7 +128,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 				}
 			}
 			if (!"".equalsIgnoreCase(jsonObject.optString("brokerUrl"))) {
-					virtualServiceRequest.setUrl(hasValue(jsonObject.optString("brokerUrl")));
+				virtualServiceRequest.setUrl(hasValue(jsonObject.optString("brokerUrl")));
 			}
 
 			virtualServiceRequest
@@ -147,7 +147,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 		}
 		return virtualServiceRequest;
 	}
-	
+
 	private List<VirtualServiceKeyValue> getParams(JSONArray params) {
 		List<VirtualServiceKeyValue> virtualServiceKeyValueList = new LinkedList<>();
 		if(params != null  && params.length() > 0) {
@@ -166,7 +166,7 @@ public class MockDataBatchProcess implements SchedulingConfigurer {
 		}
 		return virtualServiceKeyValueList;
 	}
-	
+
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
 		ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
