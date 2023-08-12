@@ -22,7 +22,7 @@
 		<hsqldb.version>2.3.2</hsqldb.version>
 		<spring.boot.version>2.7.13</spring.boot.version>
 		<spring.version>5.0.3.RELEASE</spring.version>
-		<groovy.version>3.0.12</groovy.version>
+		<groovy.version>3.0.18</groovy.version>
 		<junit.version>4.13.2</junit.version>
 		<slf4j.version>1.7.36</slf4j.version>
 		<validation-api.version>1.1.0.Final</validation-api.version>
