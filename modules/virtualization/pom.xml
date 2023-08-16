@@ -37,7 +37,7 @@
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<jackson-databind.version>2.13.4.2</jackson-databind.version>
-		<spring-kafka.version>2.8.6</spring-kafka.version>
+		<spring-kafka.version>2.9.8</spring-kafka.version>
 		<kafka-clients-version>2.8.1</kafka-clients-version>
 		<spring-integration-kafka.version>5.5.6</spring-integration-kafka.version>
 		<spring.boot.mq.version>2.7.14</spring.boot.mq.version>
@@ -492,7 +492,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.6</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.javassist</groupId>
