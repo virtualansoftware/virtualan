@@ -308,11 +308,9 @@ public class VirtualServiceUtil {
       final Map<MockRequest, MockResponse> mockDataSetupMap = readDynamicResponse(
           mockTransferObject.getResource(), mockTransferObject.getOperationId());
       MockServiceRequest mockServiceRequest = buildMockServiceRequest(mockTransferObject);
-
       //validate if it is a valid script
-      if (mockServiceRequest.getRule() != null) {
-        scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
-            mockServiceRequest.getRule().toString());
+      if ("Script".equalsIgnoreCase(mockServiceRequest.getType()) && mockServiceRequest.getRule() != null) {
+        scriptExecutor.executeScript(mockServiceRequest, new MockResponse());
       }
 
       if (mockServiceRequest.getInputObjectType() != null
@@ -457,38 +455,39 @@ public class VirtualServiceUtil {
 
     MockServiceRequest mockServiceRequest = new MockServiceRequest();
 
-    if (mockTransferObject.getInputObjectType() == null) {
+    if(mockTransferObject.getInputObjectType() == null){
       Class inputObjectType = getVirtualServiceInfo().getInputType(mockTransferObject);
-      if(inputObjectType == null) {
-        mockServiceRequest.setInputObjectType(JsonObject.class);
-        mockTransferObject.setInputObjectType(JsonObject.class);
-      }else {
-        mockServiceRequest.setInputObjectType(inputObjectType);
+      mockServiceRequest.setInputObjectType(inputObjectType);
+      if(mockServiceRequest.getInputObjectType() != null && mockTransferObject.getInput() != null
+              &&
+              !mockServiceRequest.getInputObjectType().getClass().equals( mockTransferObject.getInput().getClass())){
+        try {
+          mockServiceRequest.setInput(getObjectMapper()
+                  .readValue(mockTransferObject.getInput().toString(),
+                          mockServiceRequest.getInputObjectType()));
+        }catch ( JsonProcessingException e){
+
+        }
       }
     } else {
       mockServiceRequest.setInputObjectType(mockTransferObject.getInputObjectType());
     }
-    if (mockTransferObject.getInput() != null &&
-        VirtualanConfiguration.isValidJson(mockTransferObject.getInput().toString()) &&
-        mockServiceRequest.getInputObjectType().isAssignableFrom(String.class)) {
-      mockServiceRequest.setInputObjectType(JsonObject.class);
-      mockTransferObject.setInputObjectType(JsonObject.class);
-    }
     mockServiceRequest.setResponseObjectType(mockTransferObject.getResponseObjectType());
     mockServiceRequest
-        .setHeaderParams(Converter.converter(mockTransferObject.getHeaderParams()));
+            .setHeaderParams(Converter.converter(mockTransferObject.getHeaderParams()));
     mockServiceRequest.setOperationId(mockTransferObject.getOperationId());
     mockServiceRequest.setContentType(mockTransferObject.getContentType());
     mockServiceRequest.setType(mockTransferObject.getType());
     mockServiceRequest.setRule(mockTransferObject.getRule());
     mockServiceRequest
-        .setParams(Converter.converter(mockTransferObject.getAvailableParams()));
+            .setParams(Converter.converter(mockTransferObject.getAvailableParams()));
     mockServiceRequest.setResource(mockTransferObject.getResource());
-    mockServiceRequest.setInput(mockTransferObject.getInput());
+    if(mockServiceRequest.getInput() == null) {
+      mockServiceRequest.setInput(mockTransferObject.getInput());
+    }
     mockServiceRequest.setOutput(mockTransferObject.getOutput());
     return mockServiceRequest;
   }
-
 
   public Object returnResponse(Method method, MockServiceRequest mockServiceRequest)
       throws IOException, JAXBException {

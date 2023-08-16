@@ -120,11 +120,11 @@ public class MessageUtil {
 			mockServiceRequest.setRule(mockTransferObject.getRule());
 		mockServiceRequest.setResponseObjectType(mockTransferObject.getResponseObjectType());
 			if (mockTransferObject.getInputObjectType() != null) {
+				mockServiceRequest.setRule(mockServiceRequest.getRule());
 
-				//validate if it is a valid script
-				if(mockServiceRequest.getRule() != null) {
-					scriptExecutor.executeScript(mockServiceRequest, new MockResponse(),
-							mockServiceRequest.getRule().toString());
+				//validate if it is a valid scrip
+				if ("Script".equalsIgnoreCase(mockServiceRequest.getType()) && mockServiceRequest.getRule() != null) {
+					scriptExecutor.executeScript(mockServiceRequest, new MockResponse());
 				}
 				if(ContentType.XML.equals(mockTransferObject.getContentType())){
 					mockServiceRequest.setInput(

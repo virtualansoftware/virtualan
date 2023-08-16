@@ -154,8 +154,9 @@ public class VirtualServiceValidRequest {
                 log.debug("Script : {}" , mockRequestResponse.getKey().getRule());
                 log.debug("Script Input {}: " , mockServiceRequest);
                 try {
+                    mockServiceRequest.setRule(mockRequestResponse.getKey().getRule());
                     MockResponse mockResponse = new MockResponse();
-                    mockResponse = scriptExecutor.executeScript(mockServiceRequest, mockResponse, mockRequestResponse.getKey().getRule());
+                    mockResponse = scriptExecutor.executeScript(mockServiceRequest, mockResponse);
                     log.debug("Script output expected : {}" , mockResponse);
                     if (mockResponse != null) {
                         

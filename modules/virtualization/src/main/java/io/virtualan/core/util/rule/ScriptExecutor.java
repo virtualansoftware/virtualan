@@ -38,8 +38,8 @@ public class ScriptExecutor {
         shell = new GroovyShell(loader, new Binding());
     }
 
-    public MockResponse executeScript(MockServiceRequest mockServiceRequest, MockResponse mockResponse, String scriptText) {
-        Script script = shell.parse(scriptText);
+    public MockResponse executeScript(MockServiceRequest mockServiceRequest, MockResponse mockResponse) {
+        Script script = shell.parse(mockServiceRequest.getRule().toString());
         LOG.debug("Executing {}", mockServiceRequest);
         return (MockResponse) script.invokeMethod("executeScript", new Object[] { mockServiceRequest, mockResponse });
     }
