@@ -4,9 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 interface Props {
   selectRefs: any;
   http_status: any;
+  response_list: any;
+  request_type: any
 }
 
-const Selects = ({ selectRefs, http_status }: Props) => {
+const Selects = ({ selectRefs, http_status, request_type, response_list }: Props) => {
   return (
     <Row key={uuidv4()}>
       <Col xs={3}>
@@ -32,11 +34,7 @@ const Selects = ({ selectRefs, http_status }: Props) => {
           ref={selectRefs.type}
           required
         >
-          {Object.entries({
-            "?": "",
-            Response: "Response",
-            Params: "Params",
-          }).map(([key, value]) => (
+          {Object.entries(response_list).map(([key, value]) => (
             <option key={key} value={key}>
               {(value as string)}
             </option>
@@ -44,13 +42,10 @@ const Selects = ({ selectRefs, http_status }: Props) => {
         </Form.Select>
         <Form.Select
           aria-label="Default select example"
-          ref={selectRefs.isJson}
+          ref={selectRefs.requestType}
           required
         >
-          {Object.entries({
-            "? undefined:undefined ?": "",
-            JSON: "JSON",
-          }).map(([key, value]) => (
+          {Object.entries(request_type).map(([key, value]) => (
             <option key={key} value={key}>
               {(value as string)}
             </option>

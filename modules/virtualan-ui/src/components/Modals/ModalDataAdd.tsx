@@ -54,6 +54,8 @@ const Content = ({ data }: Props) => {
       form.push(
         <GetForm
           key={item}
+          operationId={data[item]["operationId"]}
+          resource={data[item]["resource"]}
           path={data[item]["url"]}
           availableParams={data[item]["availableParams"]}
           apiEntryPointPost={API_POST_ENDPOINT}
@@ -63,6 +65,8 @@ const Content = ({ data }: Props) => {
       form.push(
         <DeleteForm
           key={item}
+          operationId={data[item]["operationId"]}
+          resource={data[item]["resource"]}
           path={data[item]["url"]}
           availableParams={data[item]["availableParams"]}
           apiEntryPointPost={API_POST_ENDPOINT}
@@ -72,6 +76,8 @@ const Content = ({ data }: Props) => {
       form.push(
         <PostForm
           key={item}
+          operationId={data[item]["operationId"]}
+          resource={data[item]["resource"]}
           path={data[item]["url"]}
           availableParams={data[item]["availableParams"]}
           apiEntryPointPost={API_POST_ENDPOINT}
@@ -81,6 +87,8 @@ const Content = ({ data }: Props) => {
       form.push(
         <PutForm
           key={item}
+          operationId={data[item]["operationId"]}
+          resource={data[item]["resource"]}
           path={data[item]["url"]}
           availableParams={data[item]["availableParams"]}
           apiEntryPointPost={API_POST_ENDPOINT}
@@ -90,6 +98,8 @@ const Content = ({ data }: Props) => {
       form.push(
         <PatchForm
           key={item}
+          operationId={data[item]["operationId"]}
+          resource={data[item]["resource"]}
           path={data[item]["url"]}
           availableParams={data[item]["availableParams"]}
           apiEntryPointPost={API_POST_ENDPOINT}
