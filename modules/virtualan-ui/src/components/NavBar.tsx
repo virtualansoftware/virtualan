@@ -1,58 +1,141 @@
 import React, { useState, useEffect } from "react";
 import ModalAppAdd from "./ModalAdd";
 import ModalAppLoad from "./ModalLoad";
+import ModalAppCatalog from "./ModalCatalog";
+import ModalAppJSON from "./ModalJsonFormatter";
 import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
 import { API_GET_ENDPOINT_ADD, API_GET_ENDPOINT_LOAD } from "../constants";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
+import Content from "./Content";
 
-// interface Props {
-//   key: string;
-// }
 
 const NavBar = () => {
   const [showModalAdd, setShowModalAdd] = useState(false);
   const [showModalLoad, setShowModalLoad] = useState(false);
+  const [showModalCatalog, setShowModalCatalog] = useState(false);
+  const [showModalJson, setShowModalJson] = useState(false);
+
+  const [contentSrc, setContentSrc] = useState(
+    <h2 style={{ textAlign: "center" }}>Welcome to Virtualan!!!</h2>
+  );
+  const [showContent, setShowContent] = useState(true);
+
   const [modalTitle, setModalTitle] = useState("");
+  const [modalYaml, setModalYaml] = useState("");
 
   const MockDataAdd = apiRequestsGet(API_GET_ENDPOINT_ADD);
   const MockDataLoad = apiRequestsGet(API_GET_ENDPOINT_LOAD);
 
-  const handleClick = (title: string, modal: string) => {
+  const handleClick = (
+    title: string,
+    modal: string,
+    yaml_file: string,
+    link: string
+  ) => {
     setModalTitle(title);
+    setShowContent(true);
+    setContentSrc(
+      <h2 style={{ textAlign: "center" }}>Welcome to Virtualan!!!</h2>
+    );
+    setShowModalAdd(false);
+    setShowModalLoad(false);
+    setShowModalCatalog(false);
+    setShowModalJson(false);
     if (modal === "Modal1") {
+      // Add
       setShowModalAdd(true);
-      setShowModalLoad(false);
     } else if (modal === "Modal2") {
-      setShowModalAdd(false);
+      // Load
+      setModalTitle("List of Mock Response!");
       setShowModalLoad(true);
+    } else if (modal === "Modal3") {
+      // Catalog
+      setShowModalCatalog(true);
+      setModalYaml(yaml_file);
+    } else if (modal === "Modal4") {
+      // JSON Formatter
+      setShowModalJson(true);
+    } else if (modal === "help") {
+      // Help
+      setContentSrc(
+        <iframe
+          src={link}
+          style={{ width: "100%", height: "720px", borderStyle: "none" }}
+        ></iframe>
+      );
+    } else if (modal === "popup") {
+      // Popup
+      window.open(link, "_blank", "height=600,width=800");
     } else {
-      setShowModalAdd(false);
-      setShowModalLoad(false);
+      // Default
     }
   };
 
   const menuItems = {
     Home: {},
     "Virtual Service": {
-      "Add Mock Data": "Modal1",
-      "Load Mock Data": "Modal2",
+      "Add Mock Data": {
+        modal: "Modal1",
+        icon: <FontAwesomeIcon icon={faPlus} />,
+      },
+      "Load Mock Data": {
+        modal: "Modal2",
+        icon: <FontAwesomeIcon icon={faList} />,
+      },
     },
     Catalog: {
-      "View Service": "data",
+      Person: {
+        modal: "Modal3",
+        icon: <FontAwesomeIcon icon={faList} />,
+        yaml_file: "person.yaml",
+      },
+      Pet: {
+        modal: "Modal3",
+        icon: <FontAwesomeIcon icon={faList} />,
+        yaml_file: "petstore.yaml",
+      },
+      Risk: {
+        modal: "Modal3",
+        icon: <FontAwesomeIcon icon={faList} />,
+        yaml_file: "riskfactor.yaml",
+      },
+      Service: {
+        modal: "Modal3",
+        icon: <FontAwesomeIcon icon={faList} />,
+        yaml_file: "Service.yaml",
+      },
+      Uber: {
+        modal: "Modal3",
+        icon: <FontAwesomeIcon icon={faList} />,
+        yaml_file: "uber.yaml",
+      },
+      VirtualService: {
+        modal: "Modal3",
+        icon: <FontAwesomeIcon icon={faList} />,
+        yaml_file: "virtualservices.yaml",
+      },
     },
     Utility: {
-      "Overall Catalog": "data",
-      "OpenAPI Editor": "data",
-      "JSON Formatter": "data",
+      "Overall Catalog": { modal: "popup", link: "/swagger-ui/index.html" },
+      "OpenAPI Editor": { modal: "popup", link: "/swagger-editor/index.html" },
+      "JSON Formatter": { modal: "Modal4" },
       "-": "-",
-      "v2.5.2": "data",
-      Help: "data",
+      "v2.5.2": { modal: false, link: "/swagger-ui/index.html" },
+      Help: {
+        modal: "help",
+        link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version=v2.5.2",
+      },
     },
   };
   return (
     <>
-      <nav className="navbar navbar-expand-lg bg-body-tertiary">
+      <nav
+        className="navbar navbar-expand-lg bg-body-tertiary"
+        style={{ borderBottom: "5px solid black", marginBottom: "35px" }}
+      >
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
             <img src={logoVirtualan} alt="VT" width="50" height="50" />
@@ -87,21 +170,28 @@ const NavBar = () => {
                         {key}
                       </a>
                       <ul className="dropdown-menu">
-                        {Object.entries(value).map(([subkey, subvalue]) =>
-                          subkey === "-" ? (
+                        {Object.entries(value).map(([subkey, subvalue]) => {
+                          return subkey === "-" ? (
                             <hr className="dropdown-divider" key={key} />
                           ) : (
                             <li key={subkey}>
                               <a
                                 className="dropdown-item"
                                 key={subkey}
-                                onClick={() => handleClick(subkey, subvalue)}
+                                onClick={() =>
+                                  handleClick(
+                                    subkey,
+                                    subvalue.modal,
+                                    subvalue.yaml_file,
+                                    subvalue.link
+                                  )
+                                }
                               >
-                                {subkey}
+                                {subvalue.icon} {subkey}
                               </a>
                             </li>
-                          )
-                        )}
+                          );
+                        })}
                       </ul>
                     </>
                   ) : (
@@ -122,8 +212,6 @@ const NavBar = () => {
         </div>
       </nav>
 
-      <hr />
-
       {showModalAdd && (
         <ModalAppAdd
           title={modalTitle}
@@ -140,6 +228,22 @@ const NavBar = () => {
           dataApi={MockDataLoad}
         />
       )}
+      {showModalCatalog && (
+        <ModalAppCatalog
+          title={modalTitle}
+          yaml_file={modalYaml}
+          onClose={() => setShowModalCatalog(false)}
+          show={showModalCatalog}
+        />
+      )}
+      {showModalJson && (
+        <ModalAppJSON
+          title={modalTitle}
+          onClose={() => setShowModalJson(false)}
+          show={showModalJson}
+        />
+      )}
+      <Content show={showContent} htmlContent={contentSrc} />
     </>
   );
 };

@@ -8,6 +8,9 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
 import HttpStatusList from "../../api/HttpStatusList.json";
+import RequestType from "../../api/RequestType.json";
+import ResponseList from "../../api/ResponseList.json";
+import MockRequestBody from "../Blocks/MockRequestBody";
 import { apiRequestsPost } from "../../api/apiRequests";
 import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
@@ -19,12 +22,14 @@ import FormButtons from "../Blocks/FormButtons";
 import { v4 as uuidv4 } from "uuid";
 
 interface Props {
+  operationId: string;
+  resource: string;
   path: string;
   availableParams: string[];
   apiEntryPointPost: string;
 }
 
-const GetForm = ({ path, availableParams, apiEntryPointPost }: Props) => {
+const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPost}: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [queryParams, setQueryParams] = useState<{ [key: string]: string }>({});
   const [reqParams, setReqParams] = useState([]);
@@ -36,7 +41,7 @@ const GetForm = ({ path, availableParams, apiEntryPointPost }: Props) => {
   const selectRefs = {
     status: useRef(null),
     type: useRef(null),
-    isJson: useRef(null),
+    requestType: useRef(null),
   };
 
   const contentStyle = {
@@ -48,6 +53,8 @@ const GetForm = ({ path, availableParams, apiEntryPointPost }: Props) => {
   const formId = uuidv4();
 
   const http_status = HttpStatusList;
+  const request_type = RequestType;
+  const response_list = ResponseList;
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,21 +66,16 @@ const GetForm = ({ path, availableParams, apiEntryPointPost }: Props) => {
     // console.log("excludeList", excludeListRef.current.value);
 
     const dataToSubmit = {
-      //   "id": 22,
-      //   "operationId": "personsGet",
+      operationId: operationId,
       httpStatusCode: selectRefs.status.current.value,
       url: path,
-      type: selectRefs.type.current.value,
-      //   "requestType": "REST",
-      //   "usageCount": 0,
-      //   "priority": 0,
+      type: selectRefs.type != null ? selectRefs.type.current.value : "",
+      contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "GET",
-      output: mockResponseRef.current.value,
-      availableParams: [
-        Object.entries(queryParams).map(([key, value]) => ({ key, value })),
-      ],
-      //   "headerParams": [],
-      //   "resource": "persons",
+      output: mockResponseRef != null ? mockResponseRef.current.value : "",
+      availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
+      //headerParams: [],
+      resource: resource
     };
 
     // console.log("dataToSubmit", dataToSubmit);
@@ -165,7 +167,7 @@ const GetForm = ({ path, availableParams, apiEntryPointPost }: Props) => {
           )}
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-              <Selects selectRefs={selectRefs} http_status={http_status} />
+              <Selects selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
               {/*  */}
               <HeaderParams
                 availableParams={availableParams}
