@@ -3,6 +3,7 @@ import ModalAppAdd from "./ModalAdd";
 import ModalAppLoad from "./ModalLoad";
 import ModalAppCatalog from "./ModalCatalog";
 import ModalAppJSON from "./ModalJsonFormatter";
+
 import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
@@ -10,6 +11,7 @@ import { API_GET_ENDPOINT_ADD, API_GET_ENDPOINT_LOAD } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
+
 
 
 const NavBar = () => {
@@ -25,6 +27,7 @@ const NavBar = () => {
 
   const [modalTitle, setModalTitle] = useState("");
   const [modalYaml, setModalYaml] = useState("");
+
 
   const MockDataAdd = apiRequestsGet(API_GET_ENDPOINT_ADD);
   const MockDataLoad = apiRequestsGet(API_GET_ENDPOINT_LOAD);
@@ -71,6 +74,7 @@ const NavBar = () => {
       window.open(link, "_blank", "height=600,width=800");
     } else {
       // Default
+
     }
   };
 
@@ -128,6 +132,7 @@ const NavBar = () => {
         modal: "help",
         link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version=v2.5.2",
       },
+
     },
   };
   return (
@@ -136,6 +141,7 @@ const NavBar = () => {
         className="navbar navbar-expand-lg bg-body-tertiary"
         style={{ borderBottom: "5px solid black", marginBottom: "35px" }}
       >
+
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
             <img src={logoVirtualan} alt="VT" width="50" height="50" />
@@ -172,6 +178,7 @@ const NavBar = () => {
                       <ul className="dropdown-menu">
                         {Object.entries(value).map(([subkey, subvalue]) => {
                           return subkey === "-" ? (
+
                             <hr className="dropdown-divider" key={key} />
                           ) : (
                             <li key={subkey}>
@@ -192,6 +199,7 @@ const NavBar = () => {
                             </li>
                           );
                         })}
+
                       </ul>
                     </>
                   ) : (
@@ -211,6 +219,7 @@ const NavBar = () => {
           </div>
         </div>
       </nav>
+
 
       {showModalAdd && (
         <ModalAppAdd
@@ -244,6 +253,7 @@ const NavBar = () => {
         />
       )}
       <Content show={showContent} htmlContent={contentSrc} />
+
     </>
   );
 };
