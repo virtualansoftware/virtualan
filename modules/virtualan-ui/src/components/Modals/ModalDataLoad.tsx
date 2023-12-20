@@ -4,15 +4,50 @@ import { apiRequestsDelete } from "../../api/apiRequests";
 import { API_DELETE_ENDPOINT } from "../../constants";
 import "../../assets/css/styles.css";
 
-interface Props {
-  data: string[];
+import ReactMarkdown from "react-markdown";
+import JSONPretty from "react-json-pretty";
+import JSONPrettyMon from "react-json-pretty/dist/monikai";
+
+import Stack from "react-bootstrap/Stack";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
+import yaml from "js-yaml";
+import ModalContent from "./ModalDataAdd";
+
+import {
+  JsonView,
+  allExpanded,
+  darkStyles,
+  defaultStyles,
+} from "react-json-view-lite";
+import "react-json-view-lite/dist/index.css";
+
+function isJSON(str: any) {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
-const ModalContentLoad = ({ data }: Props) => {
+interface Props {
+  data: string[];
+  mainModalClose: () => void;
+}
+
+const ModalContentLoad = ({ data, mainModalClose }: Props) => {
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
 
   const handleModalClose = () => {
     setShowModal(false);
@@ -29,10 +64,12 @@ const ModalContentLoad = ({ data }: Props) => {
     setSearchQuery(event.target.value);
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const handleItemsPerPageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setItemsPerPage(Number(event.target.value));
+  };
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const handleClick = (page: number) => {
     setCurrentPage(page);
@@ -41,6 +78,28 @@ const ModalContentLoad = ({ data }: Props) => {
   const handleRemoveItem = (id: number) => {
     apiRequestsDelete(API_DELETE_ENDPOINT, id);
   };
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const handleRefresh = () => {
+    setRefreshKey((oldKey) => oldKey + 1);
+  };
+
+  const renderJsonView = (jsonString: any) => {
+    try {
+      const data = JSON.parse(jsonString);
+      return (
+        <JsonView
+          data={data}
+          shouldExpandNode={allExpanded}
+          style={defaultStyles}
+        />
+      );
+    } catch (error) {
+      return null;
+    }
+  };
+
 
   const renderData = () => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -53,7 +112,8 @@ const ModalContentLoad = ({ data }: Props) => {
     );
 
     return (
-      <div style={{ maxHeight: "400px", overflowY: "auto", fontSize: "12px" }}>
+      <div style={{ fontSize: "12px" }}>
+
         <div>
           <input
             type="text"
@@ -182,11 +242,37 @@ const ModalContentLoad = ({ data }: Props) => {
             })}
           </tbody>
         </Table>
-        <Modal show={showModal} onHide={handleModalClose}>
+        <Modal show={showModal} onHide={handleModalClose} size="lg">
+          {" "}
+          {/*  subModal */}
           <Modal.Header closeButton>
             <Modal.Title>{modalTitle}</Modal.Title>
           </Modal.Header>
-          <Modal.Body>{modalContent}</Modal.Body>
+          <Modal.Body>
+            <div className="row" style={{ padding: "20px" }}>
+              {isJSON(modalContent) ? (
+                <>
+                  <div className="col">
+                    <JSONPretty
+                      data={JSON.parse(modalContent)}
+                      theme={JSONPrettyMon}
+                    />
+                  </div>
+                  <div className="col">
+                    {/* <pre style={{ color: "green", padding: "10px" }}> */}
+                      {/* {yaml.dump(JSON.parse(modalContent))} */}
+                      { renderJsonView(modalContent) }
+                    {/* </pre> */}
+                  </div>
+                </>
+              ) : (
+                <div className="col">
+                  <ReactMarkdown>{modalContent}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          </Modal.Body>
+
           <Modal.Footer>
             <Button variant="secondary" onClick={handleModalClose}>
               Close
@@ -200,55 +286,128 @@ const ModalContentLoad = ({ data }: Props) => {
   const renderPagination = () => {
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <li
-          key={i}
-          className={`page-item ${currentPage === i ? "active" : ""}`}
-        >
+      pages.push(i);
+    }
+
+    const activeStyle = {
+      backgroundColor: "#39b3d7",
+      color: "#fff",
+      cursor: "default",
+    };
+
+    const defaultStyle = {
+      color: "#999",
+      fontSize: "0.8rem",
+    };
+
+    return (
+      // <ul className="pagination-sm pagination">
+      <ul className="pagination-sm pagination">
+        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
           <a
-            key={i}
             className="page-link"
             href="#"
-            onClick={() => handleClick(i)}
+            onClick={() => handleClick(1)}
+            style={defaultStyle}
           >
-            {i}
+            First
           </a>
         </li>
-      );
-    }
-    return pages;
+        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+          <a
+            className="page-link"
+            href="#"
+            onClick={() => handleClick(currentPage - 1)}
+            style={defaultStyle}
+          >
+            Previous
+          </a>
+        </li>
+        {pages.map((page, index) => (
+          <li
+            key={index}
+            className={`page-item ${currentPage === page ? "active" : ""}`}
+
+          >
+            <a
+              className="page-link"
+              href="#"
+              onClick={() => handleClick(page)}
+              style={currentPage === page ? activeStyle : defaultStyle}
+            >
+              {page}
+            </a>
+          </li>
+        ))}
+        <li
+          className={`page-item ${
+            currentPage === totalPages ? "disabled" : ""
+          }`}
+        >
+          <a
+            className="page-link"
+            href="#"
+            onClick={() => handleClick(currentPage + 1)}
+            style={defaultStyle}
+          >
+            Next
+          </a>
+        </li>
+        <li
+          className={`page-item ${
+            currentPage === totalPages ? "disabled" : ""
+          }`}
+        >
+          <a
+            className="page-link"
+            href="#"
+            onClick={() => handleClick(totalPages)}
+            style={defaultStyle}
+          >
+            Last
+          </a>
+        </li>
+      </ul>
+    );
   };
 
   return (
     <>
-      <div>{renderData()}</div>
-      <nav aria-label="Page navigation example">
-        <ul className="pagination">
-          <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handleClick(currentPage - 1)}
-            >
-              Previous
-            </a>
-          </li>
-          {renderPagination()}
-          <li
-            className={`page-item ${
-              currentPage === totalPages ? "disabled" : ""
-            }`}
+      <div key={refreshKey}>{renderData()}</div>
+
+      <Stack direction="horizontal">
+        <div className="p-2 ms-auto">
+          View{" "}
+          <select value={itemsPerPage} onChange={handleItemsPerPageChange}>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>{" "}
+          records at a time.
+        </div>
+        <div className="pb-4 mb-3">
+          <nav aria-label="Page navigation example">{renderPagination()}</nav>
+        </div>
+        <div className="p-2">
+          <button
+            type="button"
+            className="btn btn-refresh"
+            onClick={handleRefresh}
           >
-            <a
-              className="page-link"
-              href="#"
-              onClick={() => handleClick(currentPage + 1)}
-            >
-              Next
-            </a>
-          </li>
-        </ul>
-      </nav>
+            Refresh
+          </button>
+          <button
+            type="button"
+            className="btn"
+            style={{ marginLeft: "5px" }}
+            onClick={() => mainModalClose()}
+          >
+            Close
+          </button>
+        </div>
+      </Stack>
+
     </>
   );
 };
