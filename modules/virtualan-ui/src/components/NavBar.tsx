@@ -209,6 +209,7 @@ const NavBar = () => {
                                 }
                               >
                                 {item.icon} {subkey}
+
                               </a>
                             </li>
                           );
