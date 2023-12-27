@@ -34,8 +34,9 @@ const ModalJSON = ({ title, onClose, show }: Props) => {
       setInputJSON(formatted);
       setErrorFormat("");
     } catch (error) {
-      setErrorFormat(error.message);
-    }
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        setErrorFormat((error as { message: string }).message);
+      }    }
   };
 
   const renderJsonView = (jsonString: any) => {

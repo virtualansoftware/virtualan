@@ -3,6 +3,7 @@ import ModalAppAdd from "./ModalAdd";
 import ModalAppLoad from "./ModalLoad";
 import ModalAppCatalog from "./ModalCatalog";
 import ModalAppJSON from "./ModalJsonFormatter";
+
 import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
@@ -10,6 +11,7 @@ import { API_GET_ENDPOINT_ADD, API_GET_ENDPOINT_LOAD } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
+
 
 
 const NavBar = () => {
@@ -26,8 +28,11 @@ const NavBar = () => {
   const [modalTitle, setModalTitle] = useState("");
   const [modalYaml, setModalYaml] = useState("");
 
+
   const MockDataAdd = apiRequestsGet(API_GET_ENDPOINT_ADD);
   const MockDataLoad = apiRequestsGet(API_GET_ENDPOINT_LOAD);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleClick = (
     title: string,
@@ -71,10 +76,22 @@ const NavBar = () => {
       window.open(link, "_blank", "height=600,width=800");
     } else {
       // Default
+
     }
   };
 
-  const menuItems = {
+  type SubMenuItem = {
+    modal?: string;
+    icon?: JSX.Element;
+    yaml_file?: string;
+    link?: string;
+  };
+
+  type MenuItem = {
+    [key: string]: SubMenuItem | {};
+  };
+
+  const menuItems: Record<string, MenuItem> = {
     Home: {},
     "Virtual Service": {
       "Add Mock Data": {
@@ -128,6 +145,7 @@ const NavBar = () => {
         modal: "help",
         link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version=v2.5.2",
       },
+
     },
   };
   return (
@@ -136,6 +154,7 @@ const NavBar = () => {
         className="navbar navbar-expand-lg bg-body-tertiary"
         style={{ borderBottom: "5px solid black", marginBottom: "35px" }}
       >
+
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
             <img src={logoVirtualan} alt="VT" width="50" height="50" />
@@ -171,6 +190,7 @@ const NavBar = () => {
                       </a>
                       <ul className="dropdown-menu">
                         {Object.entries(value).map(([subkey, subvalue]) => {
+                          const item = subvalue as SubMenuItem;
                           return subkey === "-" ? (
                             <hr className="dropdown-divider" key={key} />
                           ) : (
@@ -181,17 +201,18 @@ const NavBar = () => {
                                 onClick={() =>
                                   handleClick(
                                     subkey,
-                                    subvalue.modal,
-                                    subvalue.yaml_file,
-                                    subvalue.link
+                                    item.modal,
+                                    item.yaml_file,
+                                    item.link
                                   )
                                 }
                               >
-                                {subvalue.icon} {subkey}
+                                {item.icon} {subkey}
                               </a>
                             </li>
                           );
                         })}
+
                       </ul>
                     </>
                   ) : (
@@ -212,6 +233,7 @@ const NavBar = () => {
         </div>
       </nav>
 
+
       {showModalAdd && (
         <ModalAppAdd
           title={modalTitle}
@@ -226,6 +248,7 @@ const NavBar = () => {
           onClose={() => setShowModalLoad(false)}
           show={showModalLoad}
           dataApi={MockDataLoad}
+          refreshKey={refreshKey}
         />
       )}
       {showModalCatalog && (
@@ -244,6 +267,7 @@ const NavBar = () => {
         />
       )}
       <Content show={showContent} htmlContent={contentSrc} />
+
     </>
   );
 };
