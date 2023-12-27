@@ -3,12 +3,14 @@ import ReactDOM from "react-dom/client";
 import NavBar from "./components/NavBar";
 // import Content from "./components/Content";
 import Footer from "./components/Footer";
+
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 // const [contentSrc, setContentSrc] = useState("");
 // const [showContent, setShowContent] = useState(false);
+
 
 const router = createBrowserRouter([
   {
@@ -52,3 +54,4 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <Footer />
   </React.StrictMode>
 );
+

@@ -40,12 +40,14 @@ interface Props {
 
 const ModalContentLoad = ({ data, mainModalClose }: Props) => {
   const [refreshKey, setRefreshKey] = useState(0);
+
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+
 
   const handleModalClose = () => {
     setShowModal(false);
@@ -67,6 +69,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
   ) => {
     setItemsPerPage(Number(event.target.value));
   };
+
 
   const handleClick = (page: number) => {
     setCurrentPage(page);
@@ -97,6 +100,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
     }
   };
 
+
   const renderData = () => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
@@ -109,6 +113,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
 
     return (
       <div style={{ fontSize: "12px" }}>
+
         <div>
           <input
             type="text"
@@ -267,6 +272,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
               )}
             </div>
           </Modal.Body>
+
           <Modal.Footer>
             <Button variant="secondary" onClick={handleModalClose}>
               Close
@@ -321,6 +327,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           <li
             key={index}
             className={`page-item ${currentPage === page ? "active" : ""}`}
+
           >
             <a
               className="page-link"
@@ -400,6 +407,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           </button>
         </div>
       </Stack>
+
     </>
   );
 };

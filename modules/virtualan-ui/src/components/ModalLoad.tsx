@@ -5,6 +5,7 @@ import "../assets/css/styles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
+
 interface Props {
   title: string;
   onClose: () => void;
@@ -14,12 +15,14 @@ interface Props {
 }
 
 const ModalApp = ({ refreshKey, title, onClose, show, dataApi }: Props) => {
+
   const handleClose = () => onClose();
 
   return (
     <>
       <Modal key={refreshKey} show={show} onHide={handleClose} size="xl">
         <Modal.Header>
+
           <Modal.Title>
             <img src={logoVirtualan} alt="VT" width="50" height="50" />
             {" " + title}
@@ -39,6 +42,7 @@ const ModalApp = ({ refreshKey, title, onClose, show, dataApi }: Props) => {
         </Modal.Header>
         <Modal.Body className="modal-body-custom">
           <ModalContentLoad data={dataApi} mainModalClose={onClose} />
+
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>

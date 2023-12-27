@@ -192,6 +192,7 @@ const NavBar = () => {
                         {Object.entries(value).map(([subkey, subvalue]) => {
                           const item = subvalue as SubMenuItem;
                           return subkey === "-" ? (
+
                             <hr className="dropdown-divider" key={key} />
                           ) : (
                             <li key={subkey}>
