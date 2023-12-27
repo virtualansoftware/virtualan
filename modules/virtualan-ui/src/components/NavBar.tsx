@@ -32,6 +32,8 @@ const NavBar = () => {
   const MockDataAdd = apiRequestsGet(API_GET_ENDPOINT_ADD);
   const MockDataLoad = apiRequestsGet(API_GET_ENDPOINT_LOAD);
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const handleClick = (
     title: string,
     modal: string,
@@ -78,7 +80,18 @@ const NavBar = () => {
     }
   };
 
-  const menuItems = {
+  type SubMenuItem = {
+    modal?: string;
+    icon?: JSX.Element;
+    yaml_file?: string;
+    link?: string;
+  };
+
+  type MenuItem = {
+    [key: string]: SubMenuItem | {};
+  };
+
+  const menuItems: Record<string, MenuItem> = {
     Home: {},
     "Virtual Service": {
       "Add Mock Data": {
@@ -177,6 +190,7 @@ const NavBar = () => {
                       </a>
                       <ul className="dropdown-menu">
                         {Object.entries(value).map(([subkey, subvalue]) => {
+                          const item = subvalue as SubMenuItem;
                           return subkey === "-" ? (
 
                             <hr className="dropdown-divider" key={key} />
@@ -188,13 +202,14 @@ const NavBar = () => {
                                 onClick={() =>
                                   handleClick(
                                     subkey,
-                                    subvalue.modal,
-                                    subvalue.yaml_file,
-                                    subvalue.link
+                                    item.modal,
+                                    item.yaml_file,
+                                    item.link
                                   )
                                 }
                               >
-                                {subvalue.icon} {subkey}
+                                {item.icon} {subkey}
+
                               </a>
                             </li>
                           );
@@ -235,6 +250,7 @@ const NavBar = () => {
           onClose={() => setShowModalLoad(false)}
           show={showModalLoad}
           dataApi={MockDataLoad}
+          refreshKey={refreshKey}
         />
       )}
       {showModalCatalog && (
