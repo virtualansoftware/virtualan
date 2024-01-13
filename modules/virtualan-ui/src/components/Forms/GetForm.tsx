@@ -16,6 +16,7 @@ import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
 import AdditionalParams from "../Blocks/AdditionalParams";
 import MockResponse from "../Blocks/MockResponse";
+import Script from "../Blocks/Script";
 import RespHeaderParams from "../Blocks/RespHeaderParams";
 import ExcludeList from "../Blocks/ExcludeList";
 import FormButtons from "../Blocks/FormButtons";
@@ -35,9 +36,11 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
+  const [showRuleBlock, setShowRuleBlock] = useState("");
 
   const mockResponseRef = useRef(null);
   const excludeListRef = useRef(null);
+  const scriptRef = useRef(null);
   const selectRefs = {
     status: useRef(null),
     type: useRef(null),
@@ -72,6 +75,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "GET",
+      rule:  scriptRef != null ? scriptRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
       //headerParams: [],
@@ -167,7 +171,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
           )}
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-              <Selects selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
+              <Selects setShowRuleBlock = {setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
               {/*  */}
               <HeaderParams
                 availableParams={availableParams}
@@ -175,6 +179,9 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
                 handleAddQueryParams={handleAddQueryParams}
               />
               {/*  */}
+              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
+              && (<Script formId={formId} scriptRef = {scriptRef} />)
+              }
               <AdditionalParams
                 reqParams={reqParams}
                 setReqParams={setReqParams}

@@ -14,6 +14,7 @@ import { apiRequestsPost } from "../../api/apiRequests";
 import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
 import AdditionalParams from "../Blocks/AdditionalParams";
+import Script from "../Blocks/Script";
 import MockResponse from "../Blocks/MockResponse";
 import RespHeaderParams from "../Blocks/RespHeaderParams";
 import ExcludeList from "../Blocks/ExcludeList";
@@ -35,9 +36,11 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
+  const [showRuleBlock, setShowRuleBlock] = useState("");
 
   const mockResponseRef = useRef(null);
   const excludeListRef = useRef(null);
+  const scriptRef = useRef(null);
   const selectRefs = {
     status: useRef(null),
     type: useRef(null),
@@ -70,6 +73,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
       httpStatusCode: selectRefs.status.current.value,
       url: path,
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
+      rule:  scriptRef != null ? scriptRef.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "DELETE",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
@@ -167,7 +171,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
               {/*  */}
-              <Selects selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
+              <Selects setShowRuleBlock={setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
               {/*  */}
               <HeaderParams
                 availableParams={availableParams}
@@ -181,6 +185,10 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
+              {/*  */}
+              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
+              && (<Script formId={formId} scriptRef = {scriptRef} />)
+              }
               {/*  */}
               <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
               {/*  */}

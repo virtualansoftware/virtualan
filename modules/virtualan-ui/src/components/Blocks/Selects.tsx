@@ -5,10 +5,12 @@ interface Props {
   selectRefs: any;
   http_status: any;
   response_list: any;
-  request_type: any
+  request_type: any;
+  setShowRuleBlock: any;
 }
 
-const Selects = ({ selectRefs, http_status, request_type, response_list }: Props) => {
+const Selects = ({ setShowRuleBlock,  selectRefs, http_status, response_list, request_type  }: Props) => {
+
   return (
     <Row key={uuidv4()}>
       <Col xs={3}>
@@ -29,7 +31,7 @@ const Selects = ({ selectRefs, http_status, request_type, response_list }: Props
             </option>
           ))}
         </Form.Select>
-        <Form.Select
+        <Form.Select  onChange={e => setShowRuleBlock(e.target.value)} 
           aria-label="Default select example"
           ref={selectRefs.type}
           required
@@ -40,7 +42,7 @@ const Selects = ({ selectRefs, http_status, request_type, response_list }: Props
             </option>
           ))}
         </Form.Select>
-        <Form.Select
+        <Form.Select 
           aria-label="Default select example"
           ref={selectRefs.requestType}
           required

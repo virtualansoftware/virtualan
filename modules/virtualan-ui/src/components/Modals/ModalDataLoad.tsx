@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
 import { apiRequestsDelete } from "../../api/apiRequests";
 import { API_DELETE_ENDPOINT } from "../../constants";
+import { CodeBlock, dracula } from 'react-code-blocks';
+
 import "../../assets/css/styles.css";
 
 import ReactMarkdown from "react-markdown";
@@ -40,7 +42,7 @@ interface Props {
 
 const ModalContentLoad = ({ data, mainModalClose }: Props) => {
   const [refreshKey, setRefreshKey] = useState(0);
-
+  const [showScript, setShowScript] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
@@ -54,9 +56,10 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
     setModalContent("");
   };
 
-  const handleModalShow = (content: any, title: string) => {
+  const handleModalShow = (type: any, content: any, title: string) => {
     setShowModal(true);
     setModalContent(content);
+    (type == 'Script') && setShowScript(true);
     setModalTitle(title);
   };
 
@@ -181,11 +184,14 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                       <div
                         key={item.rule}
                         onClick={() =>
-                          handleModalShow(item.rule, "Parameterized")
+                          handleModalShow(item.type, item.rule, "Parameterized")
                         }
                       >
                         <span className="form-button button-table-blue">
-                          Parameterized!
+                          {((item.type).toLowerCase() === "script") && (<>Script!</>)}
+                          {((item.type).toLowerCase() === "rule") && (<>Rule!</>)}
+                          {((item.type).toLowerCase() === "params") && (<>Parameterized!</>)}
+                          
                         </span>
                       </div>
                     ) : (
@@ -196,7 +202,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {item.input ? (
                       <div
                         key={item.input}
-                        onClick={() => handleModalShow(inputText, "Request")}
+                        onClick={() => handleModalShow(item.type, inputText, "Request")}
                       >
                         <span className="form-button button-table-blue">
                           Request
@@ -210,7 +216,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {item.output ? (
                       <div
                         key={item.output}
-                        onClick={() => handleModalShow(outputText, "Response")}
+                        onClick={() => handleModalShow(item.type, outputText, "Response")}
                       >
                         <span className="form-button button-table-blue">
                           Response
@@ -253,10 +259,10 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
               {isJSON(modalContent) ? (
                 <>
                   <div className="col">
-                    <JSONPretty
+                    { <JSONPretty
                       data={JSON.parse(modalContent)}
                       theme={JSONPrettyMon}
-                    />
+                    /> }
                   </div>
                   <div className="col">
                     {/* <pre style={{ color: "green", padding: "10px" }}> */}
@@ -265,11 +271,17 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {/* </pre> */}
                   </div>
                 </>
-              ) : (
+              ) : (showScript) ? ( <CodeBlock
+                text={modalContent}
+                language='groovy'
+                showLineNumbers= {true}
+                theme={dracula}
+              />) : (
                 <div className="col">
                   <ReactMarkdown>{modalContent}</ReactMarkdown>
                 </div>
-              )}
+              ) 
+              }
             </div>
           </Modal.Body>
 

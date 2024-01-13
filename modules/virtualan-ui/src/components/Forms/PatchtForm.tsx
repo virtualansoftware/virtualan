@@ -17,6 +17,7 @@ import AdditionalParams from "../Blocks/AdditionalParams";
 import MockResponse from "../Blocks/MockResponse";
 import MockRequestBody from "../Blocks/MockRequestBody";
 import RespHeaderParams from "../Blocks/RespHeaderParams";
+import Script from "../Blocks/Script";
 import ExcludeList from "../Blocks/ExcludeList";
 import FormButtons from "../Blocks/FormButtons";
 import { v4 as uuidv4 } from "uuid";
@@ -35,10 +36,11 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
+  const [showRuleBlock, setShowRuleBlock] = useState("");
 
   const mockResponseRef = useRef(null);
   const mockRequestRef = useRef(null);
-
+  const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
   const selectRefs = {
     status: useRef(null),
@@ -73,7 +75,8 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
       url: path,
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
-      method: "PUT",
+      method: "PATCH",
+      rule:  scriptRef != null ? scriptRef.current.value : "",
       input:  mockRequestRef != null ? mockRequestRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
@@ -170,7 +173,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
           )}
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-            <Selects selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
+            <Selects setShowRuleBlock = {setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
               {/*  */}
               <HeaderParams
                 availableParams={availableParams}
@@ -184,6 +187,10 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
+              {/* Text area */}
+              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
+              && (<Script formId={formId} scriptRef = {scriptRef} />)
+              }
               {/* Text area */}
               <MockRequestBody formId={formId} mockRequestRef={mockRequestRef} />
               {/*  */}

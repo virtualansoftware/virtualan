@@ -16,6 +16,7 @@ import HeaderParams from "../Blocks/HeaderParams";
 import AdditionalParams from "../Blocks/AdditionalParams";
 import MockResponse from "../Blocks/MockResponse";
 import MockRequestBody from "../Blocks/MockRequestBody";
+import Script from "../Blocks/Script";
 import RespHeaderParams from "../Blocks/RespHeaderParams";
 import ExcludeList from "../Blocks/ExcludeList";
 import FormButtons from "../Blocks/FormButtons";
@@ -35,9 +36,11 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
+  const [showRuleBlock, setShowRuleBlock] = useState("");
 
   const mockResponseRef = useRef(null);
   const mockRequestRef = useRef(null);
+  const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
   const selectRefs = {
     status: useRef(null),
@@ -73,6 +76,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "PUT",
+      rule:  scriptRef != null ? scriptRef.current.value : "",
       input:  mockRequestRef != null ? mockRequestRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
@@ -168,7 +172,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
           )}
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-             <Selects selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
+             <Selects setShowRuleBlock = {setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
               {/*  */}
               <HeaderParams
                 availableParams={availableParams}
@@ -182,8 +186,11 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
-
-              {/* Text area */}
+              {/*  */}
+              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
+                && (<Script formId={formId} scriptRef = {scriptRef} />)
+              }
+              {/*  */}
               <MockRequestBody formId={formId} mockRequestRef={mockRequestRef} />
 
               {/*  */}

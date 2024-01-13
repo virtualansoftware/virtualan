@@ -15,9 +15,11 @@
 package io.virtualan.api;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -61,9 +63,13 @@ public class ApiType {
             ClassPath classPath = ClassPath.from(ApiType.class.getClassLoader());
             Set<ClassInfo> classes = classPath.getAllClasses();
             for (ClassInfo classzz : classes) {
-                VirtualServiceType type = getVirtualServiceType(classzz.load());
-                if (type != null)
-                    return type;
+                try {
+                    VirtualServiceType type = getVirtualServiceType(classzz.load());
+                    if (type != null)
+                        return type;
+                }catch (Throwable e){
+                    //ignore
+                }
             }
         } catch (IOException  e1) {
             log.error("Unable to load from the class loader " + e1.getMessage());
