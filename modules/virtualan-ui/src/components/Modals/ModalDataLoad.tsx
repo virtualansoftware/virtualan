@@ -1,28 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
-import { apiRequestsDelete } from "../../api/apiRequests";
-import { API_DELETE_ENDPOINT } from "../../constants";
+import { apiRequestsDelete, apiRequestsGet} from "../../api/apiRequests";
+import { API_DELETE_ENDPOINT, API_GET_ENDPOINT_LOAD } from "../../constants";
 import { CodeBlock, dracula } from 'react-code-blocks';
 import { JsonToTable } from "react-json-to-table";
+import axios from "axios";
 
 import "../../assets/css/styles.css";
 
 import ReactMarkdown from "react-markdown";
 import JSONPretty from "react-json-pretty";
 import JSONPrettyMon from "react-json-pretty/dist/monikai";
-
 import Stack from "react-bootstrap/Stack";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-
-import yaml from "js-yaml";
-import ModalContent from "./ModalDataAdd";
-
 import {
   JsonView,
   allExpanded,
-  darkStyles,
   defaultStyles,
 } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
@@ -37,11 +29,10 @@ function isJSON(str: any) {
 }
 
 interface Props {
-  data: string[];
   mainModalClose: () => void;
 }
 
-const ModalContentLoad = ({ data, mainModalClose }: Props) => {
+const ModalContentLoad = ({  mainModalClose }: Props) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [showType, setShowType] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -50,11 +41,26 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const[dataset, setDataset] = useState([]);
+  
+  const loadData = async () => {
+    const result = await axios({
+        method: "GET",
+        url: API_GET_ENDPOINT_LOAD,
+    }).then((res) => {
+        setDataset(res.data);
+    });
+  };    
+
+  useEffect(() => {
+    loadData();
+  }, [refreshKey]);
 
 
   const handleModalClose = () => {
     setShowModal(false);
     setModalContent("");
+    setShowType("");
   };
 
   const handleModalShow = (type: any, content: any, title: string) => {
@@ -79,11 +85,12 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
     setCurrentPage(page);
   };
 
-  const handleRemoveItem = (id: number) => {
+  const handleRemoveItem = (id: number) => {  
     apiRequestsDelete(API_DELETE_ENDPOINT, id);
+    setRefreshKey((oldKey) => oldKey + 1)
   };
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(dataset.length / itemsPerPage);
 
   const handleRefresh = () => {
     setRefreshKey((oldKey) => oldKey + 1);
@@ -109,7 +116,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
 
-    const filteredData = data.filter((item) =>
+    const filteredData = dataset.filter((item) =>
       Object.values(item).some((value) =>
         JSON.stringify(value).toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -185,7 +192,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                       <div
                         key={item.rule}
                         onClick={() =>
-                          handleModalShow(item.type, item.rule, "Parameterized")
+                          handleModalShow(item.type, item.rule, item.type.toUpperCase())
                         }
                       >
                         <span className="form-button button-table-blue">
@@ -258,7 +265,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           <Modal.Body>
             <div className="row" style={{ padding: "20px" }}>
               { (showType === 'PARAMS') ? (<JsonToTable json= {JSON.parse(modalContent)}/>) :
-                isJSON(modalContent) ? (
+                (isJSON(modalContent) ? (
                 <>
                   <div className="col">
                     { <JSONPretty
@@ -273,20 +280,15 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {/* </pre> */}
                   </div>
                 </>
-              ) : (showType == 'SCRIPT' || showType =='RULE') ? ( <CodeBlock
-                text={modalContent}
-                language='groovy'
-                showLineNumbers= {true}
-                theme={dracula}
-              />) : (
+              ) : ((showType == 'SCRIPT' || showType =='RULE') ? ( <CodeBlock text={modalContent} language='groovy' showLineNumbers= {true} theme={dracula}/>
+              ) : (
                 <div className="col">
                   <ReactMarkdown>{modalContent}</ReactMarkdown>
                 </div>
-              ) 
+              )))
               }
             </div>
           </Modal.Body>
-
           <Modal.Footer>
             <Button variant="secondary" onClick={handleModalClose}>
               Close

@@ -10,11 +10,10 @@ interface Props {
   title: string;
   onClose: () => void;
   show: boolean;
-  dataApi: any;
   refreshKey: any;
 }
 
-const ModalApp = ({ refreshKey, title, onClose, show, dataApi }: Props) => {
+const ModalApp = ({ refreshKey, title, onClose, show }: Props) => {
 
   const handleClose = () => onClose();
 
@@ -41,7 +40,7 @@ const ModalApp = ({ refreshKey, title, onClose, show, dataApi }: Props) => {
           </span>
         </Modal.Header>
         <Modal.Body className="modal-body-custom">
-          <ModalContentLoad data={dataApi} mainModalClose={onClose} />
+          <ModalContentLoad mainModalClose={onClose} />
 
         </Modal.Body>
         <Modal.Footer></Modal.Footer>

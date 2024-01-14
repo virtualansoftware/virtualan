@@ -249,7 +249,6 @@ const NavBar = () => {
           title={modalTitle}
           onClose={() => setShowModalLoad(false)}
           show={showModalLoad}
-          dataApi={MockDataLoad}
           refreshKey={refreshKey}
         />
       )}
