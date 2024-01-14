@@ -3,6 +3,7 @@ import { Table, Button, Modal } from "react-bootstrap";
 import { apiRequestsDelete } from "../../api/apiRequests";
 import { API_DELETE_ENDPOINT } from "../../constants";
 import { CodeBlock, dracula } from 'react-code-blocks';
+import { JsonToTable } from "react-json-to-table";
 
 import "../../assets/css/styles.css";
 
@@ -42,7 +43,7 @@ interface Props {
 
 const ModalContentLoad = ({ data, mainModalClose }: Props) => {
   const [refreshKey, setRefreshKey] = useState(0);
-  const [showScript, setShowScript] = useState(false);
+  const [showType, setShowType] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
@@ -59,7 +60,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
   const handleModalShow = (type: any, content: any, title: string) => {
     setShowModal(true);
     setModalContent(content);
-    (type == 'Script') && setShowScript(true);
+    setShowType(type.toUpperCase());
     setModalTitle(title);
   };
 
@@ -256,7 +257,8 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           </Modal.Header>
           <Modal.Body>
             <div className="row" style={{ padding: "20px" }}>
-              {isJSON(modalContent) ? (
+              { (showType === 'PARAMS') ? (<JsonToTable json= {JSON.parse(modalContent)}/>) :
+                isJSON(modalContent) ? (
                 <>
                   <div className="col">
                     { <JSONPretty
@@ -271,7 +273,7 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {/* </pre> */}
                   </div>
                 </>
-              ) : (showScript) ? ( <CodeBlock
+              ) : (showType == 'SCRIPT' || showType =='RULE') ? ( <CodeBlock
                 text={modalContent}
                 language='groovy'
                 showLineNumbers= {true}
