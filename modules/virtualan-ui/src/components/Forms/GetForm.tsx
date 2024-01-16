@@ -75,7 +75,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "GET",
-      rule:  scriptRef != null ? scriptRef.current.value : "",
+      rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
       //headerParams: [],
@@ -164,11 +164,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
 
       <Collapse in={showForm}>
         <div style={contentStyle}>
-          {flashMessage && (
-            <Alert variant="success" className="fade-out">
-              {flashMessage}
-            </Alert>
-          )}
+          
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
               <Selects setShowRuleBlock = {setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
@@ -207,6 +203,11 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
               />
             </Stack>
           </Form>
+          {flashMessage && (
+            <Alert variant="success" className="fade-out">
+              {flashMessage}
+            </Alert>
+          )}
         </div>
       </Collapse>
     </div>

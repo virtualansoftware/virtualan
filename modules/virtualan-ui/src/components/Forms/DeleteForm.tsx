@@ -73,7 +73,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
       httpStatusCode: selectRefs.status.current.value,
       url: path,
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
-      rule:  scriptRef != null ? scriptRef.current.value : "",
+      rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "DELETE",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
@@ -163,11 +163,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
 
       <Collapse in={showForm}>
         <div style={contentStyle}>
-          {flashMessage && (
-            <Alert variant="success" className="fade-out">
-              {flashMessage}
-            </Alert>
-          )}
+         
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
               {/*  */}
@@ -208,6 +204,11 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
               />
             </Stack>
           </Form>
+          {flashMessage && (
+            <Alert variant="success" className="fade-out">
+              {flashMessage}
+            </Alert>
+          )}
         </div>
       </Collapse>
     </div>

@@ -76,7 +76,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "PATCH",
-      rule:  scriptRef != null ? scriptRef.current.value : "",
+      rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       input:  mockRequestRef != null ? mockRequestRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
@@ -166,11 +166,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
 
       <Collapse in={showForm}>
         <div style={contentStyle}>
-          {flashMessage && (
-            <Alert variant="success" className="fade-out">
-              {flashMessage}
-            </Alert>
-          )}
+         
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
             <Selects setShowRuleBlock = {setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
@@ -212,6 +208,11 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
               />
             </Stack>
           </Form>
+          {flashMessage && (
+            <Alert variant="success" className="fade-out">
+              {flashMessage}
+            </Alert>
+          )}
         </div>
       </Collapse>
     </div>

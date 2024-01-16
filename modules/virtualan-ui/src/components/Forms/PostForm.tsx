@@ -76,7 +76,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       type: selectRefs.type != null ? selectRefs.type.current.value : "",
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "POST",
-      rule:  scriptRef != null ? scriptRef.current.value : "",
+      rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       input:  mockRequestRef != null ? mockRequestRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
