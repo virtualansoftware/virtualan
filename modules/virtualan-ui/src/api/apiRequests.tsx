@@ -21,11 +21,14 @@ const apiRequestsDelete = async (deleteEndpoint: string, id: number) => {
   }
 };
 
-const apiRequestsGet = async (getEndpoint: string) => {
+const apiRequestsGet = (getEndpoint: string) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  try {
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
         const response = await axios.get(getEndpoint);
         // console.log("data fetched", response);
         const responseData = response.data;
@@ -36,6 +39,11 @@ const apiRequestsGet = async (getEndpoint: string) => {
       } finally {
         setIsLoading(false);
       }
+    };
+
+    fetchData();
+  }, [getEndpoint]);
+
   return data;
 };
 
