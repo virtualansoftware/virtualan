@@ -77,8 +77,8 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
       contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
       method: "DELETE",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
-      availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
-      //headerParams: [],
+      availableParams:  Object.entries(reqParams.push(queryParams)).map(([key, value]) => (({ key, value }))),
+      headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
       resource: resource
     };
 

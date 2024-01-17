@@ -77,8 +77,8 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
       method: "GET",
       rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
-      availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
-      //headerParams: [],
+      availableParams:  Object.entries(queryParams).map(([key, value]) => (({ key, value }))),
+      headerParams: respParams,
       resource: resource
     };
 

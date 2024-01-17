@@ -26,7 +26,7 @@ const AdditionalParams = ({
 
 
   return (
-    <>
+    <div>
       <Row key={uuidv4()}>
         <Col xs={3}>
           <Form.Label className="head-text-black">
@@ -35,7 +35,7 @@ const AdditionalParams = ({
         </Col>
       </Row>
 
-      <Row key={uuidv4()}>
+      <Row style={{ padding: 0 }} key={uuidv4()}>
         <Col xs={3}></Col>
         <Col xs={7}>
           <Row className="d-flex">
@@ -60,7 +60,7 @@ const AdditionalParams = ({
       </Row>
 
       {/* line */}
-      <Row key={uuidv4()}>
+      <Row key={uuidv4()} style={{ padding: 0 }}>
         <Col xs={3}></Col>
         <Col xs={7}>
           <Row className="d-flex">
@@ -71,7 +71,7 @@ const AdditionalParams = ({
         </Col>
       </Row>
 
-      <Row key={uuidv4()}>
+      <Row key={uuidv4()} style={{ padding: 0 }}>
         <Col xs={3}></Col>
         <Col xs={7}>
           {reqParams.map((param: any, index: string) => {
@@ -113,7 +113,7 @@ const AdditionalParams = ({
               </Row>
             );
           })}
-          <Row className="d-flex">
+          <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
               <Form.Control type="text" id={"inputReqAddParamsKey-" + randomIdAdditionalParams} />
             </Col>
@@ -139,7 +139,7 @@ const AdditionalParams = ({
           </Row>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

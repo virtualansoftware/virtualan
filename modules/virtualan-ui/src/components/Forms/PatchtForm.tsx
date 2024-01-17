@@ -79,8 +79,8 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
       rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       input:  mockRequestRef != null ? mockRequestRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
-      availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
-      //headerParams: [],
+      availableParams:  Object.entries(reqParams.push(queryParams)).map(([key, value]) => (({ key, value }))),
+      headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
       resource: resource
     };
 

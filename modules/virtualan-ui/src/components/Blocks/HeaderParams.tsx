@@ -14,7 +14,8 @@ const HeaderParams = ({
   handleAddQueryParams,
 }: Props) => {
   return (
-    <Row key={uuidv4()}>
+    <div>
+    <Row key={uuidv4()} style={{ padding: 0 }}>
       <Col xs={3}>
         <Form.Label className="head-text-black">
           Query/Path/Header Params:
@@ -22,7 +23,7 @@ const HeaderParams = ({
       </Col>
       <Col xs={7}>
         {availableParams.map((param: any, index: any) => (
-          <Row key={index} className="d-flex">
+          <Row key={index} className="d-flex" style={{ padding: 0 }}>
             <Col xs={4}>
               <Form.Label
                 name={param["key"]}
@@ -48,6 +49,7 @@ const HeaderParams = ({
         ))}
       </Col>
     </Row>
+    </div>
   );
 };
 

@@ -20,8 +20,8 @@ const RespHeaderParams = ({
   const randomIdAdditionalParams = uuidv4();
 
   return (
-    <>
-      <Row key={uuidv4()}>
+    <div>
+      <Row key={uuidv4()} >
         <Col xs={3}>
           <Form.Label className="head-text-black">
             Response Header Params:
@@ -29,7 +29,7 @@ const RespHeaderParams = ({
         </Col>
       </Row>
 
-      <Row key={uuidv4()}>
+      <Row key={uuidv4()} style={{ padding: 0 }}>
         <Col xs="3"></Col>
         <Col xs={7}>
           <Row className="d-flex">
@@ -53,7 +53,7 @@ const RespHeaderParams = ({
         </Col>
       </Row>
 
-      <Row key={uuidv4()}>
+      <Row key={uuidv4()} style={{ padding: 0 }}>
         <Col xs={3}></Col>
         <Col xs={7}>
           <Row className="d-flex">
@@ -64,7 +64,7 @@ const RespHeaderParams = ({
         </Col>
       </Row>
 
-      <Row key={uuidv4()}>
+      <Row key={uuidv4()} style={{ padding: 0 }}>
         <Col xs={3}></Col>
         <Col xs={7}>
           {respParams.map((param: any, index: any) => {
@@ -106,7 +106,7 @@ const RespHeaderParams = ({
               </Row>
             );
           })}
-          <Row className="d-flex">
+          <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
               <Form.Control
                 type="text"
@@ -138,7 +138,7 @@ const RespHeaderParams = ({
           </Row>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 
