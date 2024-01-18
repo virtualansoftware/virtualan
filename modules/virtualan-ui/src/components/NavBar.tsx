@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
+// import React from "react";
+import { useState, useEffect } from "react";
 import ModalAppAdd from "./ModalAdd";
 import ModalAppLoad from "./ModalLoad";
 import ModalAppCatalog from "./ModalCatalog";
 import ModalAppJSON from "./ModalJsonFormatter";
 
-import { MouseEvent } from "react";
+// import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
-import { API_GET_ENDPOINT_ADD, API_GET_ENDPOINT_LOAD } from "../constants";
+import { API_GET_CATALOGS } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
-
-
 
 const NavBar = () => {
   const [showModalAdd, setShowModalAdd] = useState(false);
   const [showModalLoad, setShowModalLoad] = useState(false);
   const [showModalCatalog, setShowModalCatalog] = useState(false);
   const [showModalJson, setShowModalJson] = useState(false);
+  const [catalogItems, setCatalogItems] = useState([]);
 
   const [contentSrc, setContentSrc] = useState(
     <h2 style={{ textAlign: "center" }}>Welcome to Virtualan!!!</h2>
@@ -26,20 +26,27 @@ const NavBar = () => {
   const [showContent, setShowContent] = useState(true);
 
   const [modalTitle, setModalTitle] = useState("");
-  const [modalYaml, setModalYaml] = useState("");
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await apiRequestsGet(API_GET_CATALOGS);
+      setCatalogItems(data);
+    };
 
-  const MockDataAdd = apiRequestsGet(API_GET_ENDPOINT_ADD);
-  const MockDataLoad = apiRequestsGet(API_GET_ENDPOINT_LOAD);
+    fetchData();
+  }, []);
+
+  const catalogApi = catalogItems.reduce((obj, item) => {
+    obj[item] = {
+      modal: "Modal3",
+      icon: <FontAwesomeIcon icon={faList} />,
+    };
+    return obj;
+  }, {});
 
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleClick = (
-    title: string,
-    modal: string,
-    yaml_file: string,
-    link: string
-  ) => {
+  const handleClick = (title: string, modal: string, link: string) => {
     setModalTitle(title);
     setShowContent(true);
     setContentSrc(
@@ -59,7 +66,7 @@ const NavBar = () => {
     } else if (modal === "Modal3") {
       // Catalog
       setShowModalCatalog(true);
-      setModalYaml(yaml_file);
+      // setModalYaml(yaml_file);
     } else if (modal === "Modal4") {
       // JSON Formatter
       setShowModalJson(true);
@@ -76,7 +83,6 @@ const NavBar = () => {
       window.open(link, "_blank", "height=600,width=800");
     } else {
       // Default
-
     }
   };
 
@@ -103,38 +109,7 @@ const NavBar = () => {
         icon: <FontAwesomeIcon icon={faList} />,
       },
     },
-    Catalog: {
-      Person: {
-        modal: "Modal3",
-        icon: <FontAwesomeIcon icon={faList} />,
-        yaml_file: "person.yaml",
-      },
-      Pet: {
-        modal: "Modal3",
-        icon: <FontAwesomeIcon icon={faList} />,
-        yaml_file: "petstore.yaml",
-      },
-      Risk: {
-        modal: "Modal3",
-        icon: <FontAwesomeIcon icon={faList} />,
-        yaml_file: "riskfactor.yaml",
-      },
-      Service: {
-        modal: "Modal3",
-        icon: <FontAwesomeIcon icon={faList} />,
-        yaml_file: "Service.yaml",
-      },
-      Uber: {
-        modal: "Modal3",
-        icon: <FontAwesomeIcon icon={faList} />,
-        yaml_file: "uber.yaml",
-      },
-      VirtualService: {
-        modal: "Modal3",
-        icon: <FontAwesomeIcon icon={faList} />,
-        yaml_file: "virtualservices.yaml",
-      },
-    },
+    Catalog: catalogApi,
     Utility: {
       "Overall Catalog": { modal: "popup", link: "/swagger-ui/index.html" },
       "OpenAPI Editor": { modal: "popup", link: "/swagger-editor/index.html" },
@@ -145,16 +120,15 @@ const NavBar = () => {
         modal: "help",
         link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version=v2.5.2",
       },
-
     },
   };
+
   return (
     <>
       <nav
         className="navbar navbar-expand-lg bg-body-tertiary"
         style={{ borderBottom: "5px solid black", marginBottom: "35px" }}
       >
-
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
             <img src={logoVirtualan} alt="VT" width="50" height="50" />
@@ -192,7 +166,6 @@ const NavBar = () => {
                         {Object.entries(value).map(([subkey, subvalue]) => {
                           const item = subvalue as SubMenuItem;
                           return subkey === "-" ? (
-
                             <hr className="dropdown-divider" key={key} />
                           ) : (
                             <li key={subkey}>
@@ -200,21 +173,14 @@ const NavBar = () => {
                                 className="dropdown-item"
                                 key={subkey}
                                 onClick={() =>
-                                  handleClick(
-                                    subkey,
-                                    item.modal,
-                                    item.yaml_file,
-                                    item.link
-                                  )
+                                  handleClick(subkey, item.modal, item.link)
                                 }
                               >
                                 {item.icon} {subkey}
-
                               </a>
                             </li>
                           );
                         })}
-
                       </ul>
                     </>
                   ) : (
@@ -235,13 +201,11 @@ const NavBar = () => {
         </div>
       </nav>
 
-
       {showModalAdd && (
         <ModalAppAdd
           title={modalTitle}
           onClose={() => setShowModalAdd(false)}
           show={showModalAdd}
-          dataApi={MockDataAdd}
         />
       )}
       {showModalLoad && (
@@ -255,7 +219,6 @@ const NavBar = () => {
       {showModalCatalog && (
         <ModalAppCatalog
           title={modalTitle}
-          yaml_file={modalYaml}
           onClose={() => setShowModalCatalog(false)}
           show={showModalCatalog}
         />
@@ -268,7 +231,6 @@ const NavBar = () => {
         />
       )}
       <Content show={showContent} htmlContent={contentSrc} />
-
     </>
   );
 };
