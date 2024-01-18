@@ -4,9 +4,9 @@ import axios from "axios";
 const apiRequestsPost = async (postEndpoint: string, postData: any) => {
   try {
     const response = await axios.post(postEndpoint, postData);
-    // console.log("Post request response:", response.data);
+    return response;
   } catch (error) {
-    // console.error("Error making POST request:", error);
+    return error;
   }
 };
 

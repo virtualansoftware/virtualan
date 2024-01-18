@@ -140,7 +140,7 @@ const NavBar = () => {
       "OpenAPI Editor": { modal: "popup", link: "/swagger-editor/index.html" },
       "JSON Formatter": { modal: "Modal4" },
       "-": "-",
-      "v2.5.2": { modal: false, link: "/swagger-ui/index.html" },
+      "v3.0.0": { modal: false, link: "/swagger-ui/index.html" },
       Help: {
         modal: "help",
         link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version=v2.5.2",

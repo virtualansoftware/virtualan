@@ -99,11 +99,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
     const mockResponseField = document.getElementById(
       "mockResponse" + formId
     ) as HTMLInputElement;
-    const excludeListField = document.getElementById(
-      "excludeList" + formId
-    ) as HTMLInputElement;
     mockResponseField.value = "";
-    excludeListField.value = "";
     setReqParams([]);
     setRespParams([]);
     setQueryParams({});

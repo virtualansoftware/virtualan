@@ -48,7 +48,7 @@ const RespHeaderParams = ({
           </Row>
           <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
-              <hr />
+              <hr className="hrx" />
             </Col>
             </Row>
           {respParams.map((param: any, index: any) => {

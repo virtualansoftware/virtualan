@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef , useEffect} from "react";
 
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
@@ -31,6 +31,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
+  const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [showRuleBlock, setShowRuleBlock] = useState(false);
 
   const mockResponseRef = useRef(null);
@@ -55,12 +56,6 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // console.log("selectRefs", selectRefs); // ok
-    // console.log("queryParams", queryParams); // ok
-    // console.log("reqParams", reqParams); // ok
-    // console.log("respParams", respParams); // ok
-    // console.log("mockResponse", mockResponseRef.current.value);
-    // console.log("excludeList", excludeListRef.current.value);
 
     const dataToSubmit = {
       operationId: operationId,
@@ -76,30 +71,27 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
       resource: resource
     };
 
-    // console.log("dataToSubmit", dataToSubmit);
-
-    try {
-      apiRequestsPost(apiEntryPointPost, dataToSubmit);
-      setFlashMessage("Data added successfully.");
-    } catch (error) {
-      console.error("Error making POST request:", error);
-      setFlashMessage("Error making POST request.");
+    useEffect(() => {
+      try {
+        const resposne = apiRequestsPost(apiEntryPointPost, dataToSubmit);
+        setFlashMessage( "created successfully");
+      } catch (error) {
+        console.error("Error making POST request:", error);
+        setFlashErrorMessage("Error making POST request." + error);
+      }
+      setTimeout(() => {
+        setFlashMessage("");
+      }, 5000);
+      handleResetForm();
     }
-    setTimeout(() => {
-      setFlashMessage("");
-    }, 5000);
-    handleResetForm();
+    );
   };
 
   const handleResetForm = () => {
     const mockResponseField = document.getElementById(
       "mockResponse" + formId
     ) as HTMLInputElement;
-    const excludeListField = document.getElementById(
-      "excludeList" + formId
-    ) as HTMLInputElement;
     mockResponseField.value = "";
-    excludeListField.value = "";
     setReqParams([]);
     setRespParams([]);
     setQueryParams({});
@@ -195,7 +187,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
             </Stack>
           </Form>
           {flashMessage && (
-            <Alert variant="success" className="fade-out">
+            <Alert variant='success' className="fade-out">
               {flashMessage}
             </Alert>
           )}

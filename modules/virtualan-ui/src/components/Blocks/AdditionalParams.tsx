@@ -53,10 +53,10 @@ const AdditionalParams = ({
           </Col>
         </Row>
 
-      {/* line */}
+          {/* line */}
           <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
-              <hr />
+              <hr className="hrx" />
             </Col>
           </Row>
       

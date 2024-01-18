@@ -24,6 +24,16 @@ li > a.nav-link {
   overflow-y: auto; /* Allow content to scroll if it exceeds the minimum height */
 }
 
+.hrx {
+  display: block;
+  unicode-bidi: isolate;
+  margin-block-start: 0.05em;
+  margin-block-end: 0.1em;
+  margin-inline-start: auto;
+  margin-inline-end: auto;
+  overflow: hidden;
+}
+
 .modal-header {
   background-color: #1b1b1b;
   border-radius: 0;
