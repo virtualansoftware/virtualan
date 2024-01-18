@@ -33,47 +33,33 @@ const AdditionalParams = ({
             Additional Params:
           </Form.Label>
         </Col>
-      </Row>
-
-      <Row style={{ padding: 0 }} key={uuidv4()}>
-        <Col xs={3}></Col>
         <Col xs={7}>
-          <Row className="d-flex">
-            <Col xs={6}>
-              <Form.Label
-                className="head-text-black"
-                htmlFor="inputReqParamKey"
-              >
-                Param Key
-              </Form.Label>
-            </Col>
-            <Col xs={6}>
-              <Form.Label
-                className="head-text-black"
-                htmlFor="inputReqParamValue"
-              >
-                Param Value:
-              </Form.Label>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+        <Row className="d-flex">
+          <Col xs={6}>
+            <Form.Label
+              className="head-text-black"
+              htmlFor="inputReqParamKey"
+            >
+              Param Key
+            </Form.Label>
+          </Col>
+          <Col xs={6}>
+            <Form.Label
+              className="head-text-black"
+              htmlFor="inputReqParamValue"
+            >
+              Param Value:
+            </Form.Label>
+          </Col>
+        </Row>
 
       {/* line */}
-      <Row key={uuidv4()} style={{ padding: 0 }}>
-        <Col xs={3}></Col>
-        <Col xs={7}>
-          <Row className="d-flex">
+          <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
               <hr />
             </Col>
           </Row>
-        </Col>
-      </Row>
-
-      <Row key={uuidv4()} style={{ padding: 0 }}>
-        <Col xs={3}></Col>
-        <Col xs={7}>
+      
           {reqParams.map((param: any, index: string) => {
             const key = param["key"];
             return (

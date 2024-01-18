@@ -28,6 +28,7 @@ interface Props {
   path: string;
   availableParams: string[];
   apiEntryPointPost: string;
+  
 }
 
 const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointPost }: Props) => {
@@ -81,7 +82,8 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams:  Object.entries(reqParams.push(queryParams)).map(([key, value]) => (({ key, value }))),
       headerParams: respParams,
-      resource: resource
+      resource: resource,
+      excludeList: excludeListRef.current.value
     };
 
     // console.log("dataToSubmit", dataToSubmit);
@@ -178,7 +180,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
                 handleDelParams={handleDelParams}
               />
               {/*  */}
-              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
+              {showRuleBlock 
                     && (<Script formId={formId} scriptRef = {scriptRef} />)
               }
               {/*  */}

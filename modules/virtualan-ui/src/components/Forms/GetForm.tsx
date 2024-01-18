@@ -4,13 +4,9 @@ import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
 import Alert from "react-bootstrap/Alert";
 import Collapse from "react-bootstrap/Collapse";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
-
 import HttpStatusList from "../../api/HttpStatusList.json";
 import RequestType from "../../api/RequestType.json";
 import ResponseList from "../../api/ResponseList.json";
-import MockRequestBody from "../Blocks/MockRequestBody";
 import { apiRequestsPost } from "../../api/apiRequests";
 import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
@@ -18,7 +14,6 @@ import AdditionalParams from "../Blocks/AdditionalParams";
 import MockResponse from "../Blocks/MockResponse";
 import Script from "../Blocks/Script";
 import RespHeaderParams from "../Blocks/RespHeaderParams";
-import ExcludeList from "../Blocks/ExcludeList";
 import FormButtons from "../Blocks/FormButtons";
 import { v4 as uuidv4 } from "uuid";
 
@@ -36,10 +31,9 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
-  const [showRuleBlock, setShowRuleBlock] = useState("");
+  const [showRuleBlock, setShowRuleBlock] = useState(false);
 
   const mockResponseRef = useRef(null);
-  const excludeListRef = useRef(null);
   const scriptRef = useRef(null);
   const selectRefs = {
     status: useRef(null),
@@ -175,15 +169,14 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
                 handleAddQueryParams={handleAddQueryParams}
               />
               {/*  */}
-              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
-              && (<Script formId={formId} scriptRef = {scriptRef} />)
-              }
               <AdditionalParams
                 reqParams={reqParams}
                 setReqParams={setReqParams}
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
+              {/*  */}
+              { (showRuleBlock  && (<Script formId={formId} scriptRef = {scriptRef} />)) }       
               {/*  */}
               <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
               {/*  */}
@@ -193,8 +186,6 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
-              {/*  */}
-              <ExcludeList formId={formId} excludeListRef={excludeListRef} />
               {/*  */}
               <FormButtons
                 handleResetForm={handleResetForm}

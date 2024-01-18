@@ -39,7 +39,6 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
   const [showRuleBlock, setShowRuleBlock] = useState("");
 
   const mockResponseRef = useRef(null);
-  const excludeListRef = useRef(null);
   const scriptRef = useRef(null);
   const selectRefs = {
     status: useRef(null),
@@ -182,9 +181,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
                 handleDelParams={handleDelParams}
               />
               {/*  */}
-              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
-              && (<Script formId={formId} scriptRef = {scriptRef} />)
-              }
+              { ((showRuleBlock) && (<Script formId={formId} scriptRef = {scriptRef} />)) }
               {/*  */}
               <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
               {/*  */}
@@ -194,8 +191,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
-              {/*  */}
-              <ExcludeList formId={formId} excludeListRef={excludeListRef} />
+
               {/*  */}
               <FormButtons
                 handleResetForm={handleResetForm}

@@ -81,7 +81,9 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
       availableParams:  Object.entries(reqParams.push(queryParams)).map(([key, value]) => (({ key, value }))),
       headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
-      resource: resource
+      resource: resource,
+      excludeList: excludeListRef.current.value
+
     };
 
 
@@ -184,7 +186,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
                 handleDelParams={handleDelParams}
               />
               {/* Text area */}
-              {showRuleBlock && (showRuleBlock === 'Script' || selectRefs.type.current.value === 'Rule') 
+              {showRuleBlock
               && (<Script formId={formId} scriptRef = {scriptRef} />)
               }
               {/* Text area */}

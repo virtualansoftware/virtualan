@@ -243,7 +243,9 @@ const ModalContentLoad = ({  mainModalClose }: Props) => {
                       );
                     })}
                   </td>
-                  <td key={10}></td>
+                  <td key={10}>
+                    {item.excludeList}
+                  </td>
                   <td key={11}>
                     <div onClick={() => handleRemoveItem(item.id)}>
                       <span className="form-button button-table-red">
