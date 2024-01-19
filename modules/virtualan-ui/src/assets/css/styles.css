@@ -24,6 +24,19 @@ li > a.nav-link {
   overflow-y: auto; /* Allow content to scroll if it exceeds the minimum height */
 }
 
+
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+}
+
 .hrx {
   display: block;
   unicode-bidi: isolate;
@@ -96,10 +109,7 @@ button.button-path {
   font-size: 10px !important;
 }
 
-textarea {
-  background-color: black !important;
-  color: white !important;
-}
+
 
 input {
   height: 30px;

@@ -29,6 +29,7 @@ const Script = ({ formId, scriptRef }: Props) => {
         padding={15}
         minHeight={180}
         style={{
+          backgroundColor: "#f5f5f5",
           fontFamily:
             "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
           fontSize: 12
