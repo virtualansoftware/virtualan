@@ -21,16 +21,30 @@ const apiRequestsDelete = async (deleteEndpoint: string, id: number) => {
   }
 };
 
+const apiRequestsGet = (getEndpoint: string) => {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-const apiRequestsGet = async (getEndpoint: string) => {
-  try {
-    const response = await axios.get(getEndpoint);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(getEndpoint);
+        // console.log("data fetched", response);
+        const responseData = response.data;
+        setData(responseData);
+      } catch (error: any) {
+        // console.error("Error fetching data:", error);
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [getEndpoint]);
+
+  return data;
 };
-
 
 export { apiRequestsGet, apiRequestsDelete, apiRequestsPost };

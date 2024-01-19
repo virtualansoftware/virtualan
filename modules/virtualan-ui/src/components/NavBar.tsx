@@ -8,17 +8,24 @@ import ModalAppJSON from "./ModalJsonFormatter";
 // import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
-import { API_GET_CATALOGS } from "../constants";
+import { API_GET_CATALOGS,API_GET_ENDPOINT_ADD } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
+import axios from "axios";
+
+
 
 const NavBar = () => {
   const [showModalAdd, setShowModalAdd] = useState(false);
   const [showModalLoad, setShowModalLoad] = useState(false);
   const [showModalCatalog, setShowModalCatalog] = useState(false);
   const [showModalJson, setShowModalJson] = useState(false);
-  const [catalogItems, setCatalogItems] = useState([]);
+  // const [catalogItems, setCatalogItems] = useState([]);
+
+
+  const apiLoad =  apiRequestsGet(API_GET_ENDPOINT_ADD);
+
 
   const [contentSrc, setContentSrc] = useState(
     <h2 style={{ textAlign: "center" }}>Welcome to Virtualan!!!</h2>
@@ -27,22 +34,26 @@ const NavBar = () => {
 
   const [modalTitle, setModalTitle] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await apiRequestsGet(API_GET_CATALOGS);
-      setCatalogItems(data);
-    };
+  // const loadData = async () => {
+  //   await axios({
+  //     method: "GET",
+  //     url: API_GET_CATALOGS,
+  //   }).then((res) => {
+  //     setCatalogItems(res.data);
+  //   });
+  // };
 
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   loadData();
+  // }, []);
 
-  const catalogApi = catalogItems.reduce((obj, item) => {
-    obj[item] = {
-      modal: "Modal3",
-      icon: <FontAwesomeIcon icon={faList} />,
-    };
-    return obj;
-  }, {});
+  // const catalogApi = catalogItems.reduce((obj, item) => {
+  //   obj[item] = {
+  //     modal: "Modal3",
+  //     icon: <FontAwesomeIcon icon={faList} />,
+  //   };
+  //   return obj;
+  // }, {});
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -63,9 +74,9 @@ const NavBar = () => {
       // Load
       setModalTitle("List of Mock Response!");
       setShowModalLoad(true);
-    } else if (modal === "Modal3") {
-      // Catalog
-      setShowModalCatalog(true);
+    // } else if (modal === "Modal3") {
+    //   // Catalog
+    //   setShowModalCatalog(true);
       // setModalYaml(yaml_file);
     } else if (modal === "Modal4") {
       // JSON Formatter
@@ -109,7 +120,7 @@ const NavBar = () => {
         icon: <FontAwesomeIcon icon={faList} />,
       },
     },
-    Catalog: catalogApi,
+    //Catalog: catalogApi,
     Utility: {
       "Overall Catalog": { modal: "popup", link: "/swagger-ui/index.html" },
       "OpenAPI Editor": { modal: "popup", link: "/swagger-editor/index.html" },
@@ -206,6 +217,7 @@ const NavBar = () => {
           title={modalTitle}
           onClose={() => setShowModalAdd(false)}
           show={showModalAdd}
+          dataApi={apiLoad}
         />
       )}
       {showModalLoad && (

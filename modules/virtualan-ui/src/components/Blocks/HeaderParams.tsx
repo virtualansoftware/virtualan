@@ -41,7 +41,7 @@ const HeaderParams = ({
                 id={"inputQueryParamValue" + param["key"]}
                 value={queryParams[param["key"]]}
                 onChange={(e) =>
-                  handleAddQueryParams(param["key"], e.target.value)
+                  handleAddQueryParams(param["parameterType"], param["key"], e.target.value)
                 }
               />
             </Col>

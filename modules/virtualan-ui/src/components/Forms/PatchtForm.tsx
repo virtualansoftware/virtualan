@@ -37,6 +37,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
   const [showRuleBlock, setShowRuleBlock] = useState("");
+  const [flashErrorMessage, setFlashErrorMessage] = useState("");
 
   const mockResponseRef = useRef(null);
   const mockRequestRef = useRef(null);
@@ -59,6 +60,23 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const http_status = HttpStatusList;
   const request_type = RequestType;
   const response_list = ResponseList;
+
+  const createMockRequest = (apiEntryPointPost: any, dataToSubmit : any) =>{
+    const output = apiRequestsPost(apiEntryPointPost, dataToSubmit);
+    output.then((response: any) => JSON.stringify(response)) //2
+    .then((data : any) => {
+      const jsondata  = JSON.parse(data);
+        setFlashMessage( "Success: " + jsondata.data.mockStatus.code)
+        setFlashErrorMessage("");
+    }).catch(error =>             {
+      console.log(error.response);
+      const jsondata  = JSON.parse(JSON.stringify(error.response));
+      setFlashErrorMessage( "Fail: " + jsondata.data.code);
+      setFlashMessage("");
+    }
+    );    
+  }
+
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -86,17 +104,15 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
 
     };
 
-
-    // console.log("dataToSubmit", dataToSubmit);
     try {
-      apiRequestsPost(apiEntryPointPost, dataToSubmit);
-      setFlashMessage("Data added successfully.");
+      createMockRequest(apiEntryPointPost, dataToSubmit);
     } catch (error) {
       console.error("Error making POST request:", error);
-      setFlashMessage("Error making POST request.");
+      setFlashErrorMessage("Error making POST request." + error);
     }
     setTimeout(() => {
       setFlashMessage("");
+      setFlashErrorMessage("")
     }, 5000);
     handleResetForm();
   };
@@ -213,6 +229,11 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
           {flashMessage && (
             <Alert variant="success" className="fade-out">
               {flashMessage}
+            </Alert>
+          )}
+          {flashErrorMessage && (
+            <Alert variant='warning' className="fade-out">
+              {flashErrorMessage}
             </Alert>
           )}
         </div>

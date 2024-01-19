@@ -28,6 +28,7 @@ interface Props {
 const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPost}: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [queryParams, setQueryParams] = useState<{ [key: string]: string }>({});
+  const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
@@ -54,6 +55,23 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
   const request_type = RequestType;
   const response_list = ResponseList;
 
+
+  const createMockRequest = (apiEntryPointPost: any, dataToSubmit : any) =>{
+    const output = apiRequestsPost(apiEntryPointPost, dataToSubmit);
+    output.then((response: any) => JSON.stringify(response)) //2
+    .then((data : any) => {
+      const jsondata  = JSON.parse(data);
+        setFlashMessage( "Success: " + jsondata.data.mockStatus.code)
+        setFlashErrorMessage("");
+    }).catch(error =>             {
+      console.log(error.response);
+      const jsondata  = JSON.parse(JSON.stringify(error.response));
+      setFlashErrorMessage( "Fail: " + jsondata.data.code);
+      setFlashMessage("");
+    }
+    );    
+  }
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -66,25 +84,22 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
       method: "GET",
       rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
       output: mockResponseRef != null ? mockResponseRef.current.value : "",
-      availableParams:  Object.entries(queryParams).map(([key, value]) => (({ key, value }))),
+      availableParams:  Object.entries(queryParams).map(([key, value]) => (({ key: key, value: value, parameterType: paramTypes[key]}))),
       headerParams: respParams,
       resource: resource
     };
 
-    useEffect(() => {
-      try {
-        const resposne = apiRequestsPost(apiEntryPointPost, dataToSubmit);
-        setFlashMessage( "created successfully");
-      } catch (error) {
-        console.error("Error making POST request:", error);
-        setFlashErrorMessage("Error making POST request." + error);
-      }
-      setTimeout(() => {
-        setFlashMessage("");
-      }, 5000);
-      handleResetForm();
+    try {
+      createMockRequest(apiEntryPointPost, dataToSubmit);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+      setFlashErrorMessage("Error making POST request." + error);
     }
-    );
+    setTimeout(() => {
+      setFlashMessage("");
+      setFlashErrorMessage("")
+    }, 5000);
+    handleResetForm();
   };
 
   const handleResetForm = () => {
@@ -95,6 +110,7 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
     setReqParams([]);
     setRespParams([]);
     setQueryParams({});
+    setParamTypes({});
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
@@ -133,9 +149,11 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
     }
   };
 
-  const handleAddQueryParams = (key: string, value: string) => {
+  const handleAddQueryParams = (paramType: string, key: string, value: string) => {
     queryParams[key] = value;
     setQueryParams(queryParams);
+    paramTypes[key] = paramType;
+    setParamTypes(paramTypes);
   };
 
   return (
@@ -189,6 +207,11 @@ const GetForm = ({ operationId, resource, path, availableParams, apiEntryPointPo
           {flashMessage && (
             <Alert variant='success' className="fade-out">
               {flashMessage}
+            </Alert>
+          )}
+            {flashErrorMessage && (
+            <Alert variant='warning' className="fade-out">
+              {flashErrorMessage}
             </Alert>
           )}
         </div>

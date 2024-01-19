@@ -1,29 +1,15 @@
 import Modal from "react-bootstrap/Modal";
 import ModalContent from "./Modals/ModalDataAdd";
 import logoVirtualan from "../assets/images/logo_image.png";
-import { useEffect, useState } from "react";
-import { apiRequestsGet } from "../api/apiRequests";
-import { API_GET_ENDPOINT_ADD } from "../constants";
 
 interface Props {
   title: string;
   onClose: () => void;
   show: boolean;
+  dataApi: any;
 }
-
-const ModalApp = ({ title, onClose, show }: Props) => {
+const ModalApp = ({ title, onClose, show, dataApi }: Props) => {
   const handleClose = () => onClose();
-
-  const [dataApi, setDataApi] = useState("");
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await apiRequestsGet(API_GET_ENDPOINT_ADD);
-      setDataApi(data);
-    };
-
-    fetchData();
-  });
 
   return (
     <>
