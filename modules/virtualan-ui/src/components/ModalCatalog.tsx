@@ -6,6 +6,7 @@ import { apiRequestsGet } from "../api/apiRequests";
 import { API_GET_CATALOGS } from "../constants";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 
 interface Props {
@@ -20,14 +21,19 @@ const ModalApp = ({ title, onClose, show }: Props) => {
   const [yamlFile, setYamlFile] = useState(null);
   const handleClose = () => onClose();
   
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await apiRequestsGet(API_GET_CATALOGS + '/' + title);
-      setYamlFile(data);
-    };
 
-    fetchData();
-  }, [title]);
+  const loadData = async () => {
+    await axios({
+      method: "GET",
+      url: API_GET_CATALOGS +"/"+title,
+    }).then((res) => {
+      setYamlFile(res.data);
+    });
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [show]);
 
   const formId = uuidv4();
 
@@ -52,9 +58,9 @@ const ModalApp = ({ title, onClose, show }: Props) => {
               </thead>
               <tbody>
                   <tr key={formId}>
-                    <td>{ yamlFile }</td>
+                    <td>{ title }</td>
                     <td>
-                      <a target="_new" href={`swagger-ui/index.html?url=/yaml/Person/${yamlFile}`}>
+                      <a target="_new" href={`swagger-ui/index.html?url=/yaml/${title}/${yamlFile}`}>
                         view
                       </a>
                     </td>

@@ -21,7 +21,7 @@ const NavBar = () => {
   const [showModalLoad, setShowModalLoad] = useState(false);
   const [showModalCatalog, setShowModalCatalog] = useState(false);
   const [showModalJson, setShowModalJson] = useState(false);
-  // const [catalogItems, setCatalogItems] = useState([]);
+  const [catalogItems, setCatalogItems] = useState([]);
 
 
   const apiLoad =  apiRequestsGet(API_GET_ENDPOINT_ADD);
@@ -34,26 +34,26 @@ const NavBar = () => {
 
   const [modalTitle, setModalTitle] = useState("");
 
-  // const loadData = async () => {
-  //   await axios({
-  //     method: "GET",
-  //     url: API_GET_CATALOGS,
-  //   }).then((res) => {
-  //     setCatalogItems(res.data);
-  //   });
-  // };
+  const loadData = async () => {
+    await axios({
+      method: "GET",
+      url: API_GET_CATALOGS,
+    }).then((res) => {
+      setCatalogItems(res.data);
+    });
+  };
 
-  // useEffect(() => {
-  //   loadData();
-  // }, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  // const catalogApi = catalogItems.reduce((obj, item) => {
-  //   obj[item] = {
-  //     modal: "Modal3",
-  //     icon: <FontAwesomeIcon icon={faList} />,
-  //   };
-  //   return obj;
-  // }, {});
+  const catalogApi = catalogItems.reduce((obj, item) => {
+    obj[item] = {
+      modal: "Modal3",
+      icon: <FontAwesomeIcon icon={faList} />,
+    };
+    return obj;
+  }, {});
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -74,10 +74,10 @@ const NavBar = () => {
       // Load
       setModalTitle("List of Mock Response!");
       setShowModalLoad(true);
-    // } else if (modal === "Modal3") {
-    //   // Catalog
-    //   setShowModalCatalog(true);
-      // setModalYaml(yaml_file);
+    } else if (modal === "Modal3") {
+      // Catalog
+      setShowModalCatalog(true);
+      //setModalYaml(yaml_file);
     } else if (modal === "Modal4") {
       // JSON Formatter
       setShowModalJson(true);
@@ -120,7 +120,7 @@ const NavBar = () => {
         icon: <FontAwesomeIcon icon={faList} />,
       },
     },
-    //Catalog: catalogApi,
+    Catalog: catalogApi,
     Utility: {
       "Overall Catalog": { modal: "popup", link: "/swagger-ui/index.html" },
       "OpenAPI Editor": { modal: "popup", link: "/swagger-editor/index.html" },
