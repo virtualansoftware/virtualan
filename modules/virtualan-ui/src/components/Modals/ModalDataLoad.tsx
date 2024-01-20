@@ -90,6 +90,28 @@ const ModalContentLoad = ({ mainModalClose }: Props) => {
     setRefreshKey((oldKey) => oldKey + 1);
   };
 
+  const syntaxHighlight = (json : string) => {
+    if (typeof json != 'string') {
+           json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\\s*:)?|\b(true|false|null)\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+  }
+
   const renderJsonView = (jsonString: any) => {
     try {
       const data = JSON.parse(jsonString);
@@ -101,7 +123,14 @@ const ModalContentLoad = ({ mainModalClose }: Props) => {
         />
       );
     } catch (error) {
-      return null;
+      const data = syntaxHighlight(jsonString);;
+      return (
+        <JsonView
+          data={data}
+          shouldExpandNode={allExpanded}
+          style={defaultStyles}
+        />
+      );
     }
   };
 
@@ -267,13 +296,13 @@ const ModalContentLoad = ({ mainModalClose }: Props) => {
           </Modal.Header>
           <Modal.Body>
             <div className="row" style={{ padding: "20px" }}>
-              {showType === "PARAMS" ? (
+              {(showType === "PARAMS" && modalTitle === 'PARAMS') ? (
                 <JsonToTable json={JSON.parse(modalContent)} />
               ) : isJSON(modalContent) ? (
                 <>
                   <div className="col">
                     {
-                      <JSONPretty
+                       <JSONPretty
                         data={JSON.parse(modalContent)}
                         theme={JSONPrettyMon}
                       />
@@ -295,7 +324,7 @@ const ModalContentLoad = ({ mainModalClose }: Props) => {
                 />
               ) : (
                 <div className="col">
-                  <ReactMarkdown>{modalContent}</ReactMarkdown>
+                  <ReactMarkdown>{ syntaxHighlight(modalContent)}</ReactMarkdown>
                 </div>
               )}
             </div>
