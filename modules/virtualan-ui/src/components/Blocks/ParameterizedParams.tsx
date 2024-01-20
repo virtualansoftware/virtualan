@@ -6,7 +6,6 @@ import Image from "react-bootstrap/Image";
 import plusImage from "../../assets/images/plus-img.png";
 import minusImage from "../../assets/images/minus-img.png";
 
-
 interface Props {
   reqParams: any;
   setReqParams: any;
@@ -14,59 +13,28 @@ interface Props {
   handleDelParams: Function;
 }
 
-const AdditionalParams = ({reqParams, setReqParams, handleAddParams, handleDelParams, }: Props) => {
-
-	const randomIdAdditionalParams = uuidv4();
+const ParameterizedParams = ({reqParams, setReqParams, handleAddParams, handleDelParams, }: Props) => {
+  const randomIdParameterizedParams = uuidv4();
 
   return (
     <div>
       <Row key={uuidv4()}>
         <Col xs={3}>
           <Form.Label className="head-text-black">
-            Additional Params:
+            Parameterized Values:
           </Form.Label>
         </Col>
         <Col xs={7}>
-        <Row className="d-flex">
-          <Col xs={6}>
-            <Form.Label
-              className="head-text-black"
-              htmlFor="inputReqParamKey"
-            >
-              Param Key
-            </Form.Label>
-          </Col>
-          <Col xs={6}>
-            <Form.Label
-              className="head-text-black"
-              htmlFor="inputReqParamValue"
-            >
-              Param Value:
-            </Form.Label>
-          </Col>
-        </Row>
-
+          <Row className="d-flex">
+          </Row>
           {/* line */}
           <Row className="d-flex" style={{ padding: 0 }}>
-            <Col>
-              <hr className="hrx" />
-            </Col>
           </Row>
-      
+
           {reqParams.map((param: any, index: string) => {
             const key = param["key"];
             return (
               <Row className="d-flex" key={index}>
-                <Col>
-                  <Form.Control
-                    value={param["key"]}
-                    key={index}
-                    type="text"
-                    id={"inputReqParamValue" + index}
-                    className="form_readonly"
-                    readOnly
-                  />
-                </Col>
                 <Col>
                   <Form.Control
                     value={param["value"]}
@@ -94,10 +62,10 @@ const AdditionalParams = ({reqParams, setReqParams, handleAddParams, handleDelPa
           })}
           <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
-              <Form.Control type="text" id={"inputReqAddParamsKey-" + randomIdAdditionalParams} />
-            </Col>
-            <Col>
-              <Form.Control type="text" id={"inputReqAddParamsValue-" + randomIdAdditionalParams} />
+              <Form.Control
+                type="text"
+                id={"inputReqAddParamsValue-" + randomIdParameterizedParams}
+              />
             </Col>
             <Col xs="1">
               <Image
@@ -107,8 +75,8 @@ const AdditionalParams = ({reqParams, setReqParams, handleAddParams, handleDelPa
                 roundedCircle
                 onClick={() =>
                   handleAddParams(
-                    "inputReqAddParamsKey-" + randomIdAdditionalParams,
-                    "inputReqAddParamsValue-" + randomIdAdditionalParams,
+                    "inputReqAddParamsKey-" + randomIdParameterizedParams,
+                    "inputReqAddParamsValue-" + randomIdParameterizedParams,
                     reqParams,
                     setReqParams
                   )
@@ -122,4 +90,4 @@ const AdditionalParams = ({reqParams, setReqParams, handleAddParams, handleDelPa
   );
 };
 
-export default AdditionalParams;
+export default ParameterizedParams;
