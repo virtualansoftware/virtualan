@@ -19,6 +19,12 @@ li > a.nav-link {
   max-width: 1200px !important;
 }
 
+@media (min-width: 1200px) {
+  .modal-xl {
+    --bs-modal-width: 1200px !important;
+  }
+}
+
 .modal-body-custom {
   min-height: 300px; /* Set a minimum height based on your requirements */
   overflow-y: auto; /* Allow content to scroll if it exceeds the minimum height */

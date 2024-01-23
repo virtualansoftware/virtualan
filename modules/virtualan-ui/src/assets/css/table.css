@@ -1,0 +1,35 @@
+.full-width-table {
+  width: 100%;
+}
+
+.table-header {
+  background-color: transparent;
+}
+
+.table-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.table-row:nth-child(even) {
+  background-color: transparent;
+}
+
+.table-row {
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.table-cell {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+.scrollable-table {
+  overflow-x: auto;
+  display: block;
+}
+.table-img {
+  width: 35px;
+  white-space: nowrap;
+}

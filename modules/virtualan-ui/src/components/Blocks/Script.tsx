@@ -62,8 +62,8 @@ const Script = ({ selector, formId, scriptRef }: Props) => {
       <ParameterizedParams
                 reqParams={reqParams}
                 setReqParams={setReqParams}
-                handleAddParams={handleAddParams}
-                handleDelParams={handleDelParams}
+                // handleAddParams={handleAddParams}
+                // handleDelParams={handleDelParams}
               />
     );
   }
