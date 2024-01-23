@@ -122,6 +122,8 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
     setQueryParams({});
     setParamTypes({});
     setResetKey(uuidv4());
+    setFlashMessage("");
+    setFlashErrorMessage("");
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {

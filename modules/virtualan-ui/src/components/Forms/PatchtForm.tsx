@@ -143,6 +143,8 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     setRespParams([]);
     setQueryParams({});
     setResetKey(uuidv4());
+    setFlashMessage("");
+    setFlashErrorMessage("")
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {

@@ -143,6 +143,8 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
     setRespParams([]);
     setQueryParams({});
     setResetKey(uuidv4());
+    setFlashMessage("");
+    setFlashErrorMessage("")
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {

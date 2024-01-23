@@ -134,6 +134,8 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
     setRespParams([]);
     setQueryParams({});
     setResetKey(uuidv4());
+    setFlashMessage("");
+    setFlashErrorMessage("")
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
