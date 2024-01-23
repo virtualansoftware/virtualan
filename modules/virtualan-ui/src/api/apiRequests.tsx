@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const apiRequestsPost = async (postEndpoint: string, postData: any) => {
-  try {
-    const response = await axios.post(postEndpoint, postData);
-    return response;
-  } catch (error) {
-    return error;
-  }
+  return await axios.post(postEndpoint, postData);
 };
 
 const apiRequestsDelete = async (deleteEndpoint: string, id: number) => {

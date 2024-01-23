@@ -8,7 +8,7 @@ import ModalAppJSON from "./ModalJsonFormatter";
 // import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
-import { API_GET_CATALOGS,API_GET_ENDPOINT_ADD } from "../constants";
+import { API_GET_CATALOGS,API_GET_ENDPOINT_ADD, VERSION } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
@@ -126,10 +126,10 @@ const NavBar = () => {
       "OpenAPI Editor": { modal: "popup", link: "/swagger-editor/index.html" },
       "JSON Formatter": { modal: "Modal4" },
       "-": "-",
-      "v3.0.0": { modal: false, link: "/swagger-ui/index.html" },
+      VERSION: { modal: false, link: "/swagger-ui/index.html" },
       Help: {
         modal: "help",
-        link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version=v2.5.2",
+        link: "https://tutorials.virtualan.io/#/Virtualan?downloaded=plugin&amp;version="+VERSION,
       },
     },
   };
