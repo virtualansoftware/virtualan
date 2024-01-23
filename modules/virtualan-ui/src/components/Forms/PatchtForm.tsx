@@ -36,13 +36,19 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
-  const [showRuleBlock, setShowRuleBlock] = useState("");
+  // const [showRuleBlock, setShowRuleBlock] = useState("");
+  const [selectorType, setSelectorType] = useState("");
+  const [httpStatusCode, setHttpStatusCode] = useState("");
+  const [contentType, setContentType] = useState("");
+  const [resetKey, setResetKey] = useState(uuidv4());
+
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
 
   const mockResponseRef = useRef(null);
   const mockRequestRef = useRef(null);
   const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
+
   const selectRefs = {
     status: useRef(null),
     type: useRef(null),
@@ -55,6 +61,13 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     margin: "0px",
     padding: "0px",
   };
+
+  const handleSelectChange = (data: any) => {
+    setSelectorType(data.type);
+    setHttpStatusCode(data.status);
+    setContentType(data.requestType);
+  };
+
   const formId = uuidv4();
 
   const http_status = HttpStatusList;
@@ -129,6 +142,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     setReqParams([]);
     setRespParams([]);
     setQueryParams({});
+    setResetKey(uuidv4());
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
@@ -187,43 +201,23 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
          
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-            <Selects setShowRuleBlock = {setShowRuleBlock} selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
+            <Selects selectRefs={selectRefs} onSelectionChange={handleSelectChange} resetKey={resetKey}/>
               {/*  */}
-              <HeaderParams
-                availableParams={availableParams}
-                queryParams={queryParams}
-                handleAddQueryParams={handleAddQueryParams}
-              />
+              <HeaderParams availableParams={availableParams} queryParams={queryParams} handleAddQueryParams={handleAddQueryParams}/>
               {/*  */}
-              <AdditionalParams
-                reqParams={reqParams}
-                setReqParams={setReqParams}
-                handleAddParams={handleAddParams}
-                handleDelParams={handleDelParams}
-              />
+              <AdditionalParams reqParams={reqParams} setReqParams={setReqParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams}/>
               {/* Text area */}
-              {showRuleBlock
-              && (<Script formId={formId} scriptRef = {scriptRef} />)
-              }
+              <Script formId={formId} selector={selectorType} scriptRef={scriptRef} />  {/* WIP */}
               {/* Text area */}
               <MockRequestBody formId={formId} mockRequestRef={mockRequestRef} />
               {/*  */}
               <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
               {/*  */}
-              <RespHeaderParams
-                respParams={respParams}
-                setRespParams={setRespParams}
-                handleAddParams={handleAddParams}
-                handleDelParams={handleDelParams}
-              />
+              <RespHeaderParams respParams={respParams} setRespParams={setRespParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams}/>
               {/*  */}
               <ExcludeList formId={formId} excludeListRef={excludeListRef} />
               {/*  */}
-              <FormButtons
-                handleResetForm={handleResetForm}
-                setShowForm={setShowForm}
-                showForm={showForm}
-              />
+              <FormButtons handleResetForm={handleResetForm} setShowForm={setShowForm} showForm={showForm} />
             </Stack>
           </Form>
           {flashMessage && (

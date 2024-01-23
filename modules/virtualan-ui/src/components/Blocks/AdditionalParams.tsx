@@ -6,6 +6,7 @@ import Image from "react-bootstrap/Image";
 import plusImage from "../../assets/images/plus-img.png";
 import minusImage from "../../assets/images/minus-img.png";
 
+
 interface Props {
   reqParams: any;
   setReqParams: any;
@@ -13,17 +14,9 @@ interface Props {
   handleDelParams: Function;
 }
 
-const AdditionalParams = ({
-  reqParams,
-  setReqParams,
-  handleAddParams,
-  handleDelParams,
-}: Props) => {
-
+const AdditionalParams = ({reqParams, setReqParams, handleAddParams, handleDelParams, }: Props) => {
 
 	const randomIdAdditionalParams = uuidv4();
-
-
 
   return (
     <div>
