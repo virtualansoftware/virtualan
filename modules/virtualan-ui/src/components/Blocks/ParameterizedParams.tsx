@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import Image from "react-bootstrap/Image";
@@ -7,40 +7,57 @@ import minusImage from "../../assets/images/minus-img.png";
 import "../../assets/css/table.css";
 
 interface Props {
-  reqParams: any;
-  setReqParams: any;
+  paramsValues: string[];
+  setParamsValues: any;
+  data: string[];
+  setData: any;
+  // reqParams: any;
+  // setReqParams: any;
 }
 
-const ParameterizedParams = ({ reqParams, setReqParams }: Props) => {
-  
-  const ParamValues = ["id", "var1", "var2", "var3"];
-  const dataTest = [
-    { id: "1", var1: "test1-var1", var2: "test1-var2", var3: "test1-var3" },
-    { id: "2", var1: "test2-var1", var2: "test2-var2" },
-    { id: "3", var2: "test3-var2", var3: "test3-var3" },
-    { id: "4", var1: "test4-var1", var3: "test4-var3" },
-  ];
 
-  const [data, setData] = useState([]);
-  const [params, setParams] = useState([]);
-  const [newValues, setNewValues]= useState(Array(ParamValues.length).fill(''));
-  // const randomIdParameterizedParams = uuidv4();
+const ParameterizedParams = ({ paramsValues, setParamsValues, data, setData }: Props) => {
+// const ParameterizedParams = ({ reqParams, setReqParams }: Props) => {
+  
+  // let ParamValues = ["id", "var1", "var2", "var3"];
+  // let dataTest = [
+  //   { id: "1", var1: "test1-var1", var2: "test1-var2", var3: "test1-var3" },
+  //   { id: "2", var1: "test2-var1", var2: "test2-var2" },
+  //   { id: "3", var2: "test3-var2", var3: "test3-var3" },
+  //   { id: "4", var1: "test4-var1", var3: "test4-var3" },
+  // ];
+
+  // useEffect(() => {
+  //   setData(dataTest);
+  //   setParams(ParamValues);
+  // }, []);
+
+  // const [data, setData] = useState([]);
+  // const [params, setParams] = useState([]);
+  const [goodHighlight, setGoodHighlight] = useState(false);
+  const [badHighlight, setBadHighlight] = useState(false);
+
+  const formValuesRef: Object = useRef({});
 
 
   const handleDelParams = (index: any) => {
     setData(data.filter((item: any, i: number) => i !== index));
   };
 
-  const handleAddParams = () => {
-    console.log("handleAddParams: ");
+  const handleAddParams = (formValues: any) => {
+    const tagExists = data.some((item: any) => item[paramsValues[0]] === formValues[paramsValues[0]]);
+    if (!tagExists) {
+      const newData = [...data, formValues];
+      setData(newData);
+      formValuesRef.current = {};
+      setGoodHighlight(true);
+      setTimeout(() => setGoodHighlight(false), 150);
+
+    } else {
+      setBadHighlight(true);
+      setTimeout(() => setBadHighlight(false), 150);
+    }
   };
-
-  useEffect(() => {
-    console.log("load test data");
-    setData(dataTest);
-    setParams(ParamValues);
-  }, []);
-
 
   return (
     <div>
@@ -62,7 +79,7 @@ const ParameterizedParams = ({ reqParams, setReqParams }: Props) => {
             <thead className="table-header">
               {/* Var names */}
               <tr key={1}>
-                {params.map((param: any, index) => {
+                {paramsValues.map((param: any, index) => {
                   return (
                     <th key={index} className="table-cell">
                       {param}
@@ -73,10 +90,11 @@ const ParameterizedParams = ({ reqParams, setReqParams }: Props) => {
               </tr>
             </thead>
             <tbody>
+
               {/* Values Added */}
               {data.map((param: any, index: any) => (
                 <tr key={index} className="table-row">
-                  {ParamValues.map((varName) => (
+                  {paramsValues.map((varName) => (
                     <td key={varName} className="table-cell">
                       {param[varName] || ""}
                     </td>
@@ -94,30 +112,30 @@ const ParameterizedParams = ({ reqParams, setReqParams }: Props) => {
                   </td>
                 </tr>
               ))}
+
               {/* Values to Add */}
-              <tr key={2} className="table-row">
-                {ParamValues.map((param: any, index) => {
-                  // console.log("index: ", index, params);
+              <tr key={2} className={`table-row-add ${goodHighlight ? "goodHighlight" : ""} ${badHighlight ? "badHighlight" : ""}`}>
+                {paramsValues.map((param: any, index) => {
                   return (
-                    <th key={index} className="table-cell">
+                    <td key={param} className="table-cell">
                       <Form.Control
-                        value={newValues[index]}
-                        key={index}
+                        defaultValue={formValuesRef.current[param]}
+                        key={param}
                         type="text"
-                        id={"inputReqParamValue" + index}
-                        className="form_readonly"
-                        // onChange={(e) => handleAddParams()}
+                        onChange={(e) =>{
+                          formValuesRef.current[param] = e.target.value;
+                        }}
                       />
-                    </th>
+                    </td>
                   );
                 })}
-                <td>
+                <td align="right" className="table-img">
                   <Image
                     src={plusImage}
                     width="30"
                     height="30"
                     roundedCircle
-                    onClick={() => handleAddParams()}
+                    onClick={() => handleAddParams(formValuesRef.current)}
                   />
                 </td>
               </tr>
