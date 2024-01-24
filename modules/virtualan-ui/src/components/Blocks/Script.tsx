@@ -5,66 +5,34 @@ import AdditionalParams from "../Blocks/AdditionalParams";
 import ParameterizedParams from "../Blocks/ParameterizedParams";
 import { useState } from "react";
 
-
 interface Props {
   selector: any;
   scriptRef: any;
-  formId: string;
+  paramsKeys: string[];
+  paramsSamples: string[];
+  setParamsSamples: any;
 }
 
-const Script = ({ selector, formId, scriptRef }: Props) => {
-  // selector in ['Response', 'Params', 'Rule', 'Script']
-  const [reqParams, setReqParams] = useState([]);
-  console.log("selector: ", selector);
-
-  const handleDelParams = (key: string, params: any, setParams: any) => {
-    setParams(params.filter((item: any) => item.key !== key));
-  };
-
-  const handleAddParams = (
-    keyInputId: string,
-    valueInputId: string,
-    paramsArray: any,
-    setParamsArray: any
-  ) => {
-    const keyInput = document.getElementById(keyInputId) as HTMLInputElement;
-    const valueInput = document.getElementById(
-      valueInputId
-    ) as HTMLInputElement;
-    const key = keyInput.value.trim();
-    const value = valueInput.value.trim();
-
-    // // test with valid invalid valid characters
-    // const validPattern = /^[a-zA-Z0-9]+$/;
-    // if (key.match(validPattern) && value.match(validPattern))
-
-    if (key !== "" && value !== "") {
-      const index = paramsArray.findIndex((item: any) => item.key === key);
-      if (index !== -1) {
-        const updatedParams = [...paramsArray];
-        updatedParams[index].value = value;
-        setParamsArray(updatedParams);
-      } else {
-        setParamsArray([...paramsArray, { key, value }]);
-      }
-      keyInput.value = "";
-      valueInput.value = "";
-      keyInput.focus();
-    }
-  };
+const Script = ({
+  paramsKeys,
+  paramsSamples,
+  setParamsSamples,
+  selector,
+  scriptRef,
+}: Props) => {
 
   if (selector == "Response") {
     return null;
   }
 
   if (selector == "Params") {
+
     return (
       <ParameterizedParams
-                reqParams={reqParams}
-                setReqParams={setReqParams}
-                // handleAddParams={handleAddParams}
-                // handleDelParams={handleDelParams}
-              />
+        paramsValues={paramsKeys}
+        data={paramsSamples}
+        setData={setParamsSamples}
+      />
     );
   }
 

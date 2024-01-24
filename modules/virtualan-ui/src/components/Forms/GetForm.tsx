@@ -38,9 +38,18 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
   const [contentType, setContentType] = useState("");
   const [resetKey, setResetKey] = useState(uuidv4());
 
+  // http status params
+  // const [paramsKeys, setParamsKeys] = useState([]);
+  const [paramsKeys, setParamsKeys] = useState(["id", "var1", "var2", "var3"]);
+  const [paramsSamples, setParamsSamples] = useState([]);
+  //
   const formId = uuidv4();
   const mockResponseRef = useRef(null);
   const scriptRef = useRef(null);
+
+  // useEffect(() => {
+  //   console.log("check Keys tags", queryParams);
+  // }, [queryParams]);
 
   const selectRefs = {
     status: useRef(null),
@@ -105,6 +114,7 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
       console.error("Error making POST request:", error);
       setFlashErrorMessage("Error making POST request." + error);
     }
+
     setTimeout(() => {
       setFlashMessage("");
       setFlashErrorMessage("");
@@ -193,7 +203,14 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
               {/*  */}
               <AdditionalParams reqParams={reqParams} setReqParams={setReqParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams} />
               {/*  */}
-              <Script formId={formId} selector={selectorType} scriptRef={scriptRef} />  {/* WIP */}
+              <Script
+                selector={selectorType}
+                scriptRef={scriptRef}
+                paramsKeys={paramsKeys}
+                paramsSamples={paramsSamples}
+                setParamsSamples={setParamsSamples}
+              />  {/* WIP */}
+
               {/*  */}
               <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
               {/*  */}
