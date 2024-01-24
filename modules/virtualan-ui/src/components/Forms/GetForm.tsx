@@ -47,6 +47,10 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
   const mockResponseRef = useRef(null);
   const scriptRef = useRef(null);
 
+  // useEffect(() => {
+  //   console.log("check Keys tags", queryParams);
+  // }, [queryParams]);
+
   const selectRefs = {
     status: useRef(null),
     type: useRef(null), // Response, Params, Rule, Script
@@ -201,7 +205,6 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
                 selector={selectorType}
                 scriptRef={scriptRef}
                 paramsKeys={paramsKeys}
-                setParamsKeys={setParamsKeys}
                 paramsSamples={paramsSamples}
                 setParamsSamples={setParamsSamples}
               />  {/* WIP */}

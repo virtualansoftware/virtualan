@@ -8,32 +8,13 @@ import "../../assets/css/table.css";
 
 interface Props {
   paramsValues: string[];
-  setParamsValues: any;
   data: string[];
   setData: any;
-  // reqParams: any;
-  // setReqParams: any;
 }
 
 
-const ParameterizedParams = ({ paramsValues, setParamsValues, data, setData }: Props) => {
-// const ParameterizedParams = ({ reqParams, setReqParams }: Props) => {
-  
-  // let ParamValues = ["id", "var1", "var2", "var3"];
-  // let dataTest = [
-  //   { id: "1", var1: "test1-var1", var2: "test1-var2", var3: "test1-var3" },
-  //   { id: "2", var1: "test2-var1", var2: "test2-var2" },
-  //   { id: "3", var2: "test3-var2", var3: "test3-var3" },
-  //   { id: "4", var1: "test4-var1", var3: "test4-var3" },
-  // ];
+const ParameterizedParams = ({ paramsValues, data, setData }: Props) => {
 
-  // useEffect(() => {
-  //   setData(dataTest);
-  //   setParams(ParamValues);
-  // }, []);
-
-  // const [data, setData] = useState([]);
-  // const [params, setParams] = useState([]);
   const [goodHighlight, setGoodHighlight] = useState(false);
   const [badHighlight, setBadHighlight] = useState(false);
 
