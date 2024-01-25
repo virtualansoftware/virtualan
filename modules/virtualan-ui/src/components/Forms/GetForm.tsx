@@ -15,7 +15,6 @@ import RespHeaderParams from "../Blocks/RespHeaderParams";
 import FormButtons from "../Blocks/FormButtons";
 import { v4 as uuidv4 } from "uuid";
 
-
 interface Props {
   operationId: string;
   resource: string;
@@ -24,7 +23,13 @@ interface Props {
   apiEntryPointPost: string;
 }
 
-const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPost}: Props) => {
+const GetForm = ({
+  operationId,
+  resource,
+  path,
+  availableParams,
+  apiEntryPointPost,
+}: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [queryParams, setQueryParams] = useState<{ [key: string]: string }>({});
   const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
@@ -32,24 +37,52 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
-  // const [showRuleBlock, setShowRuleBlock] = useState(false);
   const [selectorType, setSelectorType] = useState("");
   const [httpStatusCode, setHttpStatusCode] = useState("");
   const [contentType, setContentType] = useState("");
   const [resetKey, setResetKey] = useState(uuidv4());
 
-  // http status params
-  // const [paramsKeys, setParamsKeys] = useState([]);
-  const [paramsKeys, setParamsKeys] = useState(["id", "var1", "var2", "var3"]);
+  const [paramsKeys, setParamsKeys] = useState([]);
+  // const [paramsKeys, setParamsKeys] = useState(["id", "var1", "var2", "var3"]);
   const [paramsSamples, setParamsSamples] = useState([]);
-  //
+
   const formId = uuidv4();
-  const mockResponseRef = useRef(null);
+  const [mockResponse, setMockResponse] = useState("");
   const scriptRef = useRef(null);
 
-  // useEffect(() => {
-  //   console.log("check Keys tags", queryParams);
-  // }, [queryParams]);
+  useEffect(() => {
+    if (selectorType !== "Params") {
+      return;
+    }
+
+    const regex = /<([^>]+)>/g;
+    let queryParamsMatches: string[] = [];
+    Object.values(queryParams).forEach((value) => {
+      const matches = value.match(regex);
+      if (matches) {
+        queryParamsMatches = [...queryParamsMatches, ...matches];
+      }
+    });
+    if (queryParamsMatches.length > 0) {
+      queryParamsMatches = queryParamsMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    let mockResponseMatches: any = mockResponse.match(regex);
+    if (mockResponseMatches) {
+      mockResponseMatches = mockResponseMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    setParamsKeys([
+      ...new Set([
+        ...(queryParamsMatches || []),
+        ...(mockResponseMatches || []),
+      ]),
+    ]);
+  }, [queryParams, mockResponse, selectorType]);
 
   const selectRefs = {
     status: useRef(null),
@@ -97,8 +130,9 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
       type: selectorType,
       contentType: contentType,
       method: "GET",
-      rule: scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
-      output: mockResponseRef != null ? mockResponseRef.current.value : "",
+      rule:
+        scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
+      output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({
         key: key,
         value: value,
@@ -170,15 +204,9 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
     }
   };
 
-  const handleAddQueryParams = (
-    paramType: string,
-    key: string,
-    value: string
-  ) => {
-    queryParams[key] = value;
-    setQueryParams(queryParams);
-    paramTypes[key] = paramType;
-    setParamTypes(paramTypes);
+  const handleMockResponseChange = (value: string) => {
+    setMockResponse(value);
+    // console.log('mockResponse', value);
   };
 
   return (
@@ -195,11 +223,24 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
         <div style={contentStyle}>
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-              <Selects selectRefs={selectRefs} onSelectionChange={handleSelectChange} resetKey={resetKey}/>
+              <Selects
+                selectRefs={selectRefs}
+                onSelectionChange={handleSelectChange}
+                resetKey={resetKey}
+              />
               {/*  */}
-              <HeaderParams availableParams={availableParams} queryParams={queryParams} handleAddQueryParams={handleAddQueryParams} />
+              <HeaderParams
+                availableParams={availableParams}
+                queryParams={queryParams}
+                setQueryParams={setQueryParams}
+              />
               {/*  */}
-              <AdditionalParams reqParams={reqParams} setReqParams={setReqParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams} />
+              <AdditionalParams
+                reqParams={reqParams}
+                setReqParams={setReqParams}
+                handleAddParams={handleAddParams}
+                handleDelParams={handleDelParams}
+              />
               {/*  */}
               <Script
                 selector={selectorType}
@@ -207,14 +248,25 @@ const GetForm = ({operationId, resource, path, availableParams, apiEntryPointPos
                 paramsKeys={paramsKeys}
                 paramsSamples={paramsSamples}
                 setParamsSamples={setParamsSamples}
-              />  {/* WIP */}
-
+              />
               {/*  */}
-              <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
+              <MockResponse
+                formId={formId}
+                onMockResponseChange={handleMockResponseChange}
+              />
               {/*  */}
-              <RespHeaderParams respParams={respParams} setRespParams={setRespParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams} />
+              <RespHeaderParams
+                respParams={respParams}
+                setRespParams={setRespParams}
+                handleAddParams={handleAddParams}
+                handleDelParams={handleDelParams}
+              />
               {/*  */}
-              <FormButtons handleResetForm={handleResetForm} setShowForm={setShowForm} showForm={showForm} />
+              <FormButtons
+                handleResetForm={handleResetForm}
+                setShowForm={setShowForm}
+                showForm={showForm}
+              />
             </Stack>
           </Form>
           {flashMessage && (

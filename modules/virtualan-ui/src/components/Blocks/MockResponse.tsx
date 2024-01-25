@@ -1,14 +1,23 @@
+import { useState } from "react";
 import { Row, Col, Form } from "react-bootstrap";
-import { v4 as uuidv4 } from "uuid";
 
 interface Props {
-  mockResponseRef: any;
   formId: string;
+  onMockResponseChange: (value: string) => void;
 }
 
-const MockResponse = ({ formId, mockResponseRef }: Props) => {
+const MockResponse = ({ formId, onMockResponseChange }: Props) => {
+  const [mockResponse, setMockResponse] = useState("");
+
+  const handleMockResponseChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setMockResponse(e.target.value);
+    onMockResponseChange(e.target.value);
+  };
+
   return (
-    <Row key={uuidv4()}>
+    <Row key={"mockResponse"}>
       <Col xs={3}>
         <Form.Label className="head-text-black" htmlFor="mockResponse">
           Mock Response:
@@ -19,7 +28,8 @@ const MockResponse = ({ formId, mockResponseRef }: Props) => {
           id={"mockResponse" + formId}
           as="textarea"
           rows={6}
-          ref={mockResponseRef}
+          value={mockResponse}
+          onChange={handleMockResponseChange}
         />
       </Col>
     </Row>

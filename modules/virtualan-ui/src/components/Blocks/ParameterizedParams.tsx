@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import Image from "react-bootstrap/Image";
@@ -18,7 +18,7 @@ const ParameterizedParams = ({ paramsValues, data, setData }: Props) => {
   const [goodHighlight, setGoodHighlight] = useState(false);
   const [badHighlight, setBadHighlight] = useState(false);
 
-  const formValuesRef: Object = useRef({});
+  const formValuesRef: any = useRef({});
 
 
   const handleDelParams = (index: any) => {

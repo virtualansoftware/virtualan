@@ -1,9 +1,7 @@
 import { Row, Col, Form } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import CodeEditor from "@uiw/react-textarea-code-editor";
-import AdditionalParams from "../Blocks/AdditionalParams";
 import ParameterizedParams from "../Blocks/ParameterizedParams";
-import { useState } from "react";
 
 interface Props {
   selector: any;
@@ -20,13 +18,11 @@ const Script = ({
   selector,
   scriptRef,
 }: Props) => {
-
   if (selector == "Response") {
     return null;
   }
 
   if (selector == "Params") {
-
     return (
       <ParameterizedParams
         paramsValues={paramsKeys}
