@@ -98,9 +98,10 @@ const GetForm = ({
   };
 
   const handleSelectChange = (data: any) => {
+    console.log(data.type, data.status, data.contentType)
     setSelectorType(data.type);
     setHttpStatusCode(data.status);
-    setContentType(data.requestType);
+    setContentType(data.contentType);
   };
 
   const createMockRequest = (apiEntryPointPost: any, dataToSubmit: any) => {
@@ -131,7 +132,7 @@ const GetForm = ({
       contentType: contentType,
       method: "GET",
       rule:
-        scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
+        scriptRef != null && scriptRef.current ? scriptRef.current.value : undefined,
       output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({
         key: key,
@@ -157,10 +158,7 @@ const GetForm = ({
   };
 
   const handleResetForm = () => {
-    const mockResponseField = document.getElementById(
-      "mockResponse" + formId
-    ) as HTMLInputElement;
-    mockResponseField.value = "";
+    setMockResponse("");
     setReqParams([]);
     setRespParams([]);
     setQueryParams({});
@@ -226,7 +224,6 @@ const GetForm = ({
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
               <Selects
-                selectRefs={selectRefs}
                 onSelectionChange={handleSelectChange}
                 resetKey={resetKey}
               />
@@ -254,6 +251,7 @@ const GetForm = ({
               {/*  */}
               <MockResponse
                 formId={formId}
+                resetKey={resetKey}
                 onMockResponseChange={handleMockResponseChange}
               />
               {/*  */}

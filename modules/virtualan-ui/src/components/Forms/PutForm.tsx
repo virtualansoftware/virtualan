@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
@@ -41,13 +41,57 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   const [httpStatusCode, setHttpStatusCode] = useState("");
   const [contentType, setContentType] = useState("");
   const [resetKey, setResetKey] = useState(uuidv4());
-
+  const [paramsKeys, setParamsKeys] = useState([]);
+  const [mockResponse, setMockResponse] = useState("");
+  const [paramsSamples, setParamsSamples] = useState([]);
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
+  const [mockRequest, setMockRequest] = useState("");
 
-  const mockResponseRef = useRef(null);
-  const mockRequestRef = useRef(null);
   const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
+
+  useEffect(() => {
+    if (selectorType !== "Params") {
+      return;
+    }
+
+    const regex = /<([^>]+)>/g;
+    let queryParamsMatches: string[] = [];
+    Object.values(queryParams).forEach((value) => {
+      const matches = value.match(regex);
+      if (matches) {
+        queryParamsMatches = [...queryParamsMatches, ...matches];
+      }
+    });
+    if (queryParamsMatches.length > 0) {
+      queryParamsMatches = queryParamsMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    let mockRequestMatches: any = mockRequest.match(regex);
+    if (mockRequestMatches) {
+      mockRequestMatches = mockRequestMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    let mockResponseMatches: any = mockResponse.match(regex);
+    if (mockResponseMatches) {
+      mockResponseMatches = mockResponseMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    setParamsKeys([
+      ...new Set([
+        ...(queryParamsMatches || []),
+        ...(mockRequestMatches || []),
+        ...(mockResponseMatches || []),
+      ]),
+    ]);
+  }, [queryParams, mockRequest, mockResponse, selectorType]);
+
 
   const selectRefs = {
     status: useRef(null),
@@ -90,6 +134,16 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
     );    
   }
 
+  const handleMockResponseChange = (value: string) => {
+    setMockResponse(value);
+    // console.log('mockResponse', value);
+  };
+
+  const handleMockRequestChange = (value: string) => {
+    setMockRequest(value);
+    // console.log('mockResponse', value);
+  };
+
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -102,14 +156,14 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
 
     const dataToSubmit = {
       operationId: operationId,
-      httpStatusCode: selectRefs.status.current.value,
       url: path,
-      type: selectRefs.type != null ? selectRefs.type.current.value : "",
-      contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
+      httpStatusCode: httpStatusCode,
+      type: selectorType,
+      contentType: contentType,
       method: "PUT",
       rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
-      input:  mockRequestRef != null ? mockRequestRef.current.value : "",
-      output: mockResponseRef != null ? mockResponseRef.current.value : "",
+      input:  mockRequest,
+      output: mockResponse,
       availableParams:  Object.entries(reqParams.push(queryParams)).map(([key, value]) => (({ key, value }))),
       headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
       resource: resource,
@@ -130,13 +184,11 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   };
 
   const handleResetForm = () => {
-    const mockResponseField = document.getElementById(
-      "mockResponse" + formId
-    ) as HTMLInputElement;
+    setMockRequest("");
+    setMockResponse("");
     const excludeListField = document.getElementById(
       "excludeList" + formId
     ) as HTMLInputElement;
-    mockResponseField.value = "";
     excludeListField.value = "";
     setReqParams([]);
     setRespParams([]);
@@ -202,17 +254,44 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
          
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-            <Selects selectRefs={selectRefs} onSelectionChange={handleSelectChange} resetKey={resetKey}/>
               {/*  */}
-              <HeaderParams availableParams={availableParams} queryParams={queryParams} handleAddQueryParams={handleAddQueryParams} />
+               <Selects
+                onSelectionChange={handleSelectChange}
+                resetKey={resetKey}
+              />
               {/*  */}
-              <AdditionalParams reqParams={reqParams} setReqParams={setReqParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams} />
+             <HeaderParams
+                availableParams={availableParams}
+                queryParams={queryParams}
+                setQueryParams={setQueryParams}
+              />
               {/*  */}
-              <Script formId={formId} selector={selectorType} scriptRef={scriptRef} />  {/* WIP */}
+              <AdditionalParams
+                reqParams={reqParams}
+                setReqParams={setReqParams}
+                handleAddParams={handleAddParams}
+                handleDelParams={handleDelParams}
+              />
               {/*  */}
-              <MockRequestBody formId={formId} mockRequestRef={mockRequestRef} />
+              <Script
+                selector={selectorType}
+                scriptRef={scriptRef}
+                paramsKeys={paramsKeys}
+                paramsSamples={paramsSamples}
+                setParamsSamples={setParamsSamples}
+              />
+              {/* Text area */}
+              <MockRequestBody 
+                  resetKey={resetKey}
+                  formId={formId} 
+                  onMockRequestChange={handleMockRequestChange} 
+              />
               {/*  */}
-              <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
+              <MockResponse
+                resetKey={resetKey}              
+                formId={formId}
+                onMockResponseChange={handleMockResponseChange}
+              />
               {/*  */}
               <RespHeaderParams respParams={respParams} setRespParams={setRespParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams} />
               {/*  */}

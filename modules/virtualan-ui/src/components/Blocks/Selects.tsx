@@ -7,12 +7,11 @@ import ResponseList from "../../api/ResponseList.json";
 import { handle } from "hast-util-to-html/lib/handle";
 
 interface Props {
-  selectRefs: any;
   onSelectionChange: (data: any) => void;
   resetKey: string;
 }
 
-const Selects = ({ selectRefs, onSelectionChange, resetKey }: Props) => {
+const Selects = ({  onSelectionChange, resetKey }: Props) => {
   const [selectorType, setSelectorType] = useState("");
   const [status, setStatus] = useState("");
   const [content, setContent] = useState("");
@@ -28,13 +27,10 @@ const Selects = ({ selectRefs, onSelectionChange, resetKey }: Props) => {
   const request_type = RequestType;
   const response_list = ResponseList;
 
-  useEffect(() => {
-    const dataSelected = {httpStatusCode: status, type: selectorType, contentType: content}
-    onSelectionChange(dataSelected);
-  }, [selectorType, status, content]);
 
-  const handleSelectChange = (e: any, setState: (value: string) => void) => {
-    setState(e.target.value);
+  const handleSelectChange = (e: any, status: any, selectorType: any, content: any) => {
+    const dataSelected = {status: status, type: selectorType, contentType: content}
+    onSelectionChange(dataSelected);
   };
 
   return (
@@ -48,9 +44,12 @@ const Selects = ({ selectRefs, onSelectionChange, resetKey }: Props) => {
         <Form.Select
           value={selectorType}
           aria-label="Default select example"
-          ref={selectRefs.type}
           required
-          onChange={(e) => handleSelectChange(e, setSelectorType)}
+          onChange={(e) => {
+            setSelectorType(e.target.value);
+            handleSelectChange(e, status, e.target.value, content);
+            }
+          }
         >
           <option value="?"></option>
           {Object.entries(response_list).map(([key, value]) => (
@@ -63,9 +62,12 @@ const Selects = ({ selectRefs, onSelectionChange, resetKey }: Props) => {
         <Form.Select
           value={status}
           aria-label="Default select example"
-          ref={selectRefs.status}
           required
-          onChange={(e) => handleSelectChange(e, setStatus)}
+          onChange={(e) => {
+            setStatus(e.target.value);
+            handleSelectChange(e, e.target.value, selectorType, content);
+            }
+          }
         >
           <option value="?"></option>
           {Object.entries(http_status).map(([key, value]) => (
@@ -78,9 +80,12 @@ const Selects = ({ selectRefs, onSelectionChange, resetKey }: Props) => {
         <Form.Select
           value={content}
           aria-label="Default select example"
-          ref={selectRefs.requestType}
           required
-          onChange={(e) => handleSelectChange(e, setContent)}
+          onChange={(e) => {
+            setContent(e.target.value);
+            handleSelectChange(e, status, selectorType, e.target.value);
+            }
+          }
         >
           <option value="?"></option>
           {Object.entries(request_type).map(([key, value]) => (

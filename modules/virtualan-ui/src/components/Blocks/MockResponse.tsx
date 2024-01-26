@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 
 interface Props {
+  resetKey: string;
   formId: string;
   onMockResponseChange: (value: string) => void;
 }
 
-const MockResponse = ({ formId, onMockResponseChange }: Props) => {
+const MockResponse = ({ resetKey, formId, onMockResponseChange }: Props) => {
   const [mockResponse, setMockResponse] = useState("");
 
   const handleMockResponseChange = (
@@ -15,6 +16,10 @@ const MockResponse = ({ formId, onMockResponseChange }: Props) => {
     setMockResponse(e.target.value);
     onMockResponseChange(e.target.value);
   };
+
+  useEffect(() => {
+    setMockResponse("");
+  }, [resetKey]);
 
   return (
     <Row key={"mockResponse"}>
