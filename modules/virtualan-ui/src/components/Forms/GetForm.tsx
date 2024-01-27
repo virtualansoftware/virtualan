@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
 import Alert from "react-bootstrap/Alert";
 import Collapse from "react-bootstrap/Collapse";
+import ParameterizedParams from "../Blocks/ParameterizedParams";
 
 import { apiRequestsPost } from "../../api/apiRequests";
 import Selects from "../Blocks/Selects";
@@ -43,8 +44,7 @@ const GetForm = ({
   const [resetKey, setResetKey] = useState(uuidv4());
 
   const [paramsKeys, setParamsKeys] = useState([]);
-  // const [paramsKeys, setParamsKeys] = useState(["id", "var1", "var2", "var3"]);
-  const [paramsSamples, setParamsSamples] = useState([]);
+  const [paramsData, setParamsData] = useState([]);
 
   const formId = uuidv4();
   const [mockResponse, setMockResponse] = useState("");
@@ -83,12 +83,6 @@ const GetForm = ({
       ]),
     ]);
   }, [queryParams, mockResponse, selectorType]);
-
-  const selectRefs = {
-    status: useRef(null),
-    type: useRef(null), // Response, Params, Rule, Script
-    requestType: useRef(null), // JSON
-  };
 
   const contentStyle = {
     height: "auto",
@@ -132,7 +126,7 @@ const GetForm = ({
       contentType: contentType,
       method: "GET",
       rule:
-        scriptRef != null && scriptRef.current ? scriptRef.current.value : undefined,
+        scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({
         key: key,
@@ -158,6 +152,7 @@ const GetForm = ({
   };
 
   const handleResetForm = () => {
+    setParamsData([]);
     setMockResponse("");
     setReqParams([]);
     setRespParams([]);
@@ -166,6 +161,10 @@ const GetForm = ({
     setResetKey(uuidv4());
     setFlashMessage("");
     setFlashErrorMessage("");
+    setSelectorType("");
+    setHttpStatusCode("");
+    setContentType("");
+
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
@@ -206,9 +205,19 @@ const GetForm = ({
 
   const handleMockResponseChange = (value: string) => {
     setMockResponse(value);
-    // console.log('mockResponse', value);
   };
 
+  const handleAddQueryParams = (
+    paramType: string,
+    key: string,
+    value: string
+  ) => {
+    queryParams[key] = value;
+    setQueryParams(queryParams);
+    paramTypes[key] = paramType;
+    setParamTypes(paramTypes);
+  };
+  
   return (
     <div className="button-get-box button-box">
       <div
@@ -232,6 +241,7 @@ const GetForm = ({
                 availableParams={availableParams}
                 queryParams={queryParams}
                 setQueryParams={setQueryParams}
+                handleAddQueryParams={handleAddQueryParams}
               />
               {/*  */}
               <AdditionalParams
@@ -241,12 +251,16 @@ const GetForm = ({
                 handleDelParams={handleDelParams}
               />
               {/*  */}
+              <ParameterizedParams
+                selector={selectorType}
+                paramsValues={paramsKeys}
+                data={paramsData}
+                setData={setParamsData}
+              />
+              {/*  */}
               <Script
                 selector={selectorType}
                 scriptRef={scriptRef}
-                paramsKeys={paramsKeys}
-                paramsSamples={paramsSamples}
-                setParamsSamples={setParamsSamples}
               />
               {/*  */}
               <MockResponse

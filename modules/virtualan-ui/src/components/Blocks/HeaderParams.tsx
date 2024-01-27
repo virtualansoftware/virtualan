@@ -5,12 +5,14 @@ interface Props {
   availableParams: string[];
   queryParams: any;
   setQueryParams: Function;
+  handleAddQueryParams: Function
 }
 
 const HeaderParams = ({
   availableParams,
   queryParams,
   setQueryParams,
+  handleAddQueryParams
 }: Props) => {
   return (
     <div>
@@ -39,11 +41,13 @@ const HeaderParams = ({
                   type="text"
                   id={"inputQueryParamValue" + param["key"]}
                   value={queryParams[param["key"]] || ""}
-                  onChange={(e) =>
+                  onChange={(e) =>{
+                    handleAddQueryParams(param["parameterType"], param["key"], e.target.value);
                     setQueryParams((prevState: any) => ({
-                      ...prevState,
-                      [param["key"]]: e.target.value,
-                    }))
+                        ...prevState,
+                        [param["key"]]: e.target.value,
+                      }))
+                    }
                   }
                 />
               </Col>

@@ -4,13 +4,13 @@ import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
 import Alert from "react-bootstrap/Alert";
 import Collapse from "react-bootstrap/Collapse";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
+
 
 import HttpStatusList from "../../api/HttpStatusList.json";
 import RequestType from "../../api/RequestType.json";
 import ResponseList from "../../api/ResponseList.json";
 import { apiRequestsPost } from "../../api/apiRequests";
+import ParameterizedParams from "../Blocks/ParameterizedParams";
 import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
 import AdditionalParams from "../Blocks/AdditionalParams";
@@ -36,16 +36,16 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
-  // const [showRuleBlock, setShowRuleBlock] = useState("");
   const [selectorType, setSelectorType] = useState("");
   const [httpStatusCode, setHttpStatusCode] = useState("");
   const [contentType, setContentType] = useState("");
   const [resetKey, setResetKey] = useState(uuidv4());
   const [paramsKeys, setParamsKeys] = useState([]);
   const [mockResponse, setMockResponse] = useState("");
-  const [paramsSamples, setParamsSamples] = useState([]);
+  const [paramsData, setParamsData] = useState([]);
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [mockRequest, setMockRequest] = useState("");
+  const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
 
   const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
@@ -93,12 +93,6 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   }, [queryParams, mockRequest, mockResponse, selectorType]);
 
 
-  const selectRefs = {
-    status: useRef(null),
-    type: useRef(null),
-    requestType: useRef(null),
-  };
-
   const contentStyle = {
     height: "auto",
     border: "none",
@@ -113,10 +107,6 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   };
 
   const formId = uuidv4();
-
-  const http_status = HttpStatusList;
-  const request_type = RequestType;
-  const response_list = ResponseList;
 
   const createMockRequest = (apiEntryPointPost: any, dataToSubmit : any) =>{
     const output = apiRequestsPost(apiEntryPointPost, dataToSubmit);
@@ -136,24 +126,15 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
 
   const handleMockResponseChange = (value: string) => {
     setMockResponse(value);
-    // console.log('mockResponse', value);
   };
 
   const handleMockRequestChange = (value: string) => {
     setMockRequest(value);
-    // console.log('mockResponse', value);
   };
 
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // console.log("selectRefs", selectRefs);
-    // console.log("queryParams", queryParams); // ok
-    // console.log("reqParams", reqParams); // ok
-    // console.log("respParams", respParams); // ok
-    // console.log("mockResponse", mockResponseRef.current.value);
-    // console.log("excludeList", excludeListRef.current.value);
-
     const dataToSubmit = {
       operationId: operationId,
       url: path,
@@ -161,10 +142,15 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
       type: selectorType,
       contentType: contentType,
       method: "PUT",
-      rule:  scriptRef != null && scriptRef.current ? scriptRef.current.value : "",
+      rule:  
+      scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       input:  mockRequest,
       output: mockResponse,
-      availableParams:  Object.entries(reqParams.push(queryParams)).map(([key, value]) => (({ key, value }))),
+      availableParams: Object.entries(queryParams).map(([key, value]) => ({
+        key: key,
+        value: value,
+        parameterType: paramTypes[key],
+      })),
       headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
       resource: resource,
       excludeList: excludeListRef.current.value
@@ -196,6 +182,12 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
     setResetKey(uuidv4());
     setFlashMessage("");
     setFlashErrorMessage("")
+    setParamsData([]);
+    setParamTypes({});
+    setSelectorType("");
+    setHttpStatusCode("");
+    setContentType("");
+
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
@@ -215,10 +207,6 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
     const key = keyInput.value.trim();
     const value = valueInput.value.trim();
 
-    // // test with valid invalid valid characters
-    // const validPattern = /^[a-zA-Z0-9]+$/;
-    // if (key.match(validPattern) && value.match(validPattern))
-
     if (key !== "" && value !== "") {
       const index = paramsArray.findIndex((item: any) => item.key === key);
       if (index !== -1) {
@@ -234,9 +222,15 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
     }
   };
 
-  const handleAddQueryParams = (key: string, value: string) => {
+  const handleAddQueryParams = (
+    paramType: string,
+    key: string,
+    value: string
+  ) => {
     queryParams[key] = value;
     setQueryParams(queryParams);
+    paramTypes[key] = paramType;
+    setParamTypes(paramTypes);
   };
 
   return (
@@ -264,6 +258,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
                 availableParams={availableParams}
                 queryParams={queryParams}
                 setQueryParams={setQueryParams}
+                handleAddQueryParams={handleAddQueryParams}
               />
               {/*  */}
               <AdditionalParams
@@ -276,11 +271,15 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
               <Script
                 selector={selectorType}
                 scriptRef={scriptRef}
-                paramsKeys={paramsKeys}
-                paramsSamples={paramsSamples}
-                setParamsSamples={setParamsSamples}
               />
               {/* Text area */}
+              <ParameterizedParams
+                selector={selectorType}
+                paramsValues={paramsKeys}
+                data={paramsData}
+                setData={setParamsData}
+              />
+              {/*  */}
               <MockRequestBody 
                   resetKey={resetKey}
                   formId={formId} 

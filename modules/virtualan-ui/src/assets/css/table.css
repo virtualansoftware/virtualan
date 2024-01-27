@@ -48,8 +48,11 @@
 }
 
 .scrollable-table {
-  overflow-x: auto;
-  display: block;
+  width: 96%; 
+  height: 250pX;
+  margin-left: 5%;
+  padding: 1%;
+  overflow: scroll;
 }
 .table-img {
   width: 35px;

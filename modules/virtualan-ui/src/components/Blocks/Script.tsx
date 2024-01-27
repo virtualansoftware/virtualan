@@ -1,37 +1,16 @@
 import { Row, Col, Form } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import CodeEditor from "@uiw/react-textarea-code-editor";
-import ParameterizedParams from "../Blocks/ParameterizedParams";
 
 interface Props {
   selector: any;
   scriptRef: any;
-  paramsKeys: string[];
-  paramsSamples: string[];
-  setParamsSamples: any;
 }
 
 const Script = ({
-  paramsKeys,
-  paramsSamples,
-  setParamsSamples,
   selector,
   scriptRef,
 }: Props) => {
-  if (selector == "Response") {
-    return null;
-  }
-
-  if (selector == "Params") {
-
-    return (
-      <ParameterizedParams
-        paramsValues={paramsKeys}
-        data={paramsSamples}
-        setData={setParamsSamples}
-      />
-    );
-  }
 
   if (selector == "Rule") {
     return (
