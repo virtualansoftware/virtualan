@@ -117,7 +117,9 @@ const GetForm = ({
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    reqParams.map((item) => {
+      queryParams[item.key] = item.value;
+    });
     const dataToSubmit = {
       operationId: operationId,
       url: path,

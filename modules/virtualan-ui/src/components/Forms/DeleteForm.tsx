@@ -79,12 +79,6 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
   }, [queryParams, mockResponse, selectorType]);
 
 
-  const selectRefs = {
-    status: useRef(null),
-    type: useRef(null),
-    requestType: useRef(null),
-  };
-
 
   
   const contentStyle = {
@@ -122,6 +116,9 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    reqParams.map((item) => {
+      queryParams[item.key] = item.value;
+    });
     const dataToSubmit = {
       operationId: operationId,
       httpStatusCode: httpStatusCode,
@@ -137,7 +134,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
         value: value,
         parameterType: paramTypes[key],
       })),
-      headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
+      headerParams: respParams,
       resource: resource
     };
 

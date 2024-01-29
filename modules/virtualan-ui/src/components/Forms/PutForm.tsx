@@ -135,6 +135,9 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    reqParams.map((item) => {
+      queryParams[item.key] = item.value;
+    });
     const dataToSubmit = {
       operationId: operationId,
       url: path,
@@ -151,7 +154,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
         value: value,
         parameterType: paramTypes[key],
       })),
-      headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
+      headerParams: respParams,
       resource: resource,
       excludeList: excludeListRef.current.value
     };

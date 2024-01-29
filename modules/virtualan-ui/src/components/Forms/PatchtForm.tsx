@@ -6,9 +6,6 @@ import Alert from "react-bootstrap/Alert";
 import Collapse from "react-bootstrap/Collapse";
 import ParameterizedParams from "../Blocks/ParameterizedParams";
 
-import HttpStatusList from "../../api/HttpStatusList.json";
-import RequestType from "../../api/RequestType.json";
-import ResponseList from "../../api/ResponseList.json";
 import { apiRequestsPost } from "../../api/apiRequests";
 import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
@@ -91,12 +88,6 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     ]);
   }, [queryParams, mockRequest, mockResponse, selectorType]);
 
-  const selectRefs = {
-    status: useRef(null),
-    type: useRef(null),
-    requestType: useRef(null),
-  };
-
   const contentStyle = {
     height: "auto",
     border: "none",
@@ -152,6 +143,9 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    reqParams.map((item) => {
+      queryParams[item.key] = item.value;
+    });
     const dataToSubmit = {
       operationId: operationId,
       url: path,
@@ -168,7 +162,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
         value: value,
         parameterType: paramTypes[key],
       })),
-      headerParams: Object.entries(respParams).map(([key, value]) => ({ key, value })),
+      headerParams: respParams,
       resource: resource,
       excludeList: excludeListRef.current.value
 

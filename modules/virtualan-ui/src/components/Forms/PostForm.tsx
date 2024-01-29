@@ -121,6 +121,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       input:  mockRequest,
       output: mockResponse,
+      availableParams : reqParams,
       headerParams: respParams,
       resource: resource,
       excludeList: excludeListRef.current.value
@@ -152,6 +153,9 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
     setFlashMessage("");
     setFlashErrorMessage("")
     setParamsData([]);
+    setSelectorType("");
+    setHttpStatusCode("");
+    setContentType("");
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
