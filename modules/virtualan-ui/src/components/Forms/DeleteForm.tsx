@@ -40,9 +40,8 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [paramsData, setParamsData] = useState([]);
   const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
-
-  const scriptRef = useRef(null);
-
+  const [script, setScript] = useState("");
+  
 
   useEffect(() => {
     if (selectorType !== "Params") {
@@ -126,7 +125,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
       contentType: contentType,
       url: path,
       rule:  
-      scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
+      script != null  ? script : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       method: "DELETE",
       output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({
@@ -148,7 +147,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
       setFlashMessage("");
       setFlashErrorMessage("")
     }, 5000);
-    handleResetForm();
+    //handleResetForm();
   };
 
   
@@ -165,7 +164,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
     setSelectorType("");
     setHttpStatusCode("");
     setContentType("");
-
+    setScript("");
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
@@ -199,6 +198,14 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
       keyInput.focus();
     }
   };
+
+  
+
+  const handleScriptChange = (value: string) => {
+    setScript(value);
+  };
+  
+
   const handleMockResponseChange = (value: string) => {
     setMockResponse(value);
   };
@@ -251,7 +258,8 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
               {/*  */}
               <Script
                 selector={selectorType}
-                scriptRef={scriptRef}
+                onScriptChange={handleScriptChange}
+                resetKey={resetKey}
               />
               {/*  */}
               <ParameterizedParams

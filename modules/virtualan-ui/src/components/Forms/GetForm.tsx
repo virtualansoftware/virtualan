@@ -42,13 +42,11 @@ const GetForm = ({
   const [httpStatusCode, setHttpStatusCode] = useState("");
   const [contentType, setContentType] = useState("");
   const [resetKey, setResetKey] = useState(uuidv4());
-
+  const [script, setScript] = useState("");
   const [paramsKeys, setParamsKeys] = useState([]);
   const [paramsData, setParamsData] = useState([]);
-
   const formId = uuidv4();
   const [mockResponse, setMockResponse] = useState("");
-  const scriptRef = useRef(null);
 
   useEffect(() => {
     if (selectorType !== "Params") {
@@ -128,7 +126,7 @@ const GetForm = ({
       contentType: contentType,
       method: "GET",
       rule:
-        scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
+        script != null  ? script : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({
         key: key,
@@ -150,7 +148,7 @@ const GetForm = ({
       setFlashMessage("");
       setFlashErrorMessage("");
     }, 5000);
-    handleResetForm();
+    //handleResetForm();
   };
 
   const handleResetForm = () => {
@@ -166,6 +164,7 @@ const GetForm = ({
     setSelectorType("");
     setHttpStatusCode("");
     setContentType("");
+    setScript("");  
 
   };
 
@@ -203,6 +202,10 @@ const GetForm = ({
       valueInput.value = "";
       keyInput.focus();
     }
+  };
+
+  const handleScriptChange = (value: string) => {
+    setScript(value);
   };
 
   const handleMockResponseChange = (value: string) => {
@@ -262,7 +265,8 @@ const GetForm = ({
               {/*  */}
               <Script
                 selector={selectorType}
-                scriptRef={scriptRef}
+                onScriptChange={handleScriptChange}
+                resetKey={resetKey}
               />
               {/*  */}
               <MockResponse

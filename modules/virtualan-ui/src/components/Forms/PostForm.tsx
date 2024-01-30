@@ -40,9 +40,9 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
   const [mockRequest, setMockRequest] = useState("");
   const [paramsData, setParamsData] = useState([]);
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
+  const [script, setScript] = useState("");
 
 
-  const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       contentType: contentType,
       method: "POST",
       rule:  
-      scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
+      script != null ? script : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       input:  mockRequest,
       output: mockResponse,
       availableParams : reqParams,
@@ -137,7 +137,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       setFlashMessage("");
       setFlashErrorMessage("")
     }, 5000);
-    handleResetForm();
+    //handleResetForm();
   };
 
   const handleResetForm = () => {
@@ -156,6 +156,8 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
     setSelectorType("");
     setHttpStatusCode("");
     setContentType("");
+    setScript("");  
+
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
@@ -170,6 +172,9 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
     setMockRequest(value);
   };
 
+  const handleScriptChange = (value: string) => {
+    setScript(value);
+  };
 
   const handleAddParams = (
     keyInputId: string,
@@ -228,7 +233,8 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
               {/*  */}
               <Script
                 selector={selectorType}
-                scriptRef={scriptRef}
+                onScriptChange={handleScriptChange}
+                resetKey={resetKey}
               />
               {/* Text area */}
               <ParameterizedParams

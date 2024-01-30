@@ -1,16 +1,34 @@
+import { useState, useEffect } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 
 interface Props {
   selector: any;
-  scriptRef: any;
+  resetKey: any;
+  onScriptChange: (value: string) => void;
+
 }
 
 const Script = ({
   selector,
-  scriptRef,
+  onScriptChange,
+  resetKey,
 }: Props) => {
+
+  useEffect(() => {
+    setScript("");
+  }, [resetKey]);
+
+  const [script, setScript] = useState("");
+
+  const handleScriptChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setScript(e.target.value);
+    onScriptChange(e.target.value);
+  };
+  
 
   if (selector == "Rule") {
     return (
@@ -23,8 +41,9 @@ const Script = ({
         <Col xs={7}>
           <div data-color-mode="light">
             <CodeEditor
-              ref={scriptRef}
               language="groovy"
+              value={script}
+              onChange={handleScriptChange}
               placeholder="Please enter groovy/spel code."
               padding={15}
               minHeight={180}
@@ -52,7 +71,8 @@ const Script = ({
         <Col xs={7}>
           <div data-color-mode="light">
             <CodeEditor
-              ref={scriptRef}
+              value={script}
+              onChange={handleScriptChange}
               language="groovy"
               placeholder="Please enter groovy/spel code."
               padding={15}

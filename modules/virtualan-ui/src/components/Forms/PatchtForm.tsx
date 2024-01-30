@@ -42,6 +42,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [mockRequest, setMockRequest] = useState("");
   const [paramsData, setParamsData] = useState([]);
+  const [script, setScript] = useState("");
 
   const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
@@ -178,7 +179,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
       setFlashMessage("");
       setFlashErrorMessage("")
     }, 5000);
-    handleResetForm();
+    //handleResetForm();
   };
 
   const handleResetForm = () => {
@@ -199,11 +200,16 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     setSelectorType("");
     setHttpStatusCode("");
     setContentType("");
+    setScript("");  
 
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
     setParams(params.filter((item: any) => item.key !== key));
+  };
+
+  const handleScriptChange = (value: string) => {
+    setScript(value);
   };
 
   const handleAddParams = (
@@ -272,7 +278,8 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
               {/*  */}
               <Script
                 selector={selectorType}
-                scriptRef={scriptRef}
+                onScriptChange={handleScriptChange}
+                resetKey={resetKey}
               />
               {/* Text area */}
               <ParameterizedParams

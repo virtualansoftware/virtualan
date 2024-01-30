@@ -46,8 +46,8 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [mockRequest, setMockRequest] = useState("");
   const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
+  const [script, setScript] = useState("");
 
-  const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
 
   useEffect(() => {
@@ -146,7 +146,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
       contentType: contentType,
       method: "PUT",
       rule:  
-      scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
+      script != null ? script : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       input:  mockRequest,
       output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({
@@ -169,7 +169,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
       setFlashMessage("");
       setFlashErrorMessage("")
     }, 5000);
-    handleResetForm();
+    //handleResetForm();
   };
 
   const handleResetForm = () => {
@@ -190,9 +190,13 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
     setSelectorType("");
     setHttpStatusCode("");
     setContentType("");
-
+    setScript("");  
   };
 
+  const handleScriptChange = (value: string) => {
+    setScript(value);
+  };
+  
   const handleDelParams = (key: string, params: any, setParams: any) => {
     setParams(params.filter((item: any) => item.key !== key));
   };
@@ -273,7 +277,8 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
               {/*  */}
               <Script
                 selector={selectorType}
-                scriptRef={scriptRef}
+                onScriptChange={handleScriptChange}
+                resetKey={resetKey}
               />
               {/* Text area */}
               <ParameterizedParams
