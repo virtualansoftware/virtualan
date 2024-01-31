@@ -1,27 +1,39 @@
+import { useState } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 import { v4 as uuidv4 } from "uuid";
 
 interface Props {
-  mockRequestRef: any;
   formId: string;
+  onMockRequestChange: (value: string) => void;
 }
 
-const MockRequestBody = ({ formId, mockRequestRef }: Props) => {
-  return (
+const MockRequestBody = ({ formId, onMockRequestChange }: Props) => {
+  const [mockRequest, setMockRequest] = useState("");
 
-    <Row key={uuidv4()}>
-    <Col xs={3}>
-      <Form.Label
-        className="head-text-black"
-        htmlFor="mockRequestBody"
-      >
-        Mock Request Body:
-      </Form.Label>
-    </Col>
-    <Col xs={7}>
-      <Form.Control id="mockRequestBody" as="textarea" rows={6} ref={mockRequestRef} />
-    </Col>
-  </Row>
+  const handleMockRequestChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setMockRequest(e.target.value);
+    onMockRequestChange(e.target.value);
+  };
+
+  return (
+    <Row key={"mockRequest"}>
+      <Col xs={3}>
+        <Form.Label className="head-text-black" htmlFor="mockRequest">
+          Mock Request:
+        </Form.Label>
+      </Col>
+      <Col xs={7}>
+        <Form.Control
+          id={"mockRequest" + formId}
+          as="textarea"
+          rows={6}
+          value={mockRequest}
+          onChange={handleMockRequestChange}
+        />
+      </Col>
+    </Row>
   );
 };
 

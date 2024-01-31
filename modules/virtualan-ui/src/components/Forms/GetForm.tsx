@@ -43,7 +43,6 @@ const GetForm = ({
   const [resetKey, setResetKey] = useState(uuidv4());
 
   const [paramsKeys, setParamsKeys] = useState([]);
-  // const [paramsKeys, setParamsKeys] = useState(["id", "var1", "var2", "var3"]);
   const [paramsSamples, setParamsSamples] = useState([]);
 
   const formId = uuidv4();
