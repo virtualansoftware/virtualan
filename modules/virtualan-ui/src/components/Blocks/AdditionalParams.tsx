@@ -13,67 +13,45 @@ interface Props {
   handleDelParams: Function;
 }
 
-const AdditionalParams = ({
-  reqParams,
-  setReqParams,
-  handleAddParams,
-  handleDelParams,
-}: Props) => {
-
+const AdditionalParams = ({reqParams, setReqParams, handleAddParams, handleDelParams, }: Props) => {
 
 	const randomIdAdditionalParams = uuidv4();
 
-
-
   return (
-    <>
+    <div>
       <Row key={uuidv4()}>
         <Col xs={3}>
           <Form.Label className="head-text-black">
             Additional Params:
           </Form.Label>
         </Col>
-      </Row>
-
-      <Row key={uuidv4()}>
-        <Col xs={3}></Col>
         <Col xs={7}>
-          <Row className="d-flex">
-            <Col xs={6}>
-              <Form.Label
-                className="head-text-black"
-                htmlFor="inputReqParamKey"
-              >
-                Param Key
-              </Form.Label>
-            </Col>
-            <Col xs={6}>
-              <Form.Label
-                className="head-text-black"
-                htmlFor="inputReqParamValue"
-              >
-                Param Value:
-              </Form.Label>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+        <Row className="d-flex">
+          <Col xs={6}>
+            <Form.Label
+              className="head-text-black"
+              htmlFor="inputReqParamKey"
+            >
+              Param Key
+            </Form.Label>
+          </Col>
+          <Col xs={6}>
+            <Form.Label
+              className="head-text-black"
+              htmlFor="inputReqParamValue"
+            >
+              Param Value:
+            </Form.Label>
+          </Col>
+        </Row>
 
-      {/* line */}
-      <Row key={uuidv4()}>
-        <Col xs={3}></Col>
-        <Col xs={7}>
-          <Row className="d-flex">
+          {/* line */}
+          <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
-              <hr />
+              <hr className="hrx" />
             </Col>
           </Row>
-        </Col>
-      </Row>
-
-      <Row key={uuidv4()}>
-        <Col xs={3}></Col>
-        <Col xs={7}>
+      
           {reqParams.map((param: any, index: string) => {
             const key = param["key"];
             return (
@@ -113,7 +91,7 @@ const AdditionalParams = ({
               </Row>
             );
           })}
-          <Row className="d-flex">
+          <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
               <Form.Control type="text" id={"inputReqAddParamsKey-" + randomIdAdditionalParams} />
             </Col>
@@ -139,7 +117,7 @@ const AdditionalParams = ({
           </Row>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

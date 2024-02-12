@@ -1,23 +1,45 @@
 import Modal from "react-bootstrap/Modal";
-import ModalContentLoad from "./Modals/ModalDataLoad";
+// import ModalContentLoad from "./Modals/ModalDataLoad";
 import logoVirtualan from "../assets/images/logo_image.png";
 import Button from 'react-bootstrap/Button';
+import { apiRequestsGet } from "../api/apiRequests";
+import { API_GET_CATALOGS } from "../constants";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 
 interface Props {
   title: string;
-  yaml_file: string;
   onClose: () => void;
   show: boolean;
 }
 
-const ModalApp = ({ title, yaml_file, onClose, show }: Props) => {
+
+const ModalApp = ({ title, onClose, show }: Props) => {
+
+  const [yamlFile, setYamlFile] = useState(null);
   const handleClose = () => onClose();
+  
+
+  const loadData = async () => {
+    await axios({
+      method: "GET",
+      url: API_GET_CATALOGS +"/"+title,
+    }).then((res) => {
+      setYamlFile(res.data);
+    });
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [show]);
+
+  const formId = uuidv4();
 
   return (
     <>
       <Modal show={show} onHide={handleClose} size="xl">
-        {/* <Modal.Header closeButton> */}
         <Modal.Header>
           <Modal.Title>
             <img src={logoVirtualan} alt="VT" width="50" height="50" />
@@ -35,10 +57,10 @@ const ModalApp = ({ title, yaml_file, onClose, show }: Props) => {
                 </tr>
               </thead>
               <tbody>
-                  <tr key={11111}>
-                    <td>{ yaml_file }</td>
+                  <tr key={formId}>
+                    <td>{ title }</td>
                     <td>
-                      <a target="_new" href={`swagger-ui/index.html?url=/yaml/Person/${yaml_file}`}>
+                      <a target="_new" href={`swagger-ui/index.html?url=/yaml/${title}/${yamlFile}`}>
                         view
                       </a>
                     </td>

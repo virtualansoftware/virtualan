@@ -1,27 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
-import { apiRequestsDelete } from "../../api/apiRequests";
-import { API_DELETE_ENDPOINT } from "../../constants";
+import { apiRequestsDelete, apiRequestsGet } from "../../api/apiRequests";
+import { API_DELETE_ENDPOINT, API_GET_ENDPOINT_LOAD } from "../../constants";
+import { CodeBlock, dracula } from "react-code-blocks";
+import { JsonToTable } from "react-json-to-table";
+import axios from "axios";
+
 import "../../assets/css/styles.css";
 
 import ReactMarkdown from "react-markdown";
 import JSONPretty from "react-json-pretty";
 import JSONPrettyMon from "react-json-pretty/dist/monikai";
-
 import Stack from "react-bootstrap/Stack";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-
-import yaml from "js-yaml";
-import ModalContent from "./ModalDataAdd";
-
-import {
-  JsonView,
-  allExpanded,
-  darkStyles,
-  defaultStyles,
-} from "react-json-view-lite";
+import { JsonView, allExpanded, defaultStyles } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 
 function isJSON(str: any) {
@@ -34,29 +25,43 @@ function isJSON(str: any) {
 }
 
 interface Props {
-  data: string[];
   mainModalClose: () => void;
 }
 
-const ModalContentLoad = ({ data, mainModalClose }: Props) => {
+const ModalContentLoad = ({ mainModalClose }: Props) => {
   const [refreshKey, setRefreshKey] = useState(0);
-
+  const [showType, setShowType] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [modalTitle, setModalTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [dataset, setDataset] = useState([]);
 
+  const loadData = async () => {
+    const result = await axios({
+      method: "GET",
+      url: API_GET_ENDPOINT_LOAD,
+    }).then((res) => {
+      setDataset(res.data);
+    });
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [refreshKey]);
 
   const handleModalClose = () => {
     setShowModal(false);
     setModalContent("");
+    setShowType("");
   };
 
-  const handleModalShow = (content: any, title: string) => {
+  const handleModalShow = (type: any, content: any, title: string) => {
     setShowModal(true);
     setModalContent(content);
+    setShowType(type.toUpperCase());
     setModalTitle(title);
   };
 
@@ -70,20 +75,42 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
     setItemsPerPage(Number(event.target.value));
   };
 
-
   const handleClick = (page: number) => {
     setCurrentPage(page);
   };
 
   const handleRemoveItem = (id: number) => {
     apiRequestsDelete(API_DELETE_ENDPOINT, id);
+    setRefreshKey((oldKey) => oldKey + 1);
   };
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(dataset.length / itemsPerPage);
 
   const handleRefresh = () => {
     setRefreshKey((oldKey) => oldKey + 1);
   };
+
+  const syntaxHighlight = (json : string) => {
+    if (typeof json != 'string') {
+           json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\\s*:)?|\b(true|false|null)\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+  }
 
   const renderJsonView = (jsonString: any) => {
     try {
@@ -96,16 +123,22 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
         />
       );
     } catch (error) {
-      return null;
+      const data = syntaxHighlight(jsonString);;
+      return (
+        <JsonView
+          data={data}
+          shouldExpandNode={allExpanded}
+          style={defaultStyles}
+        />
+      );
     }
   };
-
 
   const renderData = () => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
 
-    const filteredData = data.filter((item) =>
+    const filteredData = dataset.filter((item) =>
       Object.values(item).some((value) =>
         JSON.stringify(value).toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -113,7 +146,6 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
 
     return (
       <div style={{ fontSize: "12px" }}>
-
         <div>
           <input
             type="text"
@@ -181,11 +213,19 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                       <div
                         key={item.rule}
                         onClick={() =>
-                          handleModalShow(item.rule, "Parameterized")
+                          handleModalShow(
+                            item.type,
+                            item.rule,
+                            item.type.toUpperCase()
+                          )
                         }
                       >
                         <span className="form-button button-table-blue">
-                          Parameterized!
+                          {item.type.toLowerCase() === "script" && <>Script!</>}
+                          {item.type.toLowerCase() === "rule" && <>Rule!</>}
+                          {item.type.toLowerCase() === "params" && (
+                            <>Parameterized!</>
+                          )}
                         </span>
                       </div>
                     ) : (
@@ -196,7 +236,9 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {item.input ? (
                       <div
                         key={item.input}
-                        onClick={() => handleModalShow(inputText, "Request")}
+                        onClick={() =>
+                          handleModalShow(item.type, inputText, "Request")
+                        }
                       >
                         <span className="form-button button-table-blue">
                           Request
@@ -210,7 +252,9 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                     {item.output ? (
                       <div
                         key={item.output}
-                        onClick={() => handleModalShow(outputText, "Response")}
+                        onClick={() =>
+                          handleModalShow(item.type, outputText, "Response")
+                        }
                       >
                         <span className="form-button button-table-blue">
                           Response
@@ -229,7 +273,9 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
                       );
                     })}
                   </td>
-                  <td key={10}></td>
+                  <td key={10}>
+                    {item.excludeList}
+                  </td>
                   <td key={11}>
                     <div onClick={() => handleRemoveItem(item.id)}>
                       <span className="form-button button-table-red">
@@ -250,29 +296,39 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           </Modal.Header>
           <Modal.Body>
             <div className="row" style={{ padding: "20px" }}>
-              {isJSON(modalContent) ? (
+              {(showType === "PARAMS" && modalTitle === 'PARAMS') ? (
+                <JsonToTable json={JSON.parse(modalContent)} />
+              ) : isJSON(modalContent) ? (
                 <>
                   <div className="col">
-                    <JSONPretty
-                      data={JSON.parse(modalContent)}
-                      theme={JSONPrettyMon}
-                    />
+                    {
+                       <JSONPretty
+                        data={JSON.parse(modalContent)}
+                        theme={JSONPrettyMon}
+                      />
+                    }
                   </div>
                   <div className="col">
                     {/* <pre style={{ color: "green", padding: "10px" }}> */}
-                      {/* {yaml.dump(JSON.parse(modalContent))} */}
-                      { renderJsonView(modalContent) }
+                    {/* {yaml.dump(JSON.parse(modalContent))} */}
+                    {renderJsonView(modalContent)}
                     {/* </pre> */}
                   </div>
                 </>
+              ) : showType == "SCRIPT" || showType == "RULE" ? (
+                <CodeBlock
+                  text={modalContent}
+                  language="groovy"
+                  showLineNumbers={true}
+                  theme={dracula}
+                />
               ) : (
                 <div className="col">
-                  <ReactMarkdown>{modalContent}</ReactMarkdown>
+                  <ReactMarkdown>{ syntaxHighlight(modalContent)}</ReactMarkdown>
                 </div>
               )}
             </div>
           </Modal.Body>
-
           <Modal.Footer>
             <Button variant="secondary" onClick={handleModalClose}>
               Close
@@ -301,7 +357,6 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
     };
 
     return (
-      // <ul className="pagination-sm pagination">
       <ul className="pagination-sm pagination">
         <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
           <a
@@ -327,7 +382,6 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           <li
             key={index}
             className={`page-item ${currentPage === page ? "active" : ""}`}
-
           >
             <a
               className="page-link"
@@ -407,7 +461,6 @@ const ModalContentLoad = ({ data, mainModalClose }: Props) => {
           </button>
         </div>
       </Stack>
-
     </>
   );
 };

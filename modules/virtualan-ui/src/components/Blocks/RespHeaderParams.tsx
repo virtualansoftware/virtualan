@@ -20,17 +20,13 @@ const RespHeaderParams = ({
   const randomIdAdditionalParams = uuidv4();
 
   return (
-    <>
-      <Row key={uuidv4()}>
+    <div>
+      <Row key={uuidv4()} >
         <Col xs={3}>
           <Form.Label className="head-text-black">
             Response Header Params:
           </Form.Label>
         </Col>
-      </Row>
-
-      <Row key={uuidv4()}>
-        <Col xs="3"></Col>
         <Col xs={7}>
           <Row className="d-flex">
             <Col xs={6}>
@@ -38,7 +34,7 @@ const RespHeaderParams = ({
                 className="head-text-black"
                 htmlFor="inputRespParamValue"
               >
-                Param Value:
+                Param Key:
               </Form.Label>
             </Col>
             <Col xs={6}>
@@ -46,27 +42,15 @@ const RespHeaderParams = ({
                 className="head-text-black"
                 htmlFor="inputRespParamKey"
               >
-                Param Key
+                Param Value
               </Form.Label>
             </Col>
           </Row>
-        </Col>
-      </Row>
-
-      <Row key={uuidv4()}>
-        <Col xs={3}></Col>
-        <Col xs={7}>
-          <Row className="d-flex">
+          <Row className="d-flex" style={{ padding: 0 }}>
             <Col>
-              <hr />
+              <hr className="hrx" />
             </Col>
-          </Row>
-        </Col>
-      </Row>
-
-      <Row key={uuidv4()}>
-        <Col xs={3}></Col>
-        <Col xs={7}>
+            </Row>
           {respParams.map((param: any, index: any) => {
             const key = param["key"];
             return (
@@ -104,41 +88,41 @@ const RespHeaderParams = ({
                   />
                 </Col>
               </Row>
-            );
-          })}
-          <Row className="d-flex">
-            <Col>
-              <Form.Control
-                type="text"
-                id={"inputRespAddParamsKey-" + randomIdAdditionalParams}
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                type="text"
-                id={"inputRespAddParamsValue-" + randomIdAdditionalParams}
-              />
-            </Col>
-            <Col xs="1">
-              <Image
-                src={plusImage}
-                width="30"
-                height="30"
-                roundedCircle
-                onClick={() =>
-                  handleAddParams(
-                    "inputRespAddParamsKey-" + randomIdAdditionalParams,
-                    "inputRespAddParamsValue-" + randomIdAdditionalParams,
-                    respParams,
-                    setRespParams
-                  )
-                }
-              />
-            </Col>
-          </Row>
+                );
+              })}
+              <Row className="d-flex" style={{ padding: 0 }}>
+                <Col>
+                  <Form.Control
+                    type="text"
+                    id={"inputRespAddParamsKey-" + randomIdAdditionalParams}
+                  />
+                </Col>
+                <Col>
+                  <Form.Control
+                    type="text"
+                    id={"inputRespAddParamsValue-" + randomIdAdditionalParams}
+                  />
+                </Col>
+                <Col xs="1">
+                  <Image
+                    src={plusImage}
+                    width="30"
+                    height="30"
+                    roundedCircle
+                    onClick={() =>
+                      handleAddParams(
+                        "inputRespAddParamsKey-" + randomIdAdditionalParams,
+                        "inputRespAddParamsValue-" + randomIdAdditionalParams,
+                        respParams,
+                        setRespParams
+                      )
+                    }
+                  />
+                </Col>
+            </Row>
         </Col>
-      </Row>
-    </>
+        </Row>
+    </div>
   );
 };
 

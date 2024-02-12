@@ -1,15 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import Form from "react-bootstrap/Form";
 import Stack from "react-bootstrap/Stack";
 import Alert from "react-bootstrap/Alert";
 import Collapse from "react-bootstrap/Collapse";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
+import ParameterizedParams from "../Blocks/ParameterizedParams";
 
-import HttpStatusList from "../../api/HttpStatusList.json";
-import RequestType from "../../api/RequestType.json";
-import ResponseList from "../../api/ResponseList.json";
 import { apiRequestsPost } from "../../api/apiRequests";
 import Selects from "../Blocks/Selects";
 import HeaderParams from "../Blocks/HeaderParams";
@@ -17,6 +13,7 @@ import AdditionalParams from "../Blocks/AdditionalParams";
 import MockResponse from "../Blocks/MockResponse";
 import MockRequestBody from "../Blocks/MockRequestBody";
 import RespHeaderParams from "../Blocks/RespHeaderParams";
+import Script from "../Blocks/Script";
 import ExcludeList from "../Blocks/ExcludeList";
 import FormButtons from "../Blocks/FormButtons";
 import { v4 as uuidv4 } from "uuid";
@@ -35,16 +32,62 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const [reqParams, setReqParams] = useState([]);
   const [respParams, setRespParams] = useState([]);
   const [flashMessage, setFlashMessage] = useState("");
+  const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
+  const [selectorType, setSelectorType] = useState("");
+  const [httpStatusCode, setHttpStatusCode] = useState("");
+  const [contentType, setContentType] = useState("");
+  const [resetKey, setResetKey] = useState(uuidv4());
+  const [paramsKeys, setParamsKeys] = useState([]);
+  const [mockResponse, setMockResponse] = useState("");
+  const [flashErrorMessage, setFlashErrorMessage] = useState("");
+  const [mockRequest, setMockRequest] = useState("");
+  const [paramsData, setParamsData] = useState([]);
+  const [script, setScript] = useState("");
 
-  const mockResponseRef = useRef(null);
-  const mockRequestRef = useRef(null);
-
+  const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
-  const selectRefs = {
-    status: useRef(null),
-    type: useRef(null),
-    requestType: useRef(null),
-  };
+
+  useEffect(() => {
+    if (selectorType !== "Params") {
+      return;
+    }
+
+    const regex = /<([^>]+)>/g;
+    let queryParamsMatches: string[] = [];
+    Object.values(queryParams).forEach((value) => {
+      const matches = value.match(regex);
+      if (matches) {
+        queryParamsMatches = [...queryParamsMatches, ...matches];
+      }
+    });
+    if (queryParamsMatches.length > 0) {
+      queryParamsMatches = queryParamsMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+    
+    let mockRequestMatches: any = mockRequest.match(regex);
+    if (mockRequestMatches) {
+      mockRequestMatches = mockRequestMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    let mockResponseMatches: any = mockResponse.match(regex);
+    if (mockResponseMatches) {
+      mockResponseMatches = mockResponseMatches.map((match: string) =>
+        match.slice(1, -1)
+      );
+    }
+
+    setParamsKeys([
+      ...new Set([
+        ...(queryParamsMatches || []),
+        ...(mockRequestMatches || []),
+        ...(mockResponseMatches || []),
+      ]),
+    ]);
+  }, [queryParams, mockRequest, mockResponse, selectorType]);
 
   const contentStyle = {
     height: "auto",
@@ -52,66 +95,121 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     margin: "0px",
     padding: "0px",
   };
+
+  const handleSelectChange = (data: any) => {
+    setSelectorType(data.type);
+    setHttpStatusCode(data.status);
+    setContentType(data.requestType);
+  };
+
   const formId = uuidv4();
 
-  const http_status = HttpStatusList;
-  const request_type = RequestType;
-  const response_list = ResponseList;
+
+  const createMockRequest = (apiEntryPointPost: any, dataToSubmit : any) =>{
+    const output = apiRequestsPost(apiEntryPointPost, dataToSubmit);
+    output.then((response: any) => JSON.stringify(response)) //2
+    .then((data : any) => {
+      const jsondata  = JSON.parse(data);
+        setFlashMessage( "Success: " + jsondata.data.mockStatus.code)
+        setFlashErrorMessage("");
+    }).catch(error =>             {
+      console.log(error.response);
+      const jsondata  = JSON.parse(JSON.stringify(error.response));
+      setFlashErrorMessage( "Fail: " + jsondata.data.code);
+      setFlashMessage("");
+    }
+    );    
+  }
+
+  const handleMockRequestChange = (value: string) => {
+    setMockRequest(value);
+  };
+
+
+  const handleMockResponseChange = (value: string) => {
+    setMockResponse(value);
+  };
+
+  
+  const handleAddQueryParams = (
+    paramType: string,
+    key: string,
+    value: string
+  ) => {
+    queryParams[key] = value;
+    setQueryParams(queryParams);
+    paramTypes[key] = paramType;
+    setParamTypes(paramTypes);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // console.log("selectRefs", selectRefs);
-    // console.log('queryParams', queryParams); // ok
-    // console.log('reqParams', reqParams); // ok
-    // console.log('respParams', respParams); // ok
-    // console.log('mockResponse', mockResponseRef.current.value);
-    // console.log('excludeList', excludeListRef.current.value);
-
+    reqParams.map((item) => {
+      queryParams[item.key] = item.value;
+    });
     const dataToSubmit = {
       operationId: operationId,
-      httpStatusCode: selectRefs.status.current.value,
       url: path,
-      type: selectRefs.type != null ? selectRefs.type.current.value : "",
-      contentType: selectRefs.requestType != null ? selectRefs.requestType.current.value : "",
-      method: "PUT",
-      input:  mockRequestRef != null ? mockRequestRef.current.value : "",
-      output: mockResponseRef != null ? mockResponseRef.current.value : "",
-      availableParams: Object.entries(queryParams).map(([key, value]) => ({ key, value })),
-      //headerParams: [],
-      resource: resource
+      httpStatusCode: httpStatusCode,
+      type: selectorType,
+      contentType: contentType,
+      method: "PATCH",
+      rule:  
+      scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
+      input:  mockRequest,
+      output: mockResponse,
+      availableParams: Object.entries(queryParams).map(([key, value]) => ({
+        key: key,
+        value: value,
+        parameterType: paramTypes[key],
+      })),
+      headerParams: respParams,
+      resource: resource,
+      excludeList: excludeListRef.current.value
+
     };
 
-
-    // console.log("dataToSubmit", dataToSubmit);
     try {
-      apiRequestsPost(apiEntryPointPost, dataToSubmit);
-      setFlashMessage("Data added successfully.");
+      createMockRequest(apiEntryPointPost, dataToSubmit);
     } catch (error) {
       console.error("Error making POST request:", error);
-      setFlashMessage("Error making POST request.");
+      setFlashErrorMessage("Error making POST request." + error);
     }
     setTimeout(() => {
       setFlashMessage("");
+      setFlashErrorMessage("")
     }, 5000);
-    handleResetForm();
+    //handleResetForm();
   };
 
   const handleResetForm = () => {
-    const mockResponseField = document.getElementById(
-      "mockResponse" + formId
-    ) as HTMLInputElement;
-    const excludeListField = document.getElementById(
+     const excludeListField = document.getElementById(
       "excludeList" + formId
     ) as HTMLInputElement;
-    mockResponseField.value = "";
     excludeListField.value = "";
+    setMockRequest("");
+    setMockResponse("");
     setReqParams([]);
     setRespParams([]);
     setQueryParams({});
+    setResetKey(uuidv4());
+    setFlashMessage("");
+    setFlashErrorMessage("")
+    setParamsData([]);
+    setParamTypes({});
+    setSelectorType("");
+    setHttpStatusCode("");
+    setContentType("");
+    setScript("");  
+
   };
 
   const handleDelParams = (key: string, params: any, setParams: any) => {
     setParams(params.filter((item: any) => item.key !== key));
+  };
+
+  const handleScriptChange = (value: string) => {
+    setScript(value);
   };
 
   const handleAddParams = (
@@ -126,10 +224,6 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     ) as HTMLInputElement;
     const key = keyInput.value.trim();
     const value = valueInput.value.trim();
-
-    // // test with valid invalid valid characters
-    // const validPattern = /^[a-zA-Z0-9]+$/;
-    // if (key.match(validPattern) && value.match(validPattern))
 
     if (key !== "" && value !== "") {
       const index = paramsArray.findIndex((item: any) => item.key === key);
@@ -146,10 +240,6 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
     }
   };
 
-  const handleAddQueryParams = (key: string, value: string) => {
-    queryParams[key] = value;
-    setQueryParams(queryParams);
-  };
 
   return (
     <div className="button-patch-box button-box">
@@ -163,19 +253,20 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
 
       <Collapse in={showForm}>
         <div style={contentStyle}>
-          {flashMessage && (
-            <Alert variant="success" className="fade-out">
-              {flashMessage}
-            </Alert>
-          )}
+         
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
-            <Selects selectRefs={selectRefs} http_status={http_status} request_type={request_type} response_list={response_list} />
+              {/*  */}
+              <Selects
+                onSelectionChange={handleSelectChange}
+                resetKey={resetKey}
+              />
               {/*  */}
               <HeaderParams
-                availableParams={availableParams}
-                queryParams={queryParams}
-                handleAddQueryParams={handleAddQueryParams}
+               availableParams={availableParams}
+               queryParams={queryParams}
+               setQueryParams={setQueryParams}
+               handleAddQueryParams={handleAddQueryParams}
               />
               {/*  */}
               <AdditionalParams
@@ -184,27 +275,49 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
                 handleAddParams={handleAddParams}
                 handleDelParams={handleDelParams}
               />
-              {/* Text area */}
-              <MockRequestBody formId={formId} mockRequestRef={mockRequestRef} />
               {/*  */}
-              <MockResponse formId={formId} mockResponseRef={mockResponseRef} />
-              {/*  */}
-              <RespHeaderParams
-                respParams={respParams}
-                setRespParams={setRespParams}
-                handleAddParams={handleAddParams}
-                handleDelParams={handleDelParams}
+              <Script
+                selector={selectorType}
+                onScriptChange={handleScriptChange}
+                resetKey={resetKey}
               />
+              {/* Text area */}
+              <ParameterizedParams
+                selector={selectorType}
+                paramsValues={paramsKeys}
+                data={paramsData}
+                setData={setParamsData}
+              />
+              {/*  */}
+              <MockRequestBody 
+                formId={formId} 
+                onMockRequestChange={handleMockRequestChange} 
+                resetKey={resetKey}
+              />
+              {/*  */}
+              <MockResponse
+                resetKey={resetKey}
+                formId={formId}
+                onMockResponseChange={handleMockResponseChange}
+              />
+              {/*  */}
+              <RespHeaderParams respParams={respParams} setRespParams={setRespParams} handleAddParams={handleAddParams} handleDelParams={handleDelParams}/>
               {/*  */}
               <ExcludeList formId={formId} excludeListRef={excludeListRef} />
               {/*  */}
-              <FormButtons
-                handleResetForm={handleResetForm}
-                setShowForm={setShowForm}
-                showForm={showForm}
-              />
+              <FormButtons handleResetForm={handleResetForm} setShowForm={setShowForm} showForm={showForm} />
             </Stack>
           </Form>
+          {flashMessage && (
+            <Alert variant="success" className="fade-out">
+              {flashMessage}
+            </Alert>
+          )}
+          {flashErrorMessage && (
+            <Alert variant='warning' className="fade-out">
+              {flashErrorMessage}
+            </Alert>
+          )}
         </div>
       </Collapse>
     </div>

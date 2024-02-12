@@ -8,14 +8,12 @@ interface Props {
   show: boolean;
   dataApi: any;
 }
-
 const ModalApp = ({ title, onClose, show, dataApi }: Props) => {
   const handleClose = () => onClose();
 
   return (
     <>
       <Modal show={show} onHide={handleClose} size="xl">
-        {/* <Modal.Header closeButton> */}
         <Modal.Header>
 
           <Modal.Title>

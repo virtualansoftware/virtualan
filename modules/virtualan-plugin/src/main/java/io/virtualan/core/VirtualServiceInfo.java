@@ -14,28 +14,27 @@
 
 package io.virtualan.core;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.virtualan.api.VirtualServiceType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.RegexPatternTypeFilter;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,6 +49,7 @@ import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceApiResponse;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
+import org.springframework.util.ClassUtils;
 
 
 /**
@@ -99,17 +99,16 @@ public interface VirtualServiceInfo {
     default Map<String, Class> findVirtualServices() {
         Map<String, Class> virtualInterfaces = new HashMap<>();
         try {
-            Field f = ClassLoader.class.getDeclaredField("classes");
-            f.setAccessible(true);
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            List<Class> classes = (List<Class>) f.get(classLoader);
-            for (int i = 0; i < classes.size(); i++) {
-                Class classzz = classes.get(i);
-                loadClasses(virtualInterfaces, classzz);
+            ClassPath classPath = ClassPath.from(ApiType.class.getClassLoader());
+            Set<ClassInfo> classes = classPath.getAllClasses();
+            for (ClassInfo clazzz : classes) {
+                try {
+                    loadClasses(virtualInterfaces, clazzz.load());
+                } catch (Throwable e) {
+                }
             }
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-            | IllegalAccessException e1) {
-            LogHolder.log.error("Unable to load from the class loader {}" , e1.getMessage());
+        }catch (IOException e){
+
         }
         return virtualInterfaces;
     }
