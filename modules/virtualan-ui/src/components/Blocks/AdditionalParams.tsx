@@ -6,7 +6,6 @@ import Image from "react-bootstrap/Image";
 import plusImage from "../../assets/images/plus-img.png";
 import minusImage from "../../assets/images/minus-img.png";
 
-
 interface Props {
   reqParams: any;
   setReqParams: any;

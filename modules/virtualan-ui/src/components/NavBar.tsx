@@ -1,11 +1,9 @@
-// import React from "react";
 import { useState, useEffect } from "react";
 import ModalAppAdd from "./ModalAdd";
 import ModalAppLoad from "./ModalLoad";
 import ModalAppCatalog from "./ModalCatalog";
 import ModalAppJSON from "./ModalJsonFormatter";
 
-// import { MouseEvent } from "react";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
 import { API_GET_CATALOGS,API_GET_ENDPOINT_ADD, VERSION } from "../constants";

@@ -5,7 +5,6 @@ import Stack from "react-bootstrap/Stack";
 import Alert from "react-bootstrap/Alert";
 import Collapse from "react-bootstrap/Collapse";
 
-
 import HttpStatusList from "../../api/HttpStatusList.json";
 import RequestType from "../../api/RequestType.json";
 import ResponseList from "../../api/ResponseList.json";

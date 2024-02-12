@@ -23,7 +23,6 @@ interface Props {
   path: string;
   availableParams: string[];
   apiEntryPointPost: string;
-  
 }
 
 const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointPost }: Props) => {
@@ -73,7 +72,6 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       ]),
     ]);
   }, [mockRequest, mockResponse, selectorType]);
-
 
   const contentStyle = {
     height: "auto",
