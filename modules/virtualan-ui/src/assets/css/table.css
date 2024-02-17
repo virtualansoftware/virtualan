@@ -1,0 +1,60 @@
+.full-width-table {
+  width: 100%;
+}
+
+.table-header {
+  background-color: transparent;
+}
+
+.table-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.table-row:nth-child(even) {
+  background-color: transparent;
+}
+
+.table-row {
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.table-row-add {
+  border-bottom: 1px solid #c9c9c9;
+}
+
+@keyframes goodHighlight {
+  from { background-color: transparent; }
+  to { background-color: rgb(246, 246, 175); }
+}
+
+.goodHighlight {
+  animation: goodHighlight 0.5s forwards;
+}
+
+@keyframes badHighlight {
+  from { background-color: transparent; }
+  to { background-color: rgb(238, 139, 139); }
+}
+
+.badHighlight {
+  animation: badHighlight 0.5s forwards;
+}
+
+.table-cell {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+.scrollable-table {
+  width: 96%; 
+  height: 250pX;
+  margin-left: 5%;
+  padding: 1%;
+  overflow: scroll;
+}
+.table-img {
+  width: 35px;
+  white-space: nowrap;
+}

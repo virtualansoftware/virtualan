@@ -27,9 +27,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class IndexController {
 
-    @GetMapping("/virtualan-ui")
-    public String getVirtualServicePage() {
-        return "redirect:virtualan-ui.html";
-    }
+//    @GetMapping("/virtualan-ui")
+//    public String getVirtualServicePage() {
+//        return "redirect:virtualan-ui.html";
+//    }
 
 }

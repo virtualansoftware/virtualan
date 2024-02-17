@@ -18,3 +18,13 @@ target/
 /samples/virtualan-wsdl-soap/src/main/java/com/sforce/
 /samples/virtualan-wsdl-soap/src/main/java/io/virtualan/types/helloworld/
 /samples/virtualan-wsdl-soap/src/main/java/io/virtualan/services/helloworld/
+
+# React
+node_modules/
+coverage/
+build/
+dist
+dist-ssr
+*.local
+*.log
+*.env
