@@ -206,7 +206,7 @@
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
       <scope>provided</scope>
-      <version>1.18.22</version>
+      <version>1.18.30</version>
     </dependency>
     <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
