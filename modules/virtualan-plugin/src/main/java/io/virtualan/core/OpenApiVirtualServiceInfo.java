@@ -176,6 +176,11 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
     }
 
     @Override
+    public Map<String, Class> findVirtualServices() {
+        return null;
+    }
+
+    @Override
     public Map<String, VirtualServiceApiResponse> buildResponseType(Method method) {
         return  buildOpenAPIResponseType(method);
     }

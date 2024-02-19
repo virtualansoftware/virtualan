@@ -91,6 +91,11 @@ public class NonRestVirtualServiceInfo implements VirtualServiceInfo {
         log.info("not used");
     }
 
+    @Override
+    public Map<String, Class> findVirtualServices() {
+        return null;
+    }
+
 
     public static Predicate<VirtualServiceKeyValue> isParam(String key) {
         return value -> value.getKey().equalsIgnoreCase(key);

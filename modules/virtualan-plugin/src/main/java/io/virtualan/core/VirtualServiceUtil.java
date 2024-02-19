@@ -56,14 +56,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -73,6 +77,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This class is base utility service class to perform all virtual service operations
@@ -155,12 +160,26 @@ public class VirtualServiceUtil {
         }
 
     }
+    @Autowired
+    private ApplicationContext applicationContext;
 
+    private  Map<String, Object>  getAllBeans()  {
+        return applicationContext.getBeansWithAnnotation(
+            io.virtualan.annotation.VirtualService.class);
+    }
+
+    public VirtualServiceType findApiType() throws Exception {
+        if(getAllBeans().size() > 0){
+            return VirtualServiceType.SPRING;
+        }
+        throw new Exception(
+            "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
+
+    }
     @PostConstruct
     @Order(1)
-    public void init() throws ClassNotFoundException, JsonProcessingException,
-        InstantiationException, IllegalAccessException {
-        setVirtualServiceType(ApiType.findApiType());
+    public void init() throws Exception {
+        setVirtualServiceType(findApiType());
         if (getVirtualServiceType() != null) {
             virtualServiceInfo = getVirtualServiceInfo();
             virtualServiceInfo.loadVirtualServices(scriptEnabled);
