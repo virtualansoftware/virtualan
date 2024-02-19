@@ -159,7 +159,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>5.3.29</version>
+      <version>5.3.31</version>
     </dependency>
 
     <dependency>
@@ -180,7 +180,7 @@
     <dependency>
       <artifactId>spring-context</artifactId>
       <groupId>org.springframework</groupId>
-      <version>5.3.29</version>
+      <version>5.3.31</version>
     </dependency>
 
     <dependency>
@@ -206,7 +206,7 @@
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
       <scope>provided</scope>
-      <version>1.18.22</version>
+      <version>1.18.30</version>
     </dependency>
     <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -217,7 +217,7 @@
     <dependency>
       <groupId>io.virtualan</groupId>
       <artifactId>cucumblan-api</artifactId>
-      <version>1.4.1</version>
+      <version>1.5.1</version>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
