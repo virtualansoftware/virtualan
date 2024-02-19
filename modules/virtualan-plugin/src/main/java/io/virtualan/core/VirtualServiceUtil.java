@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.virtualan.api.ApiType;
 import io.virtualan.api.VirtualServiceType;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.MockRequest;
@@ -56,15 +55,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -77,7 +73,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This class is base utility service class to perform all virtual service operations
@@ -170,6 +165,7 @@ public class VirtualServiceUtil {
 
     public VirtualServiceType findApiType() throws Exception {
         if(getAllBeans().size() > 0){
+            log.info(" Virtualan Api Type would be : " + VirtualServiceType.SPRING);
             return VirtualServiceType.SPRING;
         }
         throw new Exception(

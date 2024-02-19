@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.virtualan.api.ApiType;
 import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
@@ -56,17 +55,6 @@ public class SpringVirtualServiceInfo implements VirtualServiceInfo {
 
   Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice;
 
-  @Autowired
-  private ApiType apiType;
-
-
-  public ApiType getApiType() {
-    return apiType;
-  }
-
-  public void setApiType(ApiType apiType) {
-    this.apiType = apiType;
-  }
 
   @Override
   public ObjectMapper getObjectMapper() {

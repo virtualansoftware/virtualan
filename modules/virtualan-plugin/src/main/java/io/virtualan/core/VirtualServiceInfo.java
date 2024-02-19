@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.virtualan.annotation.ApiVirtual;
 import io.virtualan.api.ApiMethod;
 import io.virtualan.api.ApiResource;
-import io.virtualan.api.ApiType;
 import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceApiResponse;
 import io.virtualan.core.model.VirtualServiceKeyValue;
@@ -56,9 +55,6 @@ public interface VirtualServiceInfo {
     final class LogHolder
     {}
 
-    ApiType getApiType();
-
-    void setApiType(ApiType apiType);
 
     ObjectMapper getObjectMapper();
 
