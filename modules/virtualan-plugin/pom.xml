@@ -2,7 +2,7 @@
   <parent>
     <groupId>io.virtualan</groupId>
     <artifactId>virtualan-project</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -10,7 +10,7 @@
   <artifactId>virtualan-plugin</artifactId>
   <packaging>jar</packaging>
   <name>virtualan-plugin</name>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <description>
     Virtualan is an open source-based Open API Interface driven Service virtualization tool.
     Virtualan - Mock service developed on top of the
