@@ -141,7 +141,7 @@
         </exclusion>
       </exclusions>
       <groupId>org.springframework.boot</groupId>
-      <version>2.7.14</version>
+      <version>3.1.9</version>
     </dependency>
 
     <dependency>
@@ -159,7 +159,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>5.3.31</version>
+      <version>5.3.32</version>
     </dependency>
 
     <dependency>
