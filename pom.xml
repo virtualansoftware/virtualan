@@ -9,13 +9,13 @@
 	<artifactId>virtualan-project</artifactId>
 	<packaging>pom</packaging>
 	<name>virtualan-project</name>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.1.0</version>
 	<url>https://virtualan.io</url>
 	<scm>
 		<connection>scm:git:ssh://git@github.com:virtualansoftware/virtualan.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/virtualansoftware/virtualan.git</developerConnection>
 		<url>https://github.com/virtualansoftware/virtualan.git</url>
-		<tag>v1.3.0</tag>
+		<tag>virtualan-project-3.1.0</tag>
 	</scm>
 	<developers>
 		<developer>
