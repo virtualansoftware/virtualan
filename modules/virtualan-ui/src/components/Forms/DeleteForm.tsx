@@ -40,7 +40,7 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [paramsData, setParamsData] = useState([]);
   const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
-  const [script, setScript] = useState("");
+  const [script, setScript] = useState(null);
   
 
   useEffect(() => {

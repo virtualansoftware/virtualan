@@ -42,9 +42,8 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [mockRequest, setMockRequest] = useState("");
   const [paramsData, setParamsData] = useState([]);
-  const [script, setScript] = useState("");
+  const [script, setScript] = useState(null);
 
-  const scriptRef = useRef(null);
   const excludeListRef = useRef(null);
 
   useEffect(() => {
@@ -155,7 +154,7 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
       contentType: contentType,
       method: "PATCH",
       rule:  
-      scriptRef != null && scriptRef.current ? scriptRef.current.value : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
+      script != null  ? script : (paramsData != null && paramsData.length > 0)? JSON.stringify(paramsData) : undefined,
       input:  mockRequest,
       output: mockResponse,
       availableParams: Object.entries(queryParams).map(([key, value]) => ({

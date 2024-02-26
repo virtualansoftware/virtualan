@@ -39,7 +39,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
   const [mockRequest, setMockRequest] = useState("");
   const [paramsData, setParamsData] = useState([]);
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
-  const [script, setScript] = useState("");
+  const [script, setScript] = useState(null);
 
 
   const excludeListRef = useRef(null);

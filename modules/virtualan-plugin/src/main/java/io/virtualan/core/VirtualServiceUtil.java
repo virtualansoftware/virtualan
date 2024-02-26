@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.virtualan.api.ApiType;
 import io.virtualan.api.VirtualServiceType;
 import io.virtualan.core.model.ContentType;
 import io.virtualan.core.model.MockRequest;
@@ -64,6 +63,7 @@ import javax.xml.bind.JAXBException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -155,12 +155,27 @@ public class VirtualServiceUtil {
         }
 
     }
+    @Autowired
+    private ApplicationContext applicationContext;
 
+    private  Map<String, Object>  getAllBeans()  {
+        return applicationContext.getBeansWithAnnotation(
+            io.virtualan.annotation.VirtualService.class);
+    }
+
+    public VirtualServiceType findApiType() throws Exception {
+        if(getAllBeans().size() > 0){
+            log.info(" Virtualan Api Type would be : " + VirtualServiceType.SPRING);
+            return VirtualServiceType.SPRING;
+        }
+        throw new Exception(
+            "Unable to find Api Type: Service would not meet the Virtualan required criteria!!! ");
+
+    }
     @PostConstruct
     @Order(1)
-    public void init() throws ClassNotFoundException, JsonProcessingException,
-        InstantiationException, IllegalAccessException {
-        setVirtualServiceType(ApiType.findApiType());
+    public void init() throws Exception {
+        setVirtualServiceType(findApiType());
         if (getVirtualServiceType() != null) {
             virtualServiceInfo = getVirtualServiceInfo();
             virtualServiceInfo.loadVirtualServices(scriptEnabled);

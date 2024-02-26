@@ -45,7 +45,7 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
   const [flashErrorMessage, setFlashErrorMessage] = useState("");
   const [mockRequest, setMockRequest] = useState("");
   const [paramTypes, setParamTypes] = useState<{ [key: string]: string }>({});
-  const [script, setScript] = useState("");
+  const [script, setScript] = useState(null);
 
   const excludeListRef = useRef(null);
 

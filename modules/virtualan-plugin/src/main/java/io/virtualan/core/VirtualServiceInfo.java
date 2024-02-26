@@ -14,42 +14,30 @@
 
 package io.virtualan.core;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.virtualan.api.VirtualServiceType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.RegexPatternTypeFilter;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.virtualan.annotation.ApiVirtual;
-import io.virtualan.annotation.VirtualService;
 import io.virtualan.api.ApiMethod;
 import io.virtualan.api.ApiResource;
-import io.virtualan.api.ApiType;
 import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceApiResponse;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
-import org.springframework.util.ClassUtils;
 
 
 /**
@@ -67,9 +55,6 @@ public interface VirtualServiceInfo {
     final class LogHolder
     {}
 
-    ApiType getApiType();
-
-    void setApiType(ApiType apiType);
 
     ObjectMapper getObjectMapper();
 
@@ -95,38 +80,7 @@ public interface VirtualServiceInfo {
         }
         return null;
     }
-
-    default Map<String, Class> findVirtualServices() {
-        Map<String, Class> virtualInterfaces = new HashMap<>();
-        try {
-            ClassPath classPath = ClassPath.from(ApiType.class.getClassLoader());
-            Set<ClassInfo> classes = classPath.getAllClasses();
-            for (ClassInfo clazzz : classes) {
-                try {
-                    loadClasses(virtualInterfaces, clazzz.load());
-                } catch (Throwable e) {
-                }
-            }
-        }catch (IOException e){
-
-        }
-        return virtualInterfaces;
-    }
-
-    default void loadClasses(Map<String, Class> virtualInterfaces, Class classzz) {
-        try {
-            if (classzz.isAnnotationPresent(VirtualService.class)) {
-                String interfaceName = classzz.getTypeName();
-                interfaceName = interfaceName.substring(interfaceName.lastIndexOf('.') + 1
-                );
-                interfaceName = interfaceName.toLowerCase();
-                virtualInterfaces.put(interfaceName, classzz);
-            }
-        } catch (ArrayStoreException e) {
-            // ignore it
-        }
-    }
-
+    abstract Map<String, Class> findVirtualServices();
 
     default Map<String, Map<String, VirtualServiceRequest>> loadVirtualServices(boolean scriptEnabled)
         throws ClassNotFoundException, JsonProcessingException, InstantiationException,

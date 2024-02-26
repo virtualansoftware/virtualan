@@ -14,7 +14,6 @@
 package io.virtualan.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.virtualan.api.ApiType;
 import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceKeyValue;
 import io.virtualan.core.model.VirtualServiceRequest;
@@ -40,21 +39,10 @@ public class NonRestVirtualServiceInfo implements VirtualServiceInfo {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private ApiType apiType;
 
     ResourceMapper resourceParent;
 
     Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice;
-
-    public ApiType getApiType() {
-        return apiType;
-    }
-
-    public void setApiType(ApiType apiType) {
-        this.apiType = apiType;
-    }
-
 
     @Override
     public ObjectMapper getObjectMapper() {
@@ -89,6 +77,11 @@ public class NonRestVirtualServiceInfo implements VirtualServiceInfo {
     @Override
     public void buildInput(Method method, VirtualServiceRequest mockLoadRequest) {
         log.info("not used");
+    }
+
+    @Override
+    public Map<String, Class> findVirtualServices() {
+        return null;
     }
 
 

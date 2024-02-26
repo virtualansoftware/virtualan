@@ -15,7 +15,6 @@ package io.virtualan.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.virtualan.api.ApiType;
 import io.virtualan.core.model.ResourceMapper;
 import io.virtualan.core.model.VirtualServiceApiResponse;
 import io.virtualan.core.model.VirtualServiceKeyValue;
@@ -55,17 +54,7 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
 
     Map<String, Map<String, VirtualServiceRequest>> mockLoadChoice;
 
-    @Autowired
-    private ApiType apiType;
 
-
-    public ApiType getApiType() {
-        return apiType;
-    }
-
-    public void setApiType(ApiType apiType) {
-        this.apiType = apiType;
-    }
 
     @Override
     public ObjectMapper getObjectMapper() {
@@ -173,6 +162,11 @@ public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
             }
         }
         mockLoadRequest.setAvailableParams(availableParams);
+    }
+
+    @Override
+    public Map<String, Class> findVirtualServices() {
+        return null;
     }
 
     @Override
