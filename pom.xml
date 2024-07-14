@@ -67,8 +67,8 @@
 		</profile>
 	</profiles>
 	<modules>
-		<module>modules/virtualan-plugin</module>
-<!--		<module>modules/virtualization</module>-->
+<!--		<module>modules/virtualan-plugin</module>-->
+			<module>modules/virtualization</module>
 	</modules>
 	<build>
 		<plugins>
