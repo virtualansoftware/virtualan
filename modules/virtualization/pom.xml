@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>io.virtualan</groupId>
 		<artifactId>virtualan-project</artifactId>
-		<version>2.5.5-SNAPSHOT</version>
+		<version>3.1.1-SNAPSHOT</version>
 		<relativePath>../..</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -16,7 +16,7 @@
 		Supports Open API(Rest), MQTT, Kafka, AMQ and Soap.
 	</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
@@ -40,7 +40,6 @@
 		<spring-kafka.version>3.1.0</spring-kafka.version>
 		<kafka-clients-version>2.8.1</kafka-clients-version>
 		<spring-integration-kafka.version>5.5.6</spring-integration-kafka.version>
-		<spring.boot.mq.version>2.7.14</spring.boot.mq.version>
 
 	</properties>
 	<developers>
@@ -93,6 +92,45 @@
 							<outputFileName>swagger-ui.tar.gz</outputFileName>
 							<unpack>true</unpack>
 							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.14.2</version>
+				<configuration>
+					<workingDirectory>../virtualan-ui</workingDirectory>
+					<installDirectory>target</installDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<configuration>
+							<nodeVersion>v21.1.0</nodeVersion>
+							<npmVersion>10.2.0</npmVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm run build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run build</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -241,8 +279,16 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5.13</version>
 		</dependency>
-
-
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+			<version>3.2.0-M2</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -269,7 +315,7 @@
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-mqtt</artifactId>
-			<version>5.5.12</version>
+			<version>6.2.3</version>
 		</dependency>
 
 		<dependency>
@@ -291,7 +337,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>5.3.18</version>
+			<version>6.1.6</version>
 		</dependency>
 
 		<dependency>
@@ -337,7 +383,7 @@
 		<dependency>
 			<groupId>com.ibm.mq</groupId>
 			<artifactId>mq-jms-spring-boot-starter</artifactId>
-			<version>${spring.boot.mq.version}</version>
+			<version>3.2.3</version>
 		</dependency>
 
 		<dependency>
@@ -466,7 +512,11 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>${commons-lang3.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>3.2.4</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
