@@ -188,7 +188,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.6.13</version>
+			<version>3.0.0</version>
 		</dependency>
 
 
@@ -232,7 +232,7 @@
 		<dependency>
 			<artifactId>spring-context</artifactId>
 			<groupId>org.springframework</groupId>
-			<version>5.3.20</version>
+			<version>5.3.39</version>
 		</dependency>
 
 
