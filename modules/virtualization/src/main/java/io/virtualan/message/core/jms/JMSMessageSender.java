@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
@@ -41,12 +39,7 @@ public class JMSMessageSender {
     log.info(JMSTemplateLookup.getJmsTemplateMap().toString());
     log.info("sending:{} " , message);
 
-    JMSTemplateLookup.getJmsTemplate(inboundTopic).send(outboudTopic, new MessageCreator() {
-      @Override
-      public Message createMessage(Session session) throws JMSException {
-        return session.createTextMessage(message);
-      }
-    });
+    JMSTemplateLookup.getJmsTemplate(inboundTopic).send(outboudTopic, session -> session.createTextMessage(message));
   }
 
   @Autowired

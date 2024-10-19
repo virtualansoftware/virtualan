@@ -16,6 +16,7 @@ package io.virtualan.dao;
 
 import java.util.Calendar;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -29,7 +30,7 @@ import io.virtualan.entity.VirtualServiceEntity;
  * 
  **/
 @Repository
-public interface VirtualServiceRepository extends PagingAndSortingRepository<VirtualServiceEntity, Long> {
+public interface VirtualServiceRepository extends JpaRepository<VirtualServiceEntity, Long> {
 
     Iterable<VirtualServiceEntity> findByResourceAndOperationId(String resource, String operationId);
     Iterable<VirtualServiceEntity>  findByLastUsedDateTimeBefore(Calendar lastUsedDateTime);

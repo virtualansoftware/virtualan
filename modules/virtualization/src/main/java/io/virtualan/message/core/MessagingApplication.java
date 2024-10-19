@@ -14,7 +14,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
+
+import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.ListTopicsResult;
@@ -37,11 +38,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
+import org.springframework.integration.core.GenericTransformer;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.kafka.dsl.Kafka;
 import org.springframework.integration.kafka.inbound.KafkaMessageDrivenChannelAdapter;
-import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -54,7 +54,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
-@ConditionalOnClass(IntegrationFlows.class)
+@ConditionalOnClass(IntegrationFlow.class)
 @EnableIntegration
 @EnableKafka
 @ConditionalOnResource(resources = {"classpath:conf/kafka.json"})
@@ -234,7 +234,7 @@ public class MessagingApplication {
 
   @Bean("listenerFromKafkaFlow")
   public IntegrationFlow listenerFromKafkaFlow() {
-    return IntegrationFlows
+    return IntegrationFlow
         .from(Kafka.messageDrivenChannelAdapter(consumerFactory(),
             KafkaMessageDrivenChannelAdapter.ListenerMode.record,
             topics.toArray(new String[topics.size()]))
@@ -316,8 +316,8 @@ public class MessagingApplication {
         Message<String> message = MessageBuilder
             .withPayload(messageObject.getOutputMessage())
             .setHeader(KafkaHeaders.TOPIC, messageObject.getOutboundTopic())
-            .setHeader(KafkaHeaders.MESSAGE_KEY, messageObject.getMessageKey())
-            .setHeader(KafkaHeaders.PARTITION_ID, 0)
+            .setHeader(KafkaHeaders.KEY, messageObject.getMessageKey())
+            .setHeader(KafkaHeaders.PARTITION, 0)
             .setHeader("X-Virtualan-Header", "Mock-Service-Response")
             .build();
         kafkaTemplate().send(message);

@@ -76,7 +76,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 	Locale locale = LocaleContextHolder.getLocale();
 
 	
-	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		logger.info(ex.getClass().getName());
@@ -89,7 +88,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 	}
 
 	
-	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
 			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());
@@ -109,7 +107,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
 	}
 
-	@Override
 	protected ResponseEntity<Object> handleBindException(final BindException ex, final HttpHeaders headers,
 			final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());
@@ -126,7 +123,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
 	}
 
-	@Override
 	protected ResponseEntity<Object> handleTypeMismatch(final TypeMismatchException ex, final HttpHeaders headers,
 			final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());
@@ -139,7 +135,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
-	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestPart(final MissingServletRequestPartException ex,
 			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());
@@ -150,7 +145,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
 	}
 
-	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(
 			final MissingServletRequestParameterException ex, final HttpHeaders headers, final HttpStatus status,
 			final WebRequest request) {
@@ -193,7 +187,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	// 404
 
-	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(final NoHandlerFoundException ex,
 			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());
@@ -207,7 +200,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	// 405
 
-	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
 			final HttpRequestMethodNotSupportedException ex, final HttpHeaders headers, final HttpStatus status,
 			final WebRequest request) {
@@ -226,7 +218,6 @@ public class SpringResponseEntityExceptionHandler extends ResponseEntityExceptio
 
 	// 415
 
-	@Override
 	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(final HttpMediaTypeNotSupportedException ex,
 			final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
 		logger.info(ex.getClass().getName());

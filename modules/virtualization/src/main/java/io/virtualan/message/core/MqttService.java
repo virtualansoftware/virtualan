@@ -11,7 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
+
+import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
@@ -25,12 +26,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.core.GenericTransformer;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
-import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
@@ -268,7 +269,7 @@ public class MqttService {
    */
   @Bean
   public IntegrationFlow mqttInbound() {
-    return IntegrationFlows.from(mqttPahoMessageDrivenChannelAdapter())
+    return IntegrationFlow.from(mqttPahoMessageDrivenChannelAdapter())
         .<Message<?>>channel(sentToTransformer())
         .<Message<?>, MessageObject>transform(transformer())
         .<MessageObject>handle(getResponseMessage())

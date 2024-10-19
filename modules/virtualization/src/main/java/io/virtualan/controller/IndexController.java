@@ -16,12 +16,13 @@ package io.virtualan.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * This is entry point to the virtualan User interface. to set up the Mock data for the selected APIs.
- * 
+ *
  * @author  Elan Thangamani
- * 
+ *
  **/
 @Controller
 public class IndexController {

@@ -1,6 +1,6 @@
 package io.virtualan.autoconfig;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;

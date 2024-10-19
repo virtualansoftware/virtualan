@@ -14,8 +14,9 @@
 
 package io.virtualan.entity;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
 /**

@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+
+import jakarta.annotation.PostConstruct;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +27,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import io.virtualan.service.VirtualService;
 
-import javax.annotation.PostConstruct;
+
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;

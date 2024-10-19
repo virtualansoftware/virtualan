@@ -1,9 +1,9 @@
 package io.virtualan.message.core.jms;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
 
 interface VirtualanJMSConnectionFactory  {
-  ConnectionFactory connectionFactory(JMSConfigurationDomain conf) throws JMSException;
+  ConnectionFactory connectionFactory(JMSConfigurationDomain conf) throws JMSException, jakarta.jms.JMSException;
   String getJMSType();
 }
