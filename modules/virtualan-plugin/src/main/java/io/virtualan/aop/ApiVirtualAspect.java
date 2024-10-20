@@ -55,7 +55,6 @@ import java.util.Map;
  */
 @Aspect
 @Component
-@Slf4j
 public class ApiVirtualAspect {
 
     @Autowired

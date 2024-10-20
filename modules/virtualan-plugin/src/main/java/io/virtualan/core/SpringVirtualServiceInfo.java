@@ -45,7 +45,6 @@ import io.virtualan.requestbody.RequestBodyTypes;
  * @author Elan Thangamani
  */
 @Service("springVirtualServiceInfo")
-@Slf4j
 public class SpringVirtualServiceInfo implements VirtualServiceInfo {
 
   @Autowired

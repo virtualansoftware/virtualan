@@ -44,7 +44,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  **/
 @Service("xmlConverter")
-@Slf4j
 public class XMLConverter {
 
     @Autowired

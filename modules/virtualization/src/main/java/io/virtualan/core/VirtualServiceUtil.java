@@ -36,6 +36,7 @@ import io.virtualan.core.soap.SoapFaultException;
 import io.virtualan.core.util.*;
 import io.virtualan.core.util.rule.ScriptExecutor;
 import io.virtualan.custom.message.ResponseException;
+import io.virtualan.dao.VirtualServiceDbConfig;
 import io.virtualan.message.core.MessageUtil;
 import io.virtualan.requestbody.RequestBody;
 import io.virtualan.requestbody.RequestBodyTypes;
@@ -66,6 +67,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -87,9 +90,9 @@ import org.springframework.stereotype.Service;
  */
 
 @Service("virtualServiceUtil")
-@Slf4j
 public class VirtualServiceUtil {
 
+  private static final Logger log = LoggerFactory.getLogger(VirtualServiceUtil.class);
 
   private final Locale locale = LocaleContextHolder.getLocale();
   @Autowired

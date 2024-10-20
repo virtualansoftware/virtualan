@@ -44,7 +44,6 @@ import java.util.Map.Entry;
  */
 
 @Service("openApiVirtualServiceInfo")
-@Slf4j
 public class OpenApiVirtualServiceInfo implements VirtualServiceInfo {
 
     @Autowired

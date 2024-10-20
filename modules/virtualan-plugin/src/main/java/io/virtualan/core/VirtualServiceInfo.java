@@ -51,7 +51,7 @@ import io.virtualan.core.model.VirtualServiceRequest;
 
 public interface VirtualServiceInfo {
 
-    @Slf4j
+    //@Slf4j
     final class LogHolder
     {}
 

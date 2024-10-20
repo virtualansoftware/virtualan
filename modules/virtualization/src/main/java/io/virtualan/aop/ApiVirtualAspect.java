@@ -26,9 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
@@ -37,11 +35,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import javax.xml.bind.JAXBException;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,10 +70,10 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
  */
 @Aspect
 @Component
-@Slf4j
 public class ApiVirtualAspect {
+    private static final Logger log = LoggerFactory.getLogger(ApiVirtualAspect.class);
 
-    @Autowired
+    @Autowired(required=true)
     HttpServletRequest request;
     @Autowired
     private ObjectMapper objectMapper;

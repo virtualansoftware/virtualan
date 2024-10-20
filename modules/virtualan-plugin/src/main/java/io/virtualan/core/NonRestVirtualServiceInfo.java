@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
  */
 
 @Service("nonRestVirtualServiceInfo")
-@Slf4j
 public class NonRestVirtualServiceInfo implements VirtualServiceInfo {
 
     @Autowired
