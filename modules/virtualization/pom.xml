@@ -132,6 +132,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -185,6 +186,23 @@
 										<include>dist/**</include>
 										<include>index.html</include>
 									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/classes/META-INF/resources/static</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../virtualan-ui/dist</directory>
+									<filtering>true</filtering>
 								</resource>
 							</resources>
 						</configuration>
