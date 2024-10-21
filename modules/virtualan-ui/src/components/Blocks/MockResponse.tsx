@@ -14,7 +14,7 @@ const MockResponse = ({ resetKey, formId, onMockResponseChange }: Props) => {
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     setMockResponse(e.target.value);
-    onMockResponseChange(e.target.value);
+    onMockResponseChange(e.target.value); 
   };
 
   useEffect(() => {

@@ -116,14 +116,20 @@ const Content = ({ data }: Props) => {
 const ModalContent = ({ data }: Props) => {
   const [item, setItem] = useState("");
 
+  if (!data) {
+    return <p>No data available...</p>;
+  }
+
   const handleItemClick = (item: string) => {
     setItem(item);
   };
 
   const modalmenu = NavBarModal(Object.keys(data), handleItemClick);
+  
   return (
     <>
       {modalmenu}
+
       {item && <Content data={data[item]} />}
     </>
   );

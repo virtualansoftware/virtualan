@@ -41,7 +41,6 @@ const ModalApp = ({ refreshKey, title, onClose, show }: Props) => {
         </Modal.Header>
         <Modal.Body className="modal-body-custom">
           <ModalContentLoad mainModalClose={onClose} />
-
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>

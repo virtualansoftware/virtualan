@@ -241,13 +241,13 @@ const DeleteForm = ({ operationId, resource, path, availableParams, apiEntryPoin
                 resetKey={resetKey}
               />
               {/*  */} 
-                <HeaderParams
+                {/* <HeaderParams
                 availableParams={availableParams}
                 queryParams={queryParams}
                 setQueryParams={setQueryParams}
                 handleAddQueryParams={handleAddQueryParams}
 
-              />
+              /> */}
               {/*  */}
               <AdditionalParams
                 reqParams={reqParams}

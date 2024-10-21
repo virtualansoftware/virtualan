@@ -234,7 +234,7 @@ const GetForm = ({
       </div>
 
       <Collapse in={showForm}>
-        <div style={contentStyle}>
+        <div style={contentStyle}> 
           <Form onSubmit={handleSubmit}>
             <Stack gap={3}>
               <Selects
@@ -242,12 +242,12 @@ const GetForm = ({
                 resetKey={resetKey}
               />
               {/*  */}
-              <HeaderParams
+              {/* <HeaderParams
                 availableParams={availableParams}
                 queryParams={queryParams}
                 setQueryParams={setQueryParams}
                 handleAddQueryParams={handleAddQueryParams}
-              />
+              /> */}
               {/*  */}
               <AdditionalParams
                 reqParams={reqParams}

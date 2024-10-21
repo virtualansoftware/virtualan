@@ -261,12 +261,12 @@ const PatchForm = ({ operationId, resource, path, availableParams, apiEntryPoint
                 resetKey={resetKey}
               />
               {/*  */}
-              <HeaderParams
+              {/* <HeaderParams
                availableParams={availableParams}
                queryParams={queryParams}
                setQueryParams={setQueryParams}
                handleAddQueryParams={handleAddQueryParams}
-              />
+              /> */}
               {/*  */}
               <AdditionalParams
                 reqParams={reqParams}

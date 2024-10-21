@@ -105,7 +105,6 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
     );    
   }
 
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const dataToSubmit = {
@@ -124,7 +123,7 @@ const PostForm = ({ operationId, resource, path, availableParams, apiEntryPointP
       resource: resource,
       excludeList: excludeListRef.current.value
     };
-
+    
     try {
       createMockRequest(apiEntryPointPost, dataToSubmit);
     } catch (error) {

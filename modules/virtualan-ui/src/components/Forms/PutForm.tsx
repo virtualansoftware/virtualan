@@ -260,12 +260,12 @@ const PutForm = ({  operationId, resource, path, availableParams, apiEntryPointP
                 resetKey={resetKey}
               />
               {/*  */}
-             <HeaderParams
+             {/* <HeaderParams
                 availableParams={availableParams}
                 queryParams={queryParams}
                 setQueryParams={setQueryParams}
                 handleAddQueryParams={handleAddQueryParams}
-              />
+              /> */}
               {/*  */}
               <AdditionalParams
                 reqParams={reqParams}

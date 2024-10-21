@@ -3,33 +3,30 @@ import ModalAppAdd from "./ModalAdd";
 import ModalAppLoad from "./ModalLoad";
 import ModalAppCatalog from "./ModalCatalog";
 import ModalAppJSON from "./ModalJsonFormatter";
-
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
-import { API_GET_CATALOGS,API_GET_ENDPOINT_ADD, VERSION } from "../constants";
+import { API_GET_CATALOGS, API_GET_ENDPOINT_ADD, API_TOPICS, VERSION } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
 import axios from "axios";
-
-
+import ModalAppKafka from "./ModalKafka";
 
 const NavBar = () => {
   const [showModalAdd, setShowModalAdd] = useState(false);
   const [showModalLoad, setShowModalLoad] = useState(false);
+  const [showModalAddKafka, setShowModalAddKafka] = useState(false);
   const [showModalCatalog, setShowModalCatalog] = useState(false);
   const [showModalJson, setShowModalJson] = useState(false);
   const [catalogItems, setCatalogItems] = useState([]);
 
-
   const apiLoad =  apiRequestsGet(API_GET_ENDPOINT_ADD);
-
+  const loadTopic =  apiRequestsGet(API_TOPICS);
 
   const [contentSrc, setContentSrc] = useState(
     <h2 style={{ textAlign: "center" }}>Welcome to Virtualan!!!</h2>
   );
   const [showContent, setShowContent] = useState(true);
-
   const [modalTitle, setModalTitle] = useState("");
 
   const loadData = async () => {
@@ -63,8 +60,10 @@ const NavBar = () => {
     );
     setShowModalAdd(false);
     setShowModalLoad(false);
+    setShowModalAddKafka(false);
     setShowModalCatalog(false);
     setShowModalJson(false);
+
     if (modal === "Modal1") {
       // Add
       setShowModalAdd(true);
@@ -79,6 +78,9 @@ const NavBar = () => {
     } else if (modal === "Modal4") {
       // JSON Formatter
       setShowModalJson(true);
+    } else if (modal === "Modal5") {
+      // Kafka
+      setShowModalAddKafka(true);
     } else if (modal === "help") {
       // Help
       setContentSrc(
@@ -111,6 +113,16 @@ const NavBar = () => {
     "Virtual Service": {
       "Add Mock Data": {
         modal: "Modal1",
+        icon: <FontAwesomeIcon icon={faPlus} />,
+      },
+      "Load Mock Data": {
+        modal: "Modal2",
+        icon: <FontAwesomeIcon icon={faList} />,
+      },
+    },
+    "Virtual Message": {
+      "Add Mock Data": {
+        modal: "Modal5",
         icon: <FontAwesomeIcon icon={faPlus} />,
       },
       "Load Mock Data": {
@@ -224,6 +236,14 @@ const NavBar = () => {
           onClose={() => setShowModalLoad(false)}
           show={showModalLoad}
           refreshKey={refreshKey}
+        />
+      )}
+      {showModalAddKafka && (
+        <ModalAppKafka
+          title={modalTitle}
+          onClose={() => setShowModalAddKafka(false)}
+          show={showModalAddKafka}
+          dataApi={loadTopic}
         />
       )}
       {showModalCatalog && (

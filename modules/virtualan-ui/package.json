@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "proxy": "http://localhost:5173",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -16,6 +17,7 @@
     "@uiw/react-textarea-code-editor": "^3.0.2",
     "axios": "^1.5.1",
     "bootstrap": "^5.2.3",
+    "cors": "^2.8.5",
     "js-yaml": "^4.1.0",
     "json-beautify": "^1.1.1",
     "react": "^18.2.0",

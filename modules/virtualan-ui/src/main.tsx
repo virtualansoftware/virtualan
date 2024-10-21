@@ -11,7 +11,6 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // const [contentSrc, setContentSrc] = useState("");
 // const [showContent, setShowContent] = useState(false);
 
-
 const router = createBrowserRouter([
   {
     path: "/virtualan-ui",

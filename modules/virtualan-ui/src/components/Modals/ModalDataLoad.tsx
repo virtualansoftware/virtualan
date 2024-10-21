@@ -69,9 +69,7 @@ const ModalContentLoad = ({ mainModalClose }: Props) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleItemsPerPageChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(Number(event.target.value));
   };
 

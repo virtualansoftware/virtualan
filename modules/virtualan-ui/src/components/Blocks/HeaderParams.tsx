@@ -2,14 +2,14 @@ import React, { useRef } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 
 interface Props {
-  availableParams: string[];
+  consumer: string[];
   queryParams: any;
   setQueryParams: Function;
   handleAddQueryParams: Function
 }
 
 const HeaderParams = ({
-  availableParams,
+  consumer,
   queryParams,
   setQueryParams,
   handleAddQueryParams
@@ -23,7 +23,7 @@ const HeaderParams = ({
           </Form.Label>
         </Col>
         <Col xs={7}>
-          {availableParams.map((param: any, index: any) => (
+          {consumer.map((param: any, index: any) => (
             <Row key={param["key"]} className="d-flex" style={{ padding: 0 }}>
               <Col xs={4}>
                 <Form.Label
