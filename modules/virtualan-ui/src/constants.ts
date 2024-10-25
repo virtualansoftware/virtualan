@@ -13,3 +13,4 @@ export const API_GET_CATALOGS = ENV_URL + "/api-catalogs";
 export const VERSION = "v3.0.0";
 export const API_TOPICS = ENV_URL + "/virtualservices/load-topics";
 export const API_MESSAGE = ENV_URL + "/virtualservices/message";
+export const API_MQTT = ENV_URL + "/virtualservices";
