@@ -1,6 +1,6 @@
 import Modal from "react-bootstrap/Modal";
 import logoVirtualan from "../assets/images/logo_image.png";
-import ModalMQTTContent from "./Modals/ModalMQTTContent";
+import ModalMQTTContent from "./Modals/ModalSOAPContent";
 
 interface Props {
   title: string;

@@ -25,7 +25,7 @@ const ModalApp = ({ title, onClose, show, dataApi }: Props) => {
 
         </Modal.Header>
         <Modal.Body>
-          <ModalMessageContent data={dataApi} topics={[]} broker={[]}/>
+          <ModalMessageContent data={dataApi}/>
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>

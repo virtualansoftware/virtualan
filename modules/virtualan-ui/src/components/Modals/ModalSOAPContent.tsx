@@ -4,7 +4,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import "../../assets/css/styles.css";
 import { API_MESSAGE } from "../../constants";
-import PostMQTTForm from "../Forms/PostMQTTForm";
+import PostMQTTForm from "../Forms/PostSOAPForm";
 
 const NavBarModal = (items: string[], onItemClick: (item: string) => void) => {
   const [selectedItem, setSelectedItem] = useState("");

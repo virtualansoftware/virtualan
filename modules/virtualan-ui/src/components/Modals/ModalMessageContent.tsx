@@ -7,7 +7,8 @@ import { API_MESSAGE } from "../../constants";
 import GetMessageForm from "../Forms/GetMessageForm";
 import PostMessageForm from "../Forms/PostMessageForm";
 
-const NavBarModal = (items: string[], onItemClick: (item: string) => void) => {
+// Navbar Component
+const NavBarModal = ({ items, onItemClick }: { items: any[], onItemClick: (item: any) => void }) => {
   const [selectedItem, setSelectedItem] = useState("");
 
   const handleSelectItem = (item: string) => {
@@ -21,15 +22,15 @@ const NavBarModal = (items: string[], onItemClick: (item: string) => void) => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto" style={{ display: "flex" }}>
-            {items.map((item:any) => (
+            {items.map((item) => (
               <Nav.Link
                 href="#features"
-                key={item}
+                key={item.broker}
                 style={{ margin: "0 10px" }}
-                className={selectedItem === item ? "modal-navbar-selected" : ""}
-                onClick={() => handleSelectItem(item)}
+                className={selectedItem === item.broker ? "modal-navbar-selected" : ""}
+                onClick={() => handleSelectItem(item.broker)}
               >
-                {item["broker"].toUpperCase()}
+                {item.broker.toUpperCase()}
               </Nav.Link>
             ))}
           </Nav>
@@ -39,18 +40,12 @@ const NavBarModal = (items: string[], onItemClick: (item: string) => void) => {
   );
 };
 
-interface Props {
-  data: any;
-  topics: any; 
-  broker: any;
-}
-
-const Content = ({ topics, broker }: Props) => {
-
+// Content Component
+const Content = ({ topics, broker }: { topics: any; broker: any }) => {
   let form: any[] = [];
 
-  Object.keys(topics).map((item, index) => {
-    if (index % 2 == 1) {
+  Object.keys(topics).forEach((item, index) => {
+    if (index % 2 === 1) {
       form.push(
         <GetMessageForm 
           key={item}
@@ -59,7 +54,7 @@ const Content = ({ topics, broker }: Props) => {
           apiEntryPointPost={API_MESSAGE}
         />
       );
-    } else if (index % 2 == 0) {
+    } else {
       form.push(
         <PostMessageForm
           key={item}
@@ -68,35 +63,34 @@ const Content = ({ topics, broker }: Props) => {
           apiEntryPointPost={API_MESSAGE}          
         />
       );
-    } else {
-      form.push(<p key={index}>Method not found</p>);
     }
   });
 
   return <>{form}</>;
 };
 
-const ModalMessageContent = ({ data }: Props) => {
-  const [item, setItem] = useState("");
+// Main Component
+const ModalMessageContent = ({ data }: { data: any }) => {
+  const [selectedBroker, setSelectedBroker] = useState("");
+  const [selectedTopics, setSelectedTopics] = useState<any>({});
 
   if (!data || data.length === 0) {
     return <p>No data available...</p>;
   }
 
-  const handleItemClick = (item: any) => {
-    setItem(item["broker"]);
+  const handleItemClick = (broker: string) => {
+    setSelectedBroker(broker);
+    const selectedData = data.find((item:any) => item.broker === broker);
+    setSelectedTopics(selectedData ? selectedData.topics : {});
   };
 
-  const modalmenu = NavBarModal((data), handleItemClick);
-  
-  const selectedData = data[0]["topics"];
-  const broker = data[0]["broker"];
+  const modalMenu = <NavBarModal items={data} onItemClick={handleItemClick} />;
 
   return (
     <>
-      {modalmenu}
+      {modalMenu}
 
-      {item && <Content data={data} topics={selectedData} broker={broker}/>}
+      {selectedBroker && <Content topics={selectedTopics} broker={selectedBroker} />}
     </>
   );
 };

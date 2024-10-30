@@ -5,13 +5,13 @@ import ModalAppCatalog from "./ModalCatalog";
 import ModalAppJSON from "./ModalJsonFormatter";
 import logoVirtualan from "../assets/images/logo_image.png";
 import { apiRequestsGet } from "../api/apiRequests";
-import { API_GET_CATALOGS, API_GET_ENDPOINT_ADD, API_MQTT, API_TOPICS, VERSION } from "../constants";
+import { API_GET_CATALOGS, API_GET_ENDPOINT_ADD, API_SOAP_MESSAGE, API_TOPICS, VERSION } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faList } from "@fortawesome/free-solid-svg-icons";
 import Content from "./Content";
 import axios from "axios";
 import ModalAppKafka from "./ModalKafka";
-import ModalAppMQTT from "./ModalMQTT";
+import ModalAppSOAP from "./ModalSOAP";
 
 const NavBar = () => {
   const [showModalAdd, setShowModalAdd] = useState(false);
@@ -24,7 +24,7 @@ const NavBar = () => {
 
   const apiLoad =  apiRequestsGet(API_GET_ENDPOINT_ADD);
   const loadTopic =  apiRequestsGet(API_TOPICS);
-  const MQTT =  apiRequestsGet(API_MQTT);
+  const MQTT =  apiRequestsGet(API_SOAP_MESSAGE);
 
   const [contentSrc, setContentSrc] = useState(
     <h2 style={{ textAlign: "center" }}>Welcome to Virtualan!!!</h2>
@@ -137,7 +137,7 @@ const NavBar = () => {
         icon: <FontAwesomeIcon icon={faList} />,
       },
     },
-    "Virtual MQTT": {
+    "Virtual SOAP Message": {
       "Add Mock Data": {
         modal: "Modal5",
         icon: <FontAwesomeIcon icon={faPlus} />,
@@ -264,7 +264,7 @@ const NavBar = () => {
         />
       )}
       {showModalAddMQTT && (
-        <ModalAppMQTT
+        <ModalAppSOAP
           title={modalTitle}
           onClose={() => setShowModalAddMQTT(false)}
           show={showModalAddMQTT}
