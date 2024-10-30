@@ -17,6 +17,7 @@ li > a.nav-link {
   padding: 0 20px;
   width: 90%;
   max-width: 1200px !important;
+  overflow: hidden;
 }
 
 @media (min-width: 1200px) {
