@@ -174,7 +174,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-activemq</artifactId>
-			<version>3.1.6</version>
+			<version>3.2.11</version>
 		</dependency>
 
 		<dependency>
@@ -188,26 +188,26 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.6.13</version>
+			<version>3.2.11</version>
 		</dependency>
 
 
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-kafka</artifactId>
-			<version>5.5.7</version>
+			<version>6.4.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>2.7.2</version>
+			<version>3.8.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-core</artifactId>
-			<version>5.5.12</version>
+			<version>6.2.10</version>
 		</dependency>
 
 		<dependency>
@@ -226,13 +226,13 @@
 				</exclusion>
 			</exclusions>
 			<groupId>org.springframework.boot</groupId>
-			<version>2.5.14</version>
+			<version>3.2.11</version>
 		</dependency>
 
 		<dependency>
 			<artifactId>spring-context</artifactId>
 			<groupId>org.springframework</groupId>
-			<version>5.3.20</version>
+			<version>6.1.14</version>
 		</dependency>
 
 
@@ -269,7 +269,7 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
-			<version>3.1.1</version>
+			<version>3.3.0</version>
 		</dependency>
 
 
