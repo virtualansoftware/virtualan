@@ -22,7 +22,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <hsqldb.version>2.3.2</hsqldb.version>
-    <spring.boot.version>2.7.14</spring.boot.version>
+    <spring.boot.version>3.3.7</spring.boot.version>
     <spring.version>5.0.3.RELEASE</spring.version>
     <groovy.version>3.0.12</groovy.version>
     <junit.version>4.13.2</junit.version>
@@ -36,7 +36,7 @@
     <commons-configuration.version>1.10</commons-configuration.version>
     <rs-api.version>2.1.1</rs-api.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
-    <commons-beanutils.version>1.9.4</commons-beanutils.version>
+    <commons-beanutils.version>1.11.0</commons-beanutils.version>
     <jackson-databind.version>2.15.2</jackson-databind.version>
   </properties>
   <developers>
