@@ -20,8 +20,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hsqldb.version>2.5.0</hsqldb.version>
-		<spring.boot.version>3.1.7</spring.boot.version>
-		<spring.boot.mq.version>2.7.1</spring.boot.mq.version>
+		<spring.boot.version>3.3.7</spring.boot.version>
+		<spring.boot.mq.version>3.5.1</spring.boot.mq.version>
 		<groovy.version>3.0.7</groovy.version>
 		<junit.version>4.13.1</junit.version>
 		<slf4j.version>1.7.36</slf4j.version>
@@ -34,13 +34,13 @@
 		<swagger-annotations.version>2.2.15</swagger-annotations.version>
 		<commons-configuration.version>1.10</commons-configuration.version>
 		<rs-api.version>2.1.1</rs-api.version>
-		<commons-lang3.version>3.12.0</commons-lang3.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
-		<jackson-databind.version>2.13.4.2</jackson-databind.version>
+		<jackson-databind.version>2.15.0</jackson-databind.version>
 		<spring-kafka.version>3.1.0</spring-kafka.version>
 		<kafka-clients-version>2.8.1</kafka-clients-version>
 		<spring-integration-kafka.version>5.5.6</spring-integration-kafka.version>
-		<spring.boot.mq.version>2.7.14</spring.boot.mq.version>
+		<spring.boot.mq.version>3.5.1</spring.boot.mq.version>
 
 	</properties>
 	<developers>
@@ -192,7 +192,7 @@
 		<dependency>
 			<groupId>org.openapitools</groupId>
 			<artifactId>openapi-generator</artifactId>
-			<version>6.2.0</version>
+			<version>7.6.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -492,7 +492,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.6</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.javassist</groupId>
