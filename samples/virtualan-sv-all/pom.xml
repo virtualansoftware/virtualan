@@ -207,7 +207,7 @@
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-core</artifactId>
-			<version>5.5.12</version>
+			<version>6.4.7</version>
 		</dependency>
 
 		<dependency>
@@ -226,13 +226,13 @@
 				</exclusion>
 			</exclusions>
 			<groupId>org.springframework.boot</groupId>
-			<version>2.5.14</version>
+			<version>3.3.10</version>
 		</dependency>
 
 		<dependency>
 			<artifactId>spring-context</artifactId>
 			<groupId>org.springframework</groupId>
-			<version>5.3.20</version>
+			<version>6.2.11</version>
 		</dependency>
 
 
@@ -269,7 +269,7 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
-			<version>3.1.1</version>
+			<version>3.3.10</version>
 		</dependency>
 
 
