@@ -520,10 +520,12 @@ public class VirtualServiceUtil {
                 new ArrayList<>(returnMockResponseMap.values());
             Collections.sort(returnMockResponseList, new BestMatchComparator());
             VirtualServiceUtil.log.debug("Sorted list : " + returnMockResponseList);
+            // serve the best exact match rather than the head of the list, which can be a
+            // partial match (e.g. an exact match on a request with no params has no param count)
             rMockResponse = returnMockResponseList.stream()
-                .filter(ReturnMockResponse::isExactMatch).findAny().orElse(null);
+                .filter(ReturnMockResponse::isExactMatch).findFirst().orElse(null);
             if (rMockResponse != null) {
-                return getResponse(method, returnMockResponseList);
+                return getResponse(method, rMockResponse);
             }
         } else {
             VirtualServiceUtil.log.error(
@@ -534,9 +536,12 @@ public class VirtualServiceUtil {
 
     public Object getResponse(Method method, List<ReturnMockResponse> returnMockResponseList)
         throws JAXBException {
-        ReturnMockResponse rMockResponse;
+        return getResponse(method, returnMockResponseList.iterator().next());
+    }
+
+    public Object getResponse(Method method, ReturnMockResponse rMockResponse)
+        throws JAXBException {
         ResponseEntity<String> responseEntity;
-        rMockResponse = returnMockResponseList.iterator().next();
         if (rMockResponse.getHeaderResponse() != null) {
             responseEntity = buildResponseEntity(rMockResponse.getMockResponse(),
                 rMockResponse.getHeaderResponse());
